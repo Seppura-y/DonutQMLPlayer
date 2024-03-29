@@ -1,0 +1,11 @@
+build-*
+*/bin
+*/lib
+*/release
+*/include
+*/build
+
+*.user
+
+bin
+lib
