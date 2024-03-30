@@ -25,7 +25,6 @@ int main(int argc, char **argv)
     }
 
     winObject->show();
-    winObject->setTitle("Component setData");
 
     return app.exec();
 }

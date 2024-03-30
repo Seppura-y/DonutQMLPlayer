@@ -5,40 +5,46 @@ project(DonutQMLPlayer)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
 
 ### QT库设置
-find_package(Qt6 COMPONENTS Quick REQUIRED)
+find_package(Qt6 COMPONENTS
+    Core
+    Qml
+    Quick REQUIRED
+
+
+)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 file(GLOB ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/*.h)
 file(GLOB ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 file(GLOB ${PROJECT_NAME}_QRC ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
+file(GLOB ${PROJECT_NAME}_QML  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 
-### opencv库设置
-set(OPENCVPATH "${CMAKE_CURRENT_LIST_DIR}/lib/opencv/")
-
-if(MINGW)
-    set(PROJECT_TOOLCHAIN "mingw")
-    string(APPEND OPENCVPATH "mingw/")
-endif()
-if(MSVC)
-    set(PROJECT_TOOLCHAIN "msvc")
-    string(APPEND OPENCVPATH "msvc/lib/")
-endif()
-
-
+source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC})
+source_group("qml"                              FILES  ${${PROJECT_NAME}_QML})
+source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_QRC}
+    ${${PROJECT_NAME}_QML}
+
 )
+
+if( MSVC )
+    SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /ENTRY:mainCRTStartup" )
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin"
+    )
+endif()
 
 qt_add_qml_module(
     ${PROJECT_NAME}
     VERSION 1.0
-    URI DonutQMLPlayer
-    RESOURCES qml.qrc
-    RESOURCES src/qml.qrc
+    URI Donut.DonutQMLPlayer
+    SOURCES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
 )
 
 
@@ -46,11 +52,17 @@ set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+    Qt6::Core
+    Qt6::Qml
     Qt6::Quick
+    Qt6::Gui
+    Qt6::Network
+    Qt6::OpenGL
+
 )
 
 # 项目输出路径
-set(RUNTIME "${CMAKE_CURRENT_LIST_DIR}/bin/${PROJECT_TOOLCHAIN}")
+set(RUNTIME "${CMAKE_CURRENT_LIST_DIR}/bin")
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${RUNTIME}
