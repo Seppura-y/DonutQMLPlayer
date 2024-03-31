@@ -94,7 +94,10 @@ Control
                 {
                     if (drag.active)
                     {
-                        slider.value = slider.from + (handleRect.x / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
+                        var clickPos = mouse.x - (handleRect.width / 2);
+                        var value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
+                        slider.value = Math.max(slider.from, Math.min(value, slider.to));
+                        handleRect.x = clickPos;
                     }
                 }
 
