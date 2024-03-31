@@ -65,7 +65,7 @@ Control
             Layout.fillWidth: true
             Layout.preferredHeight: 12
 
-            MouseArea
+            MouseArea 
             {
                 anchors.fill: parent
                 property bool mouseClicked: false
@@ -75,40 +75,31 @@ Control
                 drag.minimumX: slider.leftPadding
                 drag.maximumX: slider.width - slider.rightPadding - handleRect.width
 
-
-                onClicked:(mouse)=>
+                onClicked: (mouse)=>
                 {
                     var clickPos = mouse.x - (handleRect.width / 2)
-                    var value = slider.from + (clickPos / slider.width) * (slider.to - slider.from)
+                    var value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
-
-                    handleRect.x = clickPos
                 }
 
                 onPressed:
                 {
-                    mouseClicked=true
+                    mouseClicked = true
                     var clickPos = mouse.x - (handleRect.width / 2)
-                    var value = slider.from + (clickPos / slider.width) * (slider.to - slider.from)
+                    var value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
-
-                    handleRect.x = clickPos
                 }
 
                 onPositionChanged:(mouse)=>
                 {
-                    if(drag.active)
+                    if (drag.active)
                     {
-                        slider.value = slider.from + (handleRect.x / slider.width) * (slider.to - slider.from);
+                        slider.value = slider.from + (handleRect.x / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
                     }
-
-
-                    
                 }
 
                 onReleased: mouseClicked = false
             }
-
 
             handle: Rectangle
             {
@@ -117,6 +108,7 @@ Control
                 height: 12
                 radius: 6
                 color: slider.pressed ? "orange" : "white"
+                x: slider.leftPadding + (slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding - width))
                 anchors.verticalCenter: parent.verticalCenter
                 MouseArea
                 {
@@ -128,21 +120,18 @@ Control
                     drag.minimumX: slider.leftPadding
                     drag.maximumX: slider.width - slider.rightPadding - handleRect.width
 
-                    //drag.minimumX: 0
-                    //drag.maximumX: slider.width
+                    onEntered: handleRect.color = "orange"
+                    onExited: handleRect.color = "white"
 
-                    onEntered: handleRect.color="orange"
-                    onExited: handleRect.color="white"
+                    onPressed: handleRect.color = "orange"
 
-                    onPressed: handleRect.color="orange"
-
-                    onReleased: handleRect.color="white"
+                    onReleased: handleRect.color = "white"
 
                     onPositionChanged:
                     {
-                        if(drag.active)
+                        if (drag.active)
                         {
-                            slider.value = slider.from + (handleRect.x / slider.width) * (slider.to - slider.from);
+                            slider.value = slider.from + (handleRect.x / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
                         }
                     }
                 }
@@ -154,7 +143,7 @@ Control
                 height: 6
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#bdbebf"
-                radius: 8 // »¬²ÛµÄÔ²½Ç°ë¾¶
+                radius: 8
             }
 
             contentItem: Item
@@ -164,17 +153,21 @@ Control
                     width: slider.visualPosition * track.width + 6
                     height: track.height
                     anchors.verticalCenter: parent.verticalCenter
-                    color: "orange" // »¬¹ýÇøÓòµÄÑÕÉ«
+                    color: "orange"
                     radius: 6
                 }
-
             }
 
-            onPressedChanged: {
-                if (!pressed)  // released
-                    seekRequested(value);
+            onPressedChanged:
+            {
+                if (!pressed)
+                {
+                    // released
+                    seekRequested(value)
+                }
             }
         } // Slider
+
 
         RowLayout
         {
@@ -288,19 +281,6 @@ Control
                     print("speedDownButton onClicked")
                 }
             }
-
-//            Label
-//            {
-//                id: timeText
-//                Layout.fillWidth: true
-//                text: toHHMMSS(controlBar.currentTime)
-// 
-//                background: Rectangle
-//                {
-//                    anchors.fill: parent
-//                    color: "lightgray"
-//                }
-//            }
         
             Item
             {
