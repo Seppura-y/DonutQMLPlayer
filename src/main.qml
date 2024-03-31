@@ -41,8 +41,9 @@ Window
         }
     }
 
-        // Titlebar, Controlbar and sidebar
-    GridLayout {
+    // Titlebar, Controlbar and sidebar
+    GridLayout
+    {
         id: mainLayout
         anchors.fill: parent
         rows: 2
@@ -112,7 +113,7 @@ Window
             id: controlBar
             Layout.columnSpan: 2
             Layout.fillWidth: true
-
+            Layout.minimumHeight: 50
             focusPolicy: Qt.ClickFocus
             z: 100
             // isPlaying: mpv.state == MpvObject.VIDEO_PLAYING || mpv.state == MpvObject.TV_PLAYING
