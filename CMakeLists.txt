@@ -15,21 +15,23 @@ find_package(Qt6 COMPONENTS
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+
 file(GLOB ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/*.h)
 file(GLOB ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
-file(GLOB ${PROJECT_NAME}_QRC ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
-file(GLOB ${PROJECT_NAME}_QML  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
+file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
+file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 
-source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC})
-source_group("qml"                              FILES  ${${PROJECT_NAME}_QML})
+source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES})
+source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
+
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_QRC}
-    ${${PROJECT_NAME}_QML}
-
+    ${${PROJECT_NAME}_QRC_FILES}
+    ${${PROJECT_NAME}_QML_FILES}
+    # ${QRC_FILES}
 )
 
 if( MSVC )
@@ -40,13 +42,18 @@ if( MSVC )
     )
 endif()
 
+
+set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/src/SkinColor.qml PROPERTIES
+    QT_QML_SINGLETON_TYPE TRUE
+)
+
+
 qt_add_qml_module(
     ${PROJECT_NAME}
     VERSION 1.0
     URI Donut.DonutQMLPlayer
     SOURCES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
 )
-
 
 set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
