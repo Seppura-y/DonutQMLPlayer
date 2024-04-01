@@ -37,6 +37,17 @@ Window
         window: window
     }
 
+    DropArea
+    {
+        id: dropArea
+        anchors.fill: parent
+        onDropped:
+        {
+            var url = drop.urls[0]
+            PlaylistModel.addLocalFiles(drop.urls);
+        }
+    }
+
     Menu
     {
         id: contextMenu
