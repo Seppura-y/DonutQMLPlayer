@@ -25,6 +25,36 @@ Window
     Material.theme: SkinColor.darkMode ? Material.Dark : Material.Light
     Material.accent: Material.Grey
     Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
+
+    CoverArea
+    {
+        id: coverArea
+        anchors.fill: parent
+        titleBar: titleBar
+        sideBar: sideBar
+        controlBar: controlBar
+        contextMenu: contextMenu
+    }
+
+    Menu
+    {
+        id: contextMenu
+        width: 160
+        padding: 5
+        Action { text: qsTr("Open files"); onTriggered: fileDialog.open() }
+        MenuSeparator { padding: 0 }
+        Action { text: qsTr("Play next"); onTriggered: print("contextMenu : Play next") }
+        Action { text: qsTr("Play previous"); onTriggered: print("contextMenu : Play previous") }
+        Action { text: qsTr("Mute"); onTriggered: print("contextMenu : Mute") }
+
+        MenuSeparator { padding: 0 }
+        Action { text: qsTr("Video options"); onTriggered: sideBar.openVideoOptions() }
+
+        Action { text: qsTr("Playlist"); onTriggered: sideBar.openPlaylist() }
+        
+        delegate: MenuItem { height: 25 }
+    }
+
     Popup
     {
         id: volumePopup
@@ -56,7 +86,7 @@ Window
         // Titlebar
         Rectangle
         {
-            id: titlebar
+            id: titleBar
             color: SkinColor.titlebar
             Layout.fillWidth: true
             Layout.minimumHeight: 28
@@ -145,7 +175,7 @@ Window
         // Sidebar
         SideBar
         {
-            id: sidebar
+            id: sideBar
             Layout.fillHeight: true
             z: 100
             visible: false
@@ -170,8 +200,8 @@ Window
             // onPlayPauseButtonClicked: mpv.state == MpvObject.VIDEO_PLAYING ? mpv.pause() : mpv.play()
             // onStopButtonClicked: mpv.stop()
             // onSettingsButtonClicked: sidebar.openSettings()
-            onSidebarButtonClicked: sidebar.openPlaylist()
-            onSettingsButtonClicked: sidebar.openVideoOptions()
+            onSidebarButtonClicked: sideBar.openPlaylist()
+            onSettingsButtonClicked: sideBar.openVideoOptions()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
             onVolumeButtonClicked: {
