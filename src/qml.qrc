@@ -38,5 +38,7 @@
         <file>SideBar.qml</file>
         <file>SkinColor.qml</file>
         <file>Playlist.qml</file>
+        <file>VideoOptions.qml</file>
+        <file>Settings.qml</file>
     </qresource>
 </RCC>

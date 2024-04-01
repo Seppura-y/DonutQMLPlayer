@@ -55,8 +55,8 @@ Control
     {
         spacing: 0
         anchors.fill: parent
-        anchors.leftMargin: 10
-        anchors.rightMargin: 10
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
         Slider
         {
             id: slider
@@ -66,7 +66,7 @@ Control
             Layout.fillWidth: true
             Layout.preferredHeight: 12
             stepSize: 1
-
+            leftPadding: 0
             MouseArea 
             {
                 anchors.fill: parent
@@ -169,8 +169,8 @@ Control
             {
 //                var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
 //                handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
-                currentTime = slider.value
-                print("slider value : " + slider.value)
+                //currentTime = slider.value
+                //print("slider value : " + slider.value)
             }
 
             onWidthChanged:

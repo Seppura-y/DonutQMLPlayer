@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Material
-
+import QtQuick.Controls.Universal
 import QtQml
 
 import Donut.DonutQMLPlayer
@@ -21,7 +21,10 @@ Window
     property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
     flags: Qt.Window | (isMaterialUI ? Qt.FramelessWindowHint : 0)
 
-
+    color: SkinColor.windowBackground
+    Material.theme: SkinColor.darkMode ? Material.Dark : Material.Light
+    Material.accent: Material.Grey
+    Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
     Popup
     {
         id: volumePopup
@@ -134,6 +137,7 @@ Window
             // onStopButtonClicked: mpv.stop()
             // onSettingsButtonClicked: sidebar.openSettings()
             onSidebarButtonClicked: sidebar.openPlaylist()
+            onSettingsButtonClicked: sidebar.openVideoOptions()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
             onVolumeButtonClicked: {

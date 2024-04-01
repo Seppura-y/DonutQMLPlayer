@@ -25,7 +25,7 @@ Control {
 
     function openVideoOptions()
     {
-        layout.currentIndex = 3;
+        layout.currentIndex = 2;
         visible = true;
     }
 
@@ -49,7 +49,7 @@ Control {
         id: layout
         anchors.fill: parent
         anchors.leftMargin: 10
-        anchors.rightMargin: 10
+        anchors.rightMargin: 5
         anchors.topMargin: 5
 
         // Playlist
@@ -61,14 +61,16 @@ Control {
         }
 
         // Settings
-//        Settings {
-//            id: settings
-//        }
-//
-//        // Video Options
-//        VideoOptions {
-//            id: videoOptions
-//            mpvObject: mpv
-//        }
+        Settings
+        {
+            id: settings
+        }
+
+        // Video Options
+        VideoOptions
+        {
+            id: videoOptions
+            //mpvObject: mpv
+        }
     }
 }
