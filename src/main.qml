@@ -34,6 +34,7 @@ Window
         sideBar: sideBar
         controlBar: controlBar
         contextMenu: contextMenu
+        window: window
     }
 
     Menu
@@ -188,9 +189,12 @@ Window
         ControlBar
         {
             id: controlBar
+
             Layout.columnSpan: 2
             Layout.fillWidth: true
             Layout.minimumHeight: 50
+            Layout.bottomMargin: 1
+
             duration: 360
             focusPolicy: Qt.ClickFocus
             z: 100
@@ -204,11 +208,12 @@ Window
             onSettingsButtonClicked: sideBar.openVideoOptions()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
-            onVolumeButtonClicked: {
+            onVolumeButtonClicked:
+            {
                 volumePopup.x = mpv.mapFromItem(volumeButton, 0, 0).x;
                 volumePopup.y = mpv.mapFromItem(volumeButton, 0, 0).y - volumePopup.height;
                 volumePopup.visible = true;
             }
-        }
-    }
+        } // ControlBar
+    } // GridLayout
 }

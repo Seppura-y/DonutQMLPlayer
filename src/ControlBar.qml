@@ -18,6 +18,7 @@ Control
     {
         implicitHeight: 50
         color: SkinColor.controlbar
+        radius: 8
         //color: "lightgreen"
     }
 
@@ -167,8 +168,8 @@ Control
             //当窗口大小发生变化时，handle的位置根据Slider的当前值动态更新
             onValueChanged:
             {
-//                var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
-//                handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
+                //var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
+                //handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
                 //currentTime = slider.value
                 //print("slider value : " + slider.value)
             }
