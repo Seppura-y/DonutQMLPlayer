@@ -24,6 +24,8 @@ int main(int argc, char **argv)
         qDebug() << "QQmlComponent error : " << component.errorString();
     }
 
+
+
     winObject->show();
 
     return app.exec();

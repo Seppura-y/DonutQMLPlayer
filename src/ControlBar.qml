@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 import QtQuick.Layouts
 
 Control
@@ -278,7 +279,6 @@ Control
             Label
             {
                 id: speedText
-                anchors.verticalCenter: parent.verticalCenter
                 color: "silver"
                 font.family: "Consolas"
                 font.pixelSize: 16
@@ -319,7 +319,7 @@ Control
                         font.family: "Consolas"
                         font.pixelSize: 16
                         horizontalAlignment: Text.AlignCenter
-                        verticalAlignment: Text.AlignCenter
+                        verticalAlignment: Text.AlignVCenter
                         text: toHHMMSS(controlBar.currentTime) + " / " + toHHMMSS(controlBar.duration)
                     }
 

@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Material
-import QtQuick.Controls.Universal
 
 import QtQml
 
@@ -52,61 +51,71 @@ Window
         columnSpacing: 0
 
         // Titlebar
-        Rectangle {
-            id: titlebar
-            // color: SkinColor.titlebar
-            Layout.fillWidth: true
-            Layout.minimumHeight: 28
-            Layout.columnSpan: 2
-            z: 100
-            // Button {
-            //     id: closeButton
-            //     width: 14
-            //     height: 14
-            //     anchors.verticalCenter: parent.verticalCenter
-            //     anchors.right: parent.right
-            //     anchors.rightMargin: 8
-            //     background: Rectangle { color: SkinColor.closeButton; radius: 7; anchors.fill: parent }
-            //     onClicked: window.close()
-            // }
-            // Button {
-            //     id: maxButton
-            //     width: 14
-            //     height: 14
-            //     anchors.verticalCenter: parent.verticalCenter
-            //     anchors.right: closeButton.left
-            //     anchors.rightMargin: 6
-            //     background: Rectangle { color: SkinColor.maxButton; radius: 7; anchors.fill: parent }
-            //     onClicked: window.visibility == Window.Maximized ? window.showNormal() : window.showMaximized()
-            // }
-            // Button {
-            //     id: minButton
-            //     width: 14
-            //     height: 14
-            //     anchors.verticalCenter: parent.verticalCenter
-            //     anchors.right: maxButton.left
-            //     anchors.rightMargin: 6
-            //     background: Rectangle { color: SkinColor.minButton; radius: 7; anchors.fill: parent }
-            //     onClicked: window.showMinimized()
-            // }
-        }
+//        Rectangle {
+//            id: titlebar
+//            // color: SkinColor.titlebar
+//            Layout.fillWidth: true
+//            Layout.minimumHeight: 28
+//            Layout.columnSpan: 2
+//            z: 100
+//            // Button {
+//            //     id: closeButton
+//            //     width: 14
+//            //     height: 14
+//            //     anchors.verticalCenter: parent.verticalCenter
+//            //     anchors.right: parent.right
+//            //     anchors.rightMargin: 8
+//            //     background: Rectangle { color: SkinColor.closeButton; radius: 7; anchors.fill: parent }
+//            //     onClicked: window.close()
+//            // }
+//            // Button {
+//            //     id: maxButton
+//            //     width: 14
+//            //     height: 14
+//            //     anchors.verticalCenter: parent.verticalCenter
+//            //     anchors.right: closeButton.left
+//            //     anchors.rightMargin: 6
+//            //     background: Rectangle { color: SkinColor.maxButton; radius: 7; anchors.fill: parent }
+//            //     onClicked: window.visibility == Window.Maximized ? window.showNormal() : window.showMaximized()
+//            // }
+//            // Button {
+//            //     id: minButton
+//            //     width: 14
+//            //     height: 14
+//            //     anchors.verticalCenter: parent.verticalCenter
+//            //     anchors.right: maxButton.left
+//            //     anchors.rightMargin: 6
+//            //     background: Rectangle { color: SkinColor.minButton; radius: 7; anchors.fill: parent }
+//            //     onClicked: window.showMinimized()
+//            // }
+//        }
 
         // Empty item as placeholder
-        Item {
+        Item
+        {
             Layout.fillHeight: true
             Layout.fillWidth: true
         }
 
+        FileDialog
+        {
+            id: fileDialog
+            title: qsTr("Please choose a file")
+            fileMode: FileDialog.OpenFiles
+            onAccepted: PlaylistModel.addLocalFiles(fileDialog.selectedFiles)
+        }
+
         // Sidebar
-        // Sidebar {
-        //     id: sidebar
-        //     Layout.fillHeight: true
-        //     z: 100
-        //     visible: false
-        //     mpv: mpv
-        //     onOpenFileRequested: fileDialog.open()
-        //     onOpenUrlRequested: openUrlDialog.visible = true
-        // }
+        SideBar
+        {
+            id: sidebar
+            Layout.fillHeight: true
+            z: 100
+            visible: false
+            //mpv: mpv
+            onOpenFileRequested: fileDialog.open()
+            //onOpenUrlRequested: openUrlDialog.visible = true
+        }
 
         // Controlbar
         ControlBar
@@ -124,14 +133,14 @@ Window
             // onPlayPauseButtonClicked: mpv.state == MpvObject.VIDEO_PLAYING ? mpv.pause() : mpv.play()
             // onStopButtonClicked: mpv.stop()
             // onSettingsButtonClicked: sidebar.openSettings()
-            // onSidebarButtonClicked: sidebar.openPlaylist()
+            onSidebarButtonClicked: sidebar.openPlaylist()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
-            // onVolumeButtonClicked: {
-            //     volumePopup.x = mpv.mapFromItem(volumeButton, 0, 0).x;
-            //     volumePopup.y = mpv.mapFromItem(volumeButton, 0, 0).y - volumePopup.height;
-            //     volumePopup.visible = true;
-            // }
+            onVolumeButtonClicked: {
+                volumePopup.x = mpv.mapFromItem(volumeButton, 0, 0).x;
+                volumePopup.y = mpv.mapFromItem(volumeButton, 0, 0).y - volumePopup.height;
+                volumePopup.visible = true;
+            }
         }
     }
 }

@@ -12,7 +12,8 @@ QtObject {
 
     // Dark mode, classic theme must follow system's settings
     property bool darkModeSet: true
-    property bool darkMode: theme === 0 ? (sysPalette.window.hsvValue < 0.3) : darkModeSet
+    //property bool darkMode: theme === 0 ? (sysPalette.window.hsvValue < 0.3) : darkModeSet
+    property bool darkMode:  (sysPalette.window.hsvValue < 0.3) 
 
     // Colors for titlebar
     property color titlebar: darkMode ? "#2e3137" : "#d8e0e0e0"

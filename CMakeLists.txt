@@ -20,8 +20,9 @@ file(GLOB ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/*.h)
 file(GLOB ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
+file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
 
-source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES})
+source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
 source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 
@@ -31,6 +32,7 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_QRC_FILES}
     ${${PROJECT_NAME}_QML_FILES}
+    ${${PROJECT_NAME}_QML_DIR}
     # ${QRC_FILES}
 )
 
