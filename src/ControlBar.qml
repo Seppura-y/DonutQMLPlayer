@@ -34,7 +34,7 @@ Control
 
     property bool isPlaying: false
     property double playbackSpeed: 1.0
-    property int duration: 0
+    property int duration: 120
     property int currentTime: 0
 
     function toHHMMSS(seconds)
@@ -60,10 +60,11 @@ Control
         {
             id: slider
             from: 0
-            to: 1000
+            to: duration
             focusPolicy: Qt.NoFocus
             Layout.fillWidth: true
             Layout.preferredHeight: 12
+            stepSize: 1
 
             MouseArea 
             {
@@ -82,25 +83,25 @@ Control
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
                 }
 
+                // 解决Slider拖不到末端和超出范围的问题
                 onPressed:
                 {
                     mouseClicked = true
-                    var clickPos = mouse.x - (handleRect.width / 2)
-                    var value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from)
-                    slider.value = Math.max(slider.from, Math.min(value, slider.to))
+                    var clickPos = Math.max(slider.leftPadding, Math.min(mouse.x - (handleRect.width / 2), slider.width - slider.rightPadding - (handleRect.width / 2)));
+                    slider.value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
+                    handleRect.x = clickPos;
                 }
 
-                onPositionChanged:(mouse)=>
+                // 解决Slider拖不到末端和超出范围的问题
+                onPositionChanged: (mouse)=>
                 {
                     if (drag.active)
                     {
-                        var clickPos = mouse.x - (handleRect.width / 2);
-                        var value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
-                        slider.value = Math.max(slider.from, Math.min(value, slider.to));
+                        var clickPos = Math.max(slider.leftPadding, Math.min(mouse.x - (handleRect.width / 2), slider.width - slider.rightPadding - (handleRect.width / 2)));
+                        slider.value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
                         handleRect.x = clickPos;
                     }
                 }
-
                 onReleased: mouseClicked = false
             }
 
@@ -153,12 +154,27 @@ Control
             {
                 Rectangle
                 {
-                    width: slider.visualPosition * track.width + 6
+                    //width: slider.visualPosition * track.width + 6
+                    width: (slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding)) - (handleRect.width / 2) + 6
                     height: track.height
                     anchors.verticalCenter: parent.verticalCenter
                     color: "orange"
                     radius: 6
                 }
+            }
+
+            //当窗口大小发生变化时，handle的位置根据Slider的当前值动态更新
+            onValueChanged:
+            {
+//                var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
+//                handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
+                currentTime = slider.value
+                print("slider value : " + slider.value)
+            }
+
+            onWidthChanged:
+            {
+                handleRect.x = slider.leftPadding + (slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding - handleRect.width));
             }
 
             onPressedChanged:
@@ -339,6 +355,7 @@ Control
                 onButtonClicked:
                 {
                     volumeButtonClicked()
+                    slider.increase()
                     print("volumeButton onClicked")
                 }
             }

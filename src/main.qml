@@ -109,11 +109,13 @@ Window
         // }
 
         // Controlbar
-        ControlBar {
+        ControlBar
+        {
             id: controlBar
             Layout.columnSpan: 2
             Layout.fillWidth: true
             Layout.minimumHeight: 50
+            duration: 360
             focusPolicy: Qt.ClickFocus
             z: 100
             // isPlaying: mpv.state == MpvObject.VIDEO_PLAYING || mpv.state == MpvObject.TV_PLAYING
