@@ -12,6 +12,9 @@ int main(int argc, char **argv)
 
     QQmlComponent component(&engine);
 
+    qputenv("QT_QUICK_CONTROLS_MATERIAL_VARIANT", QByteArrayLiteral("Dense"));
+    qputenv("QT_QUICK_CONTROLS_STYLE", QByteArrayLiteral("Material"));
+
     component.loadUrl(QUrl(QStringLiteral("qrc:/main.qml")));
     if(component.isError())
     {

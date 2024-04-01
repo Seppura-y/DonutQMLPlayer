@@ -22,7 +22,7 @@ Button
         id: btnRect
         anchors.fill: parent
         radius: 8
-        color: "#2d2d30"
+        color: "#2e3137"
         Text
         {
             id: btnText
@@ -61,7 +61,7 @@ Button
         {
             if(!checked)
             {
-                btnRect.color = "#2d2d30"
+                btnRect.color = "#2e3137"
                 btnText.color = "silver"
             }
         }

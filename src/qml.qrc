@@ -40,5 +40,6 @@
         <file>Playlist.qml</file>
         <file>VideoOptions.qml</file>
         <file>Settings.qml</file>
+        <file>CoverArea.qml</file>
     </qresource>
 </RCC>

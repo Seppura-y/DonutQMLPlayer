@@ -54,44 +54,78 @@ Window
         columnSpacing: 0
 
         // Titlebar
-//        Rectangle {
-//            id: titlebar
-//            // color: SkinColor.titlebar
-//            Layout.fillWidth: true
-//            Layout.minimumHeight: 28
-//            Layout.columnSpan: 2
-//            z: 100
-//            // Button {
-//            //     id: closeButton
-//            //     width: 14
-//            //     height: 14
-//            //     anchors.verticalCenter: parent.verticalCenter
-//            //     anchors.right: parent.right
-//            //     anchors.rightMargin: 8
-//            //     background: Rectangle { color: SkinColor.closeButton; radius: 7; anchors.fill: parent }
-//            //     onClicked: window.close()
-//            // }
-//            // Button {
-//            //     id: maxButton
-//            //     width: 14
-//            //     height: 14
-//            //     anchors.verticalCenter: parent.verticalCenter
-//            //     anchors.right: closeButton.left
-//            //     anchors.rightMargin: 6
-//            //     background: Rectangle { color: SkinColor.maxButton; radius: 7; anchors.fill: parent }
-//            //     onClicked: window.visibility == Window.Maximized ? window.showNormal() : window.showMaximized()
-//            // }
-//            // Button {
-//            //     id: minButton
-//            //     width: 14
-//            //     height: 14
-//            //     anchors.verticalCenter: parent.verticalCenter
-//            //     anchors.right: maxButton.left
-//            //     anchors.rightMargin: 6
-//            //     background: Rectangle { color: SkinColor.minButton; radius: 7; anchors.fill: parent }
-//            //     onClicked: window.showMinimized()
-//            // }
-//        }
+        Rectangle
+        {
+            id: titlebar
+            color: SkinColor.titlebar
+            Layout.fillWidth: true
+            Layout.minimumHeight: 28
+            Layout.columnSpan: 2
+            z: 100
+
+            RowLayout
+            {
+                anchors.fill: parent
+                spacing: 0
+
+                Item
+                {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+
+                FontButton
+                {
+                    id: miniButton
+                    Layout.preferredWidth: 26
+                    Layout.preferredHeight: 26
+
+                    focusPolicy: Qt.NoFocus
+                    txt: String.fromCodePoint(0x2013)
+
+                    onButtonClicked:
+                    {
+                        window.showMinimized()
+                        print("nextButton onClicked")
+                    }
+                }
+
+                FontButton
+                {
+                    id: maxButton
+                    Layout.preferredWidth: 26
+                    Layout.preferredHeight: 26
+
+                    focusPolicy: Qt.NoFocus
+                    txt: String.fromCodePoint(0x23f9)
+
+                    onButtonClicked:
+                    {
+                        window.visibility == Window.Maximized ? window.showNormal() : window.showMaximized()
+                        print("nextButton onClicked")
+                    }
+                }
+
+                FontButton
+                {
+                    id: closeButton
+                    Layout.preferredWidth: 26
+                    Layout.preferredHeight: 26
+
+                    focusPolicy: Qt.NoFocus
+                    txt: String.fromCodePoint(0x00d7)
+
+                    onButtonClicked:
+                    {
+                        window.close()
+                        print("nextButton onClicked")
+                    }
+                }
+            }
+
+
+
+        }
 
         // Empty item as placeholder
         Item
