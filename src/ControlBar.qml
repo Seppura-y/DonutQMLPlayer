@@ -29,7 +29,7 @@ Control
     signal speedUpButtonClicked()
     signal speedDownButtonClicked()
     signal playModeButtonClicked()
-    signal volumeButtonClicked()
+    signal volumeButtonClicked(point pos)
     signal settingsButtonClicked()
     signal fullscreenButtonClicked()
     signal sidebarButtonClicked()
@@ -355,7 +355,8 @@ Control
 
                 onButtonClicked:
                 {
-                    volumeButtonClicked()
+                    var globalPos = volumeButton.mapToGlobal(Qt.point(0, 0));
+                    volumeButtonClicked(globalPos);
                     slider.increase()
                     print("volumeButton onClicked")
                 }
