@@ -2,13 +2,20 @@ cmake_minimum_required(VERSION 3.22)
 project(DonutQMLPlayer)
 
 
-include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
+include_directories(
+    ${CMAKE_CURRENT_LIST_DIR}/src
+    ${CMAKE_CURRENT_LIST_DIR}/src/renderer
+)
 
 ### QT库设置
 find_package(Qt6 COMPONENTS
     Core
     Qml
-    Quick REQUIRED
+    Quick
+    OpenGL
+    OpenGLWidgets
+    
+    REQUIRED
 
 
 )
@@ -22,6 +29,9 @@ file(GLOB ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 file(GLOB ${PROJECT_NAME}_RENDERER_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/renderer/*.h)
 file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/renderer/*.cpp)
 
+file(GLOB ${PROJECT_NAME}_OPENGL_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.h)
+file(GLOB ${PROJECT_NAME}_OPENGL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.cpp)
+
 file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
@@ -30,11 +40,13 @@ source_group("qrc"                              FILES ${${PROJECT_NAME}_QRC_FILE
 source_group("qrc//qml"                         FILES ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//renderer"                    FILES ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
+source_group("src//renderer//opengl"                    FILES ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES})
 
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES}
+    ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES}
     ${${PROJECT_NAME}_QRC_FILES}
     ${${PROJECT_NAME}_QML_FILES}
     ${${PROJECT_NAME}_QML_DIR}
@@ -64,7 +76,9 @@ qt_add_qml_module(
 
 set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
-target_include_directories(${CMAKE_CURRENT_LIST_DIR}/include/glm)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/include/glm
+)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -74,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Gui
     Qt6::Network
     Qt6::OpenGL
+    Qt6::OpenGLWidgets
 
 )
 
