@@ -13,8 +13,8 @@
 #define DN_CORE_ASSERT(x, ...)
 #endif
 
-#define OPENGL_FUNCTIONS QOpenGLContext::currentContext()->functions()
-#define OPENGL_EXTRA_FUNCTIONS QOpenGLContext::currentContext()->extraFunctions()
+#define OPENGL_FUNCTIONS(x) QOpenGLContext::currentContext()->functions()->x
+#define OPENGL_EXTRA_FUNCTIONS(x) QOpenGLContext::currentContext()->extraFunctions()->x
 
 namespace Donut
 {

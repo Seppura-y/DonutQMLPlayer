@@ -1,6 +1,0 @@
-#ifndef DONUT_OPENGL_RENDERER_H
-#define DONUT_OPENGL_RENDERER_H
-
-
-
-#endif

@@ -32,6 +32,11 @@ file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/rendere
 file(GLOB ${PROJECT_NAME}_OPENGL_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.h)
 file(GLOB ${PROJECT_NAME}_OPENGL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.cpp)
 
+FILE(GLOB ${PROJECT_NAME}_GLM_HEADER
+    ${CMAKE_CURRENT_LIST_DIR}/include/glm/glm/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/glm/glm/*.inl
+)
+
 file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
@@ -40,8 +45,8 @@ source_group("qrc"                              FILES ${${PROJECT_NAME}_QRC_FILE
 source_group("qrc//qml"                         FILES ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//renderer"                    FILES ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
-source_group("src//renderer//opengl"                    FILES ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES})
-
+source_group("src//renderer//opengl"            FILES ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES})
+source_group("src//glm"                         FILES ${${PROJECT_NAME}_GLM_HEADER})
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
@@ -50,6 +55,7 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_QRC_FILES}
     ${${PROJECT_NAME}_QML_FILES}
     ${${PROJECT_NAME}_QML_DIR}
+    ${${PROJECT_NAME}_GLM_HEADER}
     # ${QRC_FILES}
 )
 
@@ -78,6 +84,10 @@ set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/glm
+)
+
+target_compile_features(${PROJECT_NAME} PRIVATE
+    cxx_std_17
 )
 
 target_link_libraries(${PROJECT_NAME}
