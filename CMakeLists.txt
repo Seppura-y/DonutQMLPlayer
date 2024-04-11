@@ -32,10 +32,14 @@ file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/rendere
 file(GLOB ${PROJECT_NAME}_OPENGL_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.h)
 file(GLOB ${PROJECT_NAME}_OPENGL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/renderer/opengl/*.cpp)
 
-FILE(GLOB ${PROJECT_NAME}_GLM_HEADER
+file(GLOB ${PROJECT_NAME}_GLM_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/glm/glm/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/glm/glm/*.inl
 )
+
+file(GLOB ${PROJECT_NAME}_STB_IMAGE_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/stb_image.h)
+file(GLOB ${PROJECT_NAME}_STB_IMAGE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/stb_image.cpp)
+
 
 file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
@@ -46,7 +50,8 @@ source_group("qrc//qml"                         FILES ${${PROJECT_NAME}_QML_FILE
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//renderer"                    FILES ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
 source_group("src//renderer//opengl"            FILES ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES})
-source_group("src//glm"                         FILES ${${PROJECT_NAME}_GLM_HEADER})
+source_group("src//glm"                         FILES ${${PROJECT_NAME}_GLM_HEADERS})
+source_group("src//stb_image"                   FILES ${${PROJECT_NAME}_STB_IMAGE_HEADERS} ${${PROJECT_NAME}_STB_IMAGE_SOURCES})
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
@@ -55,7 +60,8 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_QRC_FILES}
     ${${PROJECT_NAME}_QML_FILES}
     ${${PROJECT_NAME}_QML_DIR}
-    ${${PROJECT_NAME}_GLM_HEADER}
+    ${${PROJECT_NAME}_GLM_HEADERS}
+    ${${PROJECT_NAME}_STB_IMAGE_HEADERS} ${${PROJECT_NAME}_STB_IMAGE_SOURCES}
     # ${QRC_FILES}
 )
 
@@ -84,6 +90,7 @@ set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/glm
+    ${CMAKE_CURRENT_LIST_DIR}/include/stb_image
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE

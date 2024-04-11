@@ -2,6 +2,7 @@
 
 #include "renderer/renderer_api.h"
 #include "opengl/opengl_shader.h"
+#include "render_global.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -27,7 +28,7 @@ namespace Donut
 		{
 		case RendererAPI::RendererAPIType::None:
 		{
-			DN_CORE_WARN("RendererAPI::None");
+			//DN_CORE_WARN("RendererAPI::None");
 			return nullptr;
 		}
 		case RendererAPI::RendererAPIType::OpenGL:
