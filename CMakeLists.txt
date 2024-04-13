@@ -118,3 +118,6 @@ set_target_properties(${PROJECT_NAME}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${RUNTIME}
 )
 
+target_compile_features(${PROJECT_NAME} PRIVATE
+    cxx_std_17
+)

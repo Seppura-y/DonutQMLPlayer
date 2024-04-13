@@ -23,7 +23,6 @@ namespace Donut
 	struct TextVertex;
 	struct Renderer2DData;
 
-	static Renderer2DData s_data;
 
 	struct RectangleVertex
 	{
@@ -133,6 +132,7 @@ namespace Donut
 		Ref<UniformBuffer> camera_uniform_buffer;
 	};
 
+	static Renderer2DData s_data;
 
 	void Renderer2D::init()
 	{
@@ -364,5 +364,486 @@ namespace Donut
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
 		s_data.texture_index_ = 1;
+	}
+
+	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color)
+	{
+		drawRectangle({ position.x, position.y, 0.0f }, size, color);
+	}
+
+	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		const float tiling_factor = 1.0f;
+		constexpr size_t rect_vertex_count = 4;
+		float texture_index = 0.0f;
+
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
+	{
+		drawRectangle(glm::vec3(position.x, position.y, 0.0f), size, texture, tiling_factor, tincolor);
+	}
+
+
+	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tintcolor)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		constexpr size_t rect_vertex_count = 4;
+		float texture_index = 0.0f;
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 0.0f };
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 0.0f };
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 1.0f, 1.0f };
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = { 0.0f, 1.0f };
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
+
+#if 0
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
+			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_data.single_shader_->setMat4("u_transformMatrix", transform);
+		s_data.single_shader_->setFloat4("u_color", tintcolor);
+		s_data.single_shader_->setFloat("u_tiling_factor", tiling_factor);
+
+		texture->bind();
+		s_data.rectangle_va_->bind();
+
+		RenderCommand::drawIndices(s_data.rectangle_va_);
+#endif
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, glm::vec4& color)
+	{
+		drawRotatedRectangle({ position.x, position.y, 1.0f }, size, rotation, color);
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, glm::vec4& color)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		const float tiling_factor = 1.0f;
+		const float texture_index = 0.0f;
+
+		constexpr size_t rect_vertex_count = 4;
+
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+
+		s_data.rect_vertex_buffer_ptr_++;
+		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec2& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
+	{
+		drawRotatedRectangle({ position.x, position.y, 1.0f }, size, rotation, texture, tiling_factor, tincolor);
+	}
+
+	void Renderer2D::drawRotatedRectangle(const glm::vec3& position, glm::vec2& size, float rotation, Ref<Texture2D>& texture, float tiling_factor, glm::vec4 tincolor)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		constexpr size_t rect_vertex_count = 4;
+		float texture_index = 0.0f;
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+
+		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRectangle(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor, const glm::vec4& tincolor)
+	{
+		drawRectangle({ position.x, position.y, 1.0f }, size, rotation, subtexture, tiling_factor, tincolor);
+	}
+
+	void Renderer2D::drawRectangle(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Subtexture>& subtexture, float tiling_factor, const glm::vec4& tincolor)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		constexpr size_t rect_vertex_count = 4;
+		float texture_index = 0.0f;
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const glm::vec2* tex_coord = subtexture->getTextureCoord();
+		Ref<Texture2D> texture = subtexture->getTexture();
+
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = tex_coord[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[0];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = tex_coord[0];
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[1];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = tex_coord[1];
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[2];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = tex_coord[2];
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		//s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[3];
+		//s_data.rect_vertex_buffer_ptr_->color_ = color;
+		//s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = tex_coord[3];
+		//s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+		//s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+		//s_data.rect_vertex_buffer_ptr_++;
+
+		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRectangle(const glm::mat4 transform, const glm::vec4& color, int entity_id)
+	{
+		constexpr size_t rect_vertex_count = 4;
+		const float texture_index = 0.0f;
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+		const float tiling_factor = 1.0f;
+
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+			s_data.rect_vertex_buffer_ptr_->entity_id_ = entity_id;
+
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+		s_data.rect_indices_count_ += 6;
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawRectangle(const glm::mat4 transform, const Ref<Texture2D>& texture, float tiling_factor, const glm::vec4& tint_color, int entity_id)
+	{
+		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
+		{
+			flushAndReset();
+		}
+		constexpr size_t rect_vertex_count = 4;
+		constexpr glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		float texture_index = 0.0f;
+
+		for (uint32_t i = 1; i < s_data.texture_index_; i++)
+		{
+			// 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+			if (*s_data.texture_slots_[i].get() == *texture.get())
+			{
+				texture_index = (float)i;
+				break;
+			}
+		}
+
+		if (texture_index == 0.0f)
+		{
+			if (s_data.texture_index_ >= Renderer2DData::max_texture_slots_)
+			{
+				flushAndReset();
+			}
+			texture_index = (float)s_data.texture_index_;
+			s_data.texture_slots_[s_data.texture_index_] = texture;
+			s_data.texture_index_++;
+		}
+
+		for (size_t i = 0; i < rect_vertex_count; i++)
+		{
+			s_data.rect_vertex_buffer_ptr_->position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.rect_vertex_buffer_ptr_->color_ = tint_color;
+			s_data.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+			s_data.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+			s_data.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+			s_data.rect_vertex_buffer_ptr_->entity_id_ = entity_id;
+			s_data.rect_vertex_buffer_ptr_++;
+		}
+
+		s_data.rect_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
+	}
+
+
+	void Renderer2D::drawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int entity_id)
+	{
+		for (size_t i = 0; i < 4; i++)
+		{
+			s_data.circle_vertex_buffer_ptr_->world_position_ = transform * s_data.rect_vertex_positions_[i];
+			s_data.circle_vertex_buffer_ptr_->local_position_ = s_data.rect_vertex_positions_[i] * 2.0f;
+			s_data.circle_vertex_buffer_ptr_->color_ = color;
+			s_data.circle_vertex_buffer_ptr_->thickness_ = thickness;
+			s_data.circle_vertex_buffer_ptr_->fade_ = fade;
+			s_data.circle_vertex_buffer_ptr_->entity_id_ = entity_id;
+			s_data.circle_vertex_buffer_ptr_++;
+		}
+
+		s_data.circle_indices_count_ += 6;
+
+		s_data.statistics_.rect_count_++;
+	}
+
+	void Renderer2D::drawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entity_id)
+	{
+		s_data.line_vertex_buffer_ptr_->position_ = p0;
+		s_data.line_vertex_buffer_ptr_->color_ = color;
+		s_data.line_vertex_buffer_ptr_->entity_id_ = entity_id;
+		s_data.line_vertex_buffer_ptr_++;
+
+		s_data.line_vertex_buffer_ptr_->position_ = p1;
+		s_data.line_vertex_buffer_ptr_->color_ = color;
+		s_data.line_vertex_buffer_ptr_->entity_id_ = entity_id;
+		s_data.line_vertex_buffer_ptr_++;
+
+		s_data.line_vertex_count_ += 2;
+	}
+
+	void Renderer2D::drawRectangleWithLines(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entity_id)
+	{
+		glm::vec3 p0 = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p1 = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+		glm::vec3 p3 = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+
+		drawLine(p0, p1, color, entity_id);
+		drawLine(p1, p2, color, entity_id);
+		drawLine(p2, p3, color, entity_id);
+		drawLine(p3, p0, color, entity_id);
+	}
+
+	void Renderer2D::drawRectangleWithLines(const glm::mat4& transform, const glm::vec4& color, int entity_id)
+	{
+		glm::vec3 line_vertices[4];
+		for (size_t i = 0; i < 4; i++)
+		{
+			line_vertices[i] = transform * s_data.rect_vertex_positions_[i];
+		}
+
+		drawLine(line_vertices[0], line_vertices[1], color, entity_id);
+		drawLine(line_vertices[1], line_vertices[2], color, entity_id);
+		drawLine(line_vertices[2], line_vertices[3], color, entity_id);
+		drawLine(line_vertices[3], line_vertices[0], color, entity_id);
+	}
+
+
+	float Renderer2D::getLineWidth()
+	{
+		return s_data.line_width_;
+	}
+
+	void Renderer2D::setLineWidth(float width)
+	{
+		s_data.line_width_ = width;
+	}
+
+	void Renderer2D::resetStatistics()
+	{
+		memset(&s_data.statistics_, 0, sizeof(Statistics));
+	}
+
+	Renderer2D::Statistics Renderer2D::getStatistics()
+	{
+		return s_data.statistics_;
 	}
 }
