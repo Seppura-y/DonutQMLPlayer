@@ -4,6 +4,8 @@
 #include <QQuickFramebufferObject>
 #include <QQuickItem>
 
+#include "orthographic_camera_controller.h"
+
 class DonutFramebufferItem : public QQuickFramebufferObject
 {
 	Q_OBJECT
@@ -11,7 +13,13 @@ class DonutFramebufferItem : public QQuickFramebufferObject
 public:
 	DonutFramebufferItem(QQuickItem* parent = nullptr);
 
-	virtual Renderer* createRenderer() const override;
+	virtual QQuickFramebufferObject::Renderer* createRenderer() const override;
+
+	void initCamera(float left, float right, float bottom, float top);
+
+private:
+	Donut::OrthographicCameraController camera_controller_;
 };
+
 
 #endif
