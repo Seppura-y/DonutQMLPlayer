@@ -210,6 +210,8 @@ MouseArea
 			{
 				titleBar.visible = false
 			}
+
+			framebufferItem.update()
 		}
 	}
 }

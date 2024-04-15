@@ -7,7 +7,6 @@ import QtQuick.Controls.Universal
 import QtQml
 
 import Donut.DonutQMLPlayer
-//import Donut.DonutFramebufferItem
 
 ApplicationWindow
 {
@@ -47,20 +46,6 @@ ApplicationWindow
         {
             var url = drop.urls[0]
             PlaylistModel.addLocalFiles(drop.urls);
-        }
-    }
-    DonutFramebufferItem
-    {
-        id: frameItem
-        width: 800
-        height: 600
-        visible: true
-
-        Component.onCompleted:
-        {
-            print("DonutFramebufferItem onCompleted")
-            frameItem.update()
-            print("width : " + frameItem.width)
         }
     }
 
@@ -311,11 +296,26 @@ ApplicationWindow
         }
 
         // Empty item as placeholder
-        Item
+        //Item
+        //{
+        //    Layout.fillHeight: true
+        //    Layout.fillWidth: true
+        //}
+
+        DonutFramebufferItem
         {
+            id: frameItem
+            visible: true
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Component.onCompleted:
+            {
+                print("DonutFramebufferItem onCompleted")
+                frameItem.update()
+                print("width : " + frameItem.width)
+            }
         }
+
 
         FileDialog
         {

@@ -9,6 +9,7 @@
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", QByteArray("opengl"));
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
