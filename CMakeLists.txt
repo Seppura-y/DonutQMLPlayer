@@ -45,6 +45,16 @@ file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
 
+#####################################################################################################
+# assets
+file(GLOB ${PROJECT_NAME}_TEXTURES
+    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/textures/*.*
+)
+
+file(GLOB ${PROJECT_NAME}_SHADERS
+    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/shaders/*.*
+)
+
 source_group("qrc"                              FILES ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
 source_group("qrc//qml"                         FILES ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
@@ -52,6 +62,8 @@ source_group("src//renderer"                    FILES ${${PROJECT_NAME}_RENDERER
 source_group("src//renderer//opengl"            FILES ${${PROJECT_NAME}_OPENGL_HEADERS} ${${PROJECT_NAME}_OPENGL_SOURCES})
 source_group("src//glm"                         FILES ${${PROJECT_NAME}_GLM_HEADERS})
 source_group("src//stb_image"                   FILES ${${PROJECT_NAME}_STB_IMAGE_HEADERS} ${${PROJECT_NAME}_STB_IMAGE_SOURCES})
+source_group("assets//shaders"                  FILES ${${PROJECT_NAME}_SHADERS} )
+source_group("assets//textures"                 FILES ${${PROJECT_NAME}_TEXTURES} )
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
@@ -62,6 +74,9 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_QML_DIR}
     ${${PROJECT_NAME}_GLM_HEADERS}
     ${${PROJECT_NAME}_STB_IMAGE_HEADERS} ${${PROJECT_NAME}_STB_IMAGE_SOURCES}
+
+    ${${PROJECT_NAME}_SHADERS}
+    ${${PROJECT_NAME}_TEXTURES}
     # ${QRC_FILES}
 )
 

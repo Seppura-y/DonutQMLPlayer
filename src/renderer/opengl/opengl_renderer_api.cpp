@@ -1,10 +1,28 @@
 #include "opengl_renderer_api.h"
 #include "render_global.h"
 
+#include <QDebug>
+
 namespace Donut
 {
 	void OpenGLRendererAPI::init()
 	{
+		context_ = new QOpenGLContext;
+		auto format = QSurfaceFormat::defaultFormat();
+		format.setProfile(QSurfaceFormat::CoreProfile);
+		context_->setFormat(format);
+
+		if (!context_->create())
+		{
+			qDebug() << "context create failed";
+		}
+
+		offscreen_surface_ = new QOffscreenSurface();
+		offscreen_surface_->create();
+		context_->makeCurrent(offscreen_surface_);
+
+
+		initializeOpenGLFunctions();
 		OPENGL_EXTRA_FUNCTIONS(glEnable(GL_BLEND));
 		OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 

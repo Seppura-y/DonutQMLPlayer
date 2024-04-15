@@ -1,11 +1,13 @@
 #include "donut_framebuffer_item.h"
 
 #include "renderer_2d.h"
+#include "renderer.h"
 
 #include <QOpenGLFramebufferObject>
 #include <QDebug>
 #include <QQuickWindow>
 #include <QQuickOpenGLUtils>
+#include <QOpenGLFunctions>
 
 class DonutFramebufferItemRenderer : public QQuickFramebufferObject::Renderer
 {
@@ -25,6 +27,7 @@ DonutFramebufferItemRenderer::DonutFramebufferItemRenderer()
 	: camera_controller_(1600.0f / 900.0f, true)
 {
 	qDebug() << "DonutFramebufferItemRenderer created";
+	Donut::Renderer::init();
 	Donut::Renderer2D::init();
 }
 
@@ -79,7 +82,7 @@ DonutFramebufferItem::DonutFramebufferItem(QQuickItem* parent)
 
 QQuickFramebufferObject::Renderer* DonutFramebufferItem::createRenderer() const
 {
-	return new DonutFramebufferItemRenderer();
+	return new DonutFramebufferItemRenderer;
 }
 
 void DonutFramebufferItem::initCamera(float left, float right, float bottom, float top)

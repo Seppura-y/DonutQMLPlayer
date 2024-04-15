@@ -45,7 +45,7 @@ namespace Donut
 		std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
 		void compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources);
 	private:
-		unsigned int shader_id_;
+		unsigned int shader_id_ = 0;
 		std::string name_;
 	};
 }

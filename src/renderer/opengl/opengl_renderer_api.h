@@ -3,9 +3,13 @@
 
 #include "renderer/renderer_api.h"
 
+#include <QOpenGLExtraFunctions>
+#include <QOpenGLContext>
+#include <QOffscreenSurface>
+
 namespace Donut
 {
-	class OpenGLRendererAPI : public RendererAPI
+	class OpenGLRendererAPI : public RendererAPI, public QOpenGLExtraFunctions
 	{
 	public:
 		virtual void init() override;
@@ -17,7 +21,8 @@ namespace Donut
 
 		virtual void setLineWidth(float width);
 	private:
-
+		QOpenGLContext* context_ = nullptr;
+		QOffscreenSurface* offscreen_surface_ = nullptr;
 	};
 }
 #endif

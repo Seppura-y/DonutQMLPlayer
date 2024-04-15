@@ -54,14 +54,6 @@ ApplicationWindow
         width: 800
         height: 600
         visible: true
-        Rectangle
-        {
-            anchors.fill: parent
-            color: "orange"
-            radius: 8
-            anchors.leftMargin: 20
-            anchors.rightMargin: 20
-        }
     }
     Menu
     {
