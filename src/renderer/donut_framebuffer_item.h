@@ -18,6 +18,11 @@ public:
 
 	void initCamera(float left, float right, float bottom, float top);
 
+	Q_INVOKABLE void mouseClickedInUI();
+
+protected:
+	void timerEvent(QTimerEvent* ev) override;
+
 private:
 	Donut::OrthographicCameraController camera_controller_;
 };

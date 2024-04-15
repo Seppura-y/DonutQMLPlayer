@@ -8,7 +8,7 @@ import QtQml
 
 import Donut.DonutQMLPlayer
 
-Window
+ApplicationWindow
 {
     id: window
     visible: true
@@ -35,6 +35,7 @@ Window
         controlBar: controlBar
         contextMenu: contextMenu
         window: window
+        framebufferItem: frameItem
     }
 
     DropArea
@@ -47,7 +48,21 @@ Window
             PlaylistModel.addLocalFiles(drop.urls);
         }
     }
-
+    DonutFramebufferItem
+    {
+        id: frameItem
+        width: 800
+        height: 600
+        visible: true
+        Rectangle
+        {
+            anchors.fill: parent
+            color: "orange"
+            radius: 8
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+        }
+    }
     Menu
     {
         id: contextMenu
