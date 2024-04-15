@@ -20,11 +20,43 @@ public:
 
 	Q_INVOKABLE void mouseClickedInUI();
 
+
+	bool	infoDirty() const
+	{
+		return m_infoChanged;
+	}
+	void makeInfoDirty(bool dirty)
+	{
+		m_infoChanged = dirty;
+	}
+	int videoWidth() const
+	{
+		return m_videoWidth;
+	}
+	int videoHeght() const
+	{
+		return m_videoHeight;
+	}
+	int videoFormat() const
+	{
+		return m_videoFormat;
+	}
+
+public slots:
+	void loadFile(const QUrl& url);
+
+protected slots:
+	void onVideoInfoReady(int width, int height, int format);
+
 protected:
 	void timerEvent(QTimerEvent* ev) override;
 
 private:
 	Donut::OrthographicCameraController camera_controller_;
+	int									  m_videoWidth;
+	int									  m_videoHeight;
+	int									  m_videoFormat;
+	bool								  m_infoChanged = false;
 };
 
 

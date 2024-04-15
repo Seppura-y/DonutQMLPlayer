@@ -1,103 +1,128 @@
 #include "donut_framebuffer_item.h"
-
-#include "renderer_2d.h"
-#include "renderer.h"
-
+#include "donut_video_renderer.h"
 #include <QOpenGLFramebufferObject>
-#include <QDebug>
 #include <QQuickWindow>
-#include <QQuickOpenGLUtils>
-#include <QOpenGLFunctions>
-
+#include <QDebug>
+//************TaoItemRender************//
 class DonutFramebufferItemRenderer : public QQuickFramebufferObject::Renderer
 {
 public:
 	DonutFramebufferItemRenderer();
 
-	void render() override;
+	void					  render() override;
 	QOpenGLFramebufferObject* createFramebufferObject(const QSize& size) override;
-	void synchronize(QQuickFramebufferObject* obj) override;
+	void					  synchronize(QQuickFramebufferObject*) override;
 
 private:
-	QQuickWindow* window_ = nullptr;
-	Donut::OrthographicCameraController camera_controller_;
+	DonutVideoRenderer	  m_render;
+	QQuickWindow* m_window = nullptr;
 };
 
 DonutFramebufferItemRenderer::DonutFramebufferItemRenderer()
-	: camera_controller_(1600.0f / 900.0f, true)
 {
-	qDebug() << "DonutFramebufferItemRenderer created";
-	Donut::Renderer::init();
-	Donut::Renderer2D::init();
+	qDebug() << "DonutFramebufferItemRenderer::DonutFramebufferItemRenderer()";
+	 m_render.init();
 }
 
 void DonutFramebufferItemRenderer::render()
 {
-	window_->beginExternalCommands();
-	// 执行您的渲染命令
-	Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-	Donut::Renderer2D::endScene();
-	window_->endExternalCommands();
-	qDebug() << "DonutFramebufferItemRenderer render";
+	qDebug() << "DonutFramebufferItemRenderer::render()";
+	// m_render.paint();
+	//m_window->resetOpenGLState();
 }
-
-
-void DonutFramebufferItemRenderer::synchronize(QQuickFramebufferObject* obj)
-{
-	qDebug() << "DonutFramebufferItemRenderer::synchronize";
-	DonutFramebufferItem* item = qobject_cast<DonutFramebufferItem*>(obj);
-	if (item)
-	{
-		if (!window_)
-		{
-			window_ = item->window();
-		}
-		Donut::Renderer2D::beginScene(camera_controller_.getCamera());
-		qDebug() << "DonutFramebufferItemRenderer::synchronize";
-		Donut::Renderer2D::endScene();
-	}
-}
-
 
 QOpenGLFramebufferObject* DonutFramebufferItemRenderer::createFramebufferObject(const QSize& size)
 {
+	qDebug() << "DonutFramebufferItemRenderer::createFramebufferObject(const QSize& size)";
 	QOpenGLFramebufferObjectFormat format;
 	format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
 	format.setSamples(4);
-	qDebug() << "DonutFramebufferItemRenderer createFramebufferObject";
-	//m_render.resize(size.width(), size.height());
+	m_render.resize(size.width(), size.height());
 	return new QOpenGLFramebufferObject(size, format);
 }
 
+void DonutFramebufferItemRenderer::synchronize(QQuickFramebufferObject* item)
+{
+	DonutFramebufferItem* pItem = qobject_cast<DonutFramebufferItem*>(item);
+	if (pItem)
+	{
+		if (!m_window)
+		{
+			m_window = pItem->window();
+		}
+		if (pItem->infoDirty())
+		{
+			m_render.updateTextureInfo(pItem->videoWidth(), pItem->videoHeght(), pItem->videoFormat());
+			pItem->makeInfoDirty(false);
+		}
+		bool	got = false;
+		//YUVData data = pItem->getFrame(got);
+		//if (got)
+		//{
+		//	m_render.updateTextureData(data);
+		//}
+	}
+}
 
-
-
+//************TaoItem************//
 DonutFramebufferItem::DonutFramebufferItem(QQuickItem* parent)
 	: QQuickFramebufferObject(parent),
-	camera_controller_(1600.0f / 900.0f, true)
+		camera_controller_(1600.0f / 900.0f, true)
 {
-	qDebug() << "DonutFramebufferItem created";
+	//m_decoderController = std::make_unique<TaoDecoderController>();
+	//connect(m_decoderController.get(), &TaoDecoderController::videoInfoReady, this, &TaoItem::onVideoInfoReady);
+	// 按每秒60帧的帧率更新界面
 	startTimer(1000 / 60);
+
+	qDebug() << "DonutFramebufferItem::DonutFramebufferItem(QQuickItem* parent)";
+}
+
+void DonutFramebufferItem::timerEvent(QTimerEvent* event)
+{
+	Q_UNUSED(event);
+	update();
+}
+
+//YUVData DonutFramebufferItem::getFrame(bool& got)
+//{
+//	return m_decoderController->getFrame(got);
+//}
+
+void DonutFramebufferItem::loadFile(const QUrl& url)
+{
+	//m_decoderController->load(url.toLocalFile());
+}
+
+void DonutFramebufferItem::onVideoInfoReady(int width, int height, int format)
+{
+	if (m_videoWidth != width)
+	{
+		m_videoWidth = width;
+		makeInfoDirty(true);
+	}
+	if (m_videoHeight != height)
+	{
+		m_videoHeight = height;
+		makeInfoDirty(true);
+	}
+	if (m_videoFormat != format)
+	{
+		m_videoFormat = format;
+		makeInfoDirty(true);
+	}
 }
 
 QQuickFramebufferObject::Renderer* DonutFramebufferItem::createRenderer() const
 {
+	qDebug() << "DonutFramebufferItemRenderer::createFramebufferObject(const QSize& size)";
 	return new DonutFramebufferItemRenderer;
 }
 
 void DonutFramebufferItem::initCamera(float left, float right, float bottom, float top)
 {
-
 }
 
 Q_INVOKABLE void DonutFramebufferItem::mouseClickedInUI()
 {
-	qDebug() << "mouseClickedInUI";
-}
-
-void DonutFramebufferItem::timerEvent(QTimerEvent* ev)
-{
-	Q_UNUSED(ev);
-	update();
-	//qDebug() << "DonutFramebufferItem update";
+	
 }

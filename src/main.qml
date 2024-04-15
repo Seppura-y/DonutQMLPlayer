@@ -7,6 +7,7 @@ import QtQuick.Controls.Universal
 import QtQml
 
 import Donut.DonutQMLPlayer
+//import Donut.DonutFramebufferItem
 
 ApplicationWindow
 {
@@ -54,7 +55,15 @@ ApplicationWindow
         width: 800
         height: 600
         visible: true
+
+        Component.onCompleted:
+        {
+            print("DonutFramebufferItem onCompleted")
+            frameItem.update()
+            print("width : " + frameItem.width)
+        }
     }
+
     Menu
     {
         id: contextMenu
