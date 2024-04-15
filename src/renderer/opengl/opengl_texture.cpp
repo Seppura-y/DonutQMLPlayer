@@ -109,7 +109,7 @@ namespace Donut
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
-		glDeleteTextures(1, &object_id_);
+		OPENGL_EXTRA_FUNCTIONS(glDeleteTextures(1, &object_id_));
 	}
 
 	void OpenGLTexture2D::setData(void* data, uint32_t size)

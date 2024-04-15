@@ -1,27 +1,104 @@
-#include "orthographic_camera.h"
+#include "orthographic_camera_controller.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+//#include "core/input.h"
+//#include "key_codes.h"
+//#include "mouse_codes.h"
 
 namespace Donut
 {
-	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
-		: projection_matrix_(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), view_matrix_(1.0f)
+	OrthographicCameraController::OrthographicCameraController(float aspect_ratio, bool rotation)
+		: aspect_ratio_(aspect_ratio),
+		ortho_cam_bound_({ -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ }),
+		camera_(-aspect_ratio_ * zoom_level_, aspect_ratio_* zoom_level_, -zoom_level_, zoom_level_),
+		rotation_(rotation)
 	{
-		view_projection_matrix_ = projection_matrix_ * view_matrix_;
+
 	}
 
-	void OrthographicCamera::setProjection(float left, float right, float bottom, float top)
+	//void OrthographicCameraController::onUpdate(Timestep ts)
+	//{
+	//	DN_PROFILE_FUNCTION();
+
+	//	if (Input::isKeyPressed(DN_KEY_A))
+	//	{
+	//		camera_pos_.x += camera_move_speed_ * ts;
+	//	}
+
+	//	if (Input::isKeyPressed(DN_KEY_D))
+	//	{
+	//		camera_pos_.x -= camera_move_speed_ * ts;
+	//	}
+
+	//	if (Input::isKeyPressed(DN_KEY_W))
+	//	{
+	//		camera_pos_.y -= camera_move_speed_ * ts;
+	//	}
+
+	//	if (Input::isKeyPressed(DN_KEY_S))
+	//	{
+	//		camera_pos_.y += camera_move_speed_ * ts;
+	//	}
+
+	//	if (rotation_)
+	//	{
+	//		if (Input::isKeyPressed(DN_KEY_Q))
+	//		{
+	//			camera_rotation_ -= rotation_speed_ * ts;
+	//		}
+
+	//		if (Input::isKeyPressed(DN_KEY_E))
+	//		{
+	//			camera_rotation_ += rotation_speed_ * ts;
+	//		}
+
+	//		camera_.setRotation(camera_rotation_);
+	//	}
+
+	//	camera_.setPosition(camera_pos_);
+
+	//	// the higher the zoom_level_, the faster the camera moves
+	//	camera_move_speed_ = zoom_level_;
+	//}
+
+	//void OrthographicCameraController::onEvent(Event& ev)
+	//{
+	//	DN_PROFILE_FUNCTION();
+
+	//	EventDispatcher dispatcher(ev);
+	//	dispatcher.dispatch<MouseScrolledEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onMouseScrolledEvent));
+	//	dispatcher.dispatch<WindowResizeEvent>(DN_BIND_EVENT_FN(OrthographicCameraController::onWindowResizedEvent));
+	//}
+
+	void OrthographicCameraController::onResize(float width, float height)
 	{
-		projection_matrix_ = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-		view_projection_matrix_ = projection_matrix_ * view_matrix_;
+		aspect_ratio_ = width / height;
+		calculateView();
 	}
 
-	void OrthographicCamera::recalculateViewMatrix()
+	void OrthographicCameraController::calculateView()
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position_) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(rotation_), glm::vec3(0, 0, 1));
-
-		view_matrix_ = glm::inverse(transform);
-		view_projection_matrix_ = projection_matrix_ * view_matrix_;
+		ortho_cam_bound_ = { -aspect_ratio_ * zoom_level_, aspect_ratio_ * zoom_level_, -zoom_level_, zoom_level_ };
+		camera_.setProjection(ortho_cam_bound_.left_, ortho_cam_bound_.right_, ortho_cam_bound_.bottom_, ortho_cam_bound_.top_);
 	}
+
+
+	//bool OrthographicCameraController::onMouseScrolledEvent(MouseScrolledEvent& ev)
+	//{
+	//	DN_PROFILE_FUNCTION();
+
+	//	zoom_level_ -= ev.getYOffset() * 0.4f;
+	//	zoom_level_ = std::max(zoom_level_, 0.25f);
+
+	//	calculateView();
+	//	return false;
+	//}
+
+	//bool OrthographicCameraController::onWindowResizedEvent(WindowResizeEvent& ev)
+	//{
+	//	DN_PROFILE_FUNCTION();
+
+	//	aspect_ratio_ = (float)ev.getWidth() / (float)ev.getHeight();
+	//	calculateView();
+	//	return false;
+	//}
 }

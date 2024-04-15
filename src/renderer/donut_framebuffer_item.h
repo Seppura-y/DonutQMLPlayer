@@ -10,6 +10,7 @@ class DonutFramebufferItem : public QQuickFramebufferObject
 {
 	Q_OBJECT
 	QML_ELEMENT
+	friend class DonutFramebufferItemRenderer;
 public:
 	DonutFramebufferItem(QQuickItem* parent = nullptr);
 

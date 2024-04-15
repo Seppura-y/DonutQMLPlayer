@@ -24,8 +24,8 @@ namespace Donut
 
 		OrthographicCameraController(float aspect_ratio, bool rotation = false);
 
-		void onUpdate(Timestep ts);
-		void onEvent(Event& ev);
+		//void onUpdate(Timestep ts);
+		//void onEvent(Event& ev);
 
 		OrthographicCamera& getCamera() { return camera_; }
 		const OrthographicCamera& getCamera() const { return camera_; }
@@ -39,8 +39,8 @@ namespace Donut
 	private:
 		void calculateView();
 
-		bool onMouseScrolledEvent(MouseScrolledEvent& ev);
-		bool onWindowResizedEvent(WindowResizeEvent& ev);
+		//bool onMouseScrolledEvent(MouseScrolledEvent& ev);
+		//bool onWindowResizedEvent(WindowResizeEvent& ev);
 
 	private:
 		float aspect_ratio_;
