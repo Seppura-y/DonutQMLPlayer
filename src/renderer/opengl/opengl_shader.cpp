@@ -143,11 +143,18 @@ namespace Donut
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			OPENGL_EXTRA_FUNCTIONS(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
+			//OPENGL_EXTRA_FUNCTIONS(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
+
+			char           message[512];
+
+
+			OPENGL_EXTRA_FUNCTIONS(glGetProgramInfoLog(program, 512, nullptr, message));
+			qDebug() << message;
+			
 
 			// The maxLength includes the NULL character
-			std::vector<GLchar> infoLog(maxLength);
-			OPENGL_EXTRA_FUNCTIONS(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
+			//std::vector<GLchar> infoLog(maxLength);
+			//OPENGL_EXTRA_FUNCTIONS(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
 
 			// We don't need the program anymore.
 			OPENGL_EXTRA_FUNCTIONS(glDeleteProgram(program));

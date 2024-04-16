@@ -169,7 +169,7 @@ namespace Donut
 		Ref<IndexBuffer> rectangle_ib;
 		rectangle_ib.reset(IndexBuffer::create(rectangle_indices, s_data.max_indices_));
 		s_data.rectangle_va_->setIndexBuffer(rectangle_ib);
-		delete[] rectangle_indices;
+		//delete[] rectangle_indices;
 
 		s_data.circle_va_ = VertexArray::create();
 
@@ -225,6 +225,7 @@ namespace Donut
 		}
 
 		s_data.circle_shader_ = Shader::createShader("assets/shaders/c8_circle_rendering.glsl");
+		//s_data.rectangle_shader_ = Shader::createShader("assets/shaders/300_shader.glsl");
 		s_data.rectangle_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
 		s_data.line_shader_ = Shader::createShader("assets/shaders/c9_line_rendering.glsl");
 		//s_data.text_shader_ = Shader::createShader("assets/shaders/c10_text_rendering.glsl");
@@ -277,6 +278,32 @@ namespace Donut
 	{
 		s_data.rectangle_shader_->bind();
 		s_data.rectangle_shader_->setMat4("u_viewProjectionMatrix", camera.getViewProjectionMatrix());
+
+		s_data.rect_indices_count_ = 0;
+		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
+
+		s_data.circle_indices_count_ = 0;
+		s_data.circle_vertex_buffer_ptr_ = s_data.circle_vertex_buffer_base_;
+
+		s_data.line_vertex_count_ = 0;
+		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
+
+		//s_data.text_indices_count_ = 0;
+		//s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
+
+		s_data.texture_index_ = 1;
+	}
+
+	void Renderer2D::beginScene(const EditorCamera& camera)
+	{
+
+		//glm::mat4 view_projection = camera.getViewProjection();
+
+		//s_data.single_shader_->bind();
+		//s_data.single_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+
+		s_data.camera_buffer.view_projection_ = camera.getViewProjection();
+		s_data.camera_uniform_buffer->setData(&s_data.camera_buffer, sizeof(Renderer2DData::CameraData));
 
 		s_data.rect_indices_count_ = 0;
 		s_data.rect_vertex_buffer_ptr_ = s_data.rect_vertex_buffer_base_;
@@ -366,12 +393,14 @@ namespace Donut
 		s_data.texture_index_ = 1;
 	}
 
-	void Renderer2D::drawRectangle(const glm::vec2& position, glm::vec2& size, glm::vec4& color)
+	void Renderer2D::drawRectangle(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		drawRectangle({ position.x, position.y, 0.0f }, size, color);
 	}
 
-	void Renderer2D::drawRectangle(const glm::vec3& position, glm::vec2& size, glm::vec4& color)
+
+
+	void Renderer2D::drawRectangle(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		if (s_data.rect_indices_count_ >= Renderer2DData::max_indices_)
 		{
@@ -784,7 +813,7 @@ namespace Donut
 		s_data.statistics_.rect_count_++;
 	}
 
-	void Renderer2D::drawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entity_id)
+	void Renderer2D::drawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entity_id)
 	{
 		s_data.line_vertex_buffer_ptr_->position_ = p0;
 		s_data.line_vertex_buffer_ptr_->color_ = color;

@@ -48,11 +48,11 @@ file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
 #####################################################################################################
 # assets
 file(GLOB ${PROJECT_NAME}_TEXTURES
-    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/textures/*.*
+    ${CMAKE_CURRENT_LIST_DIR}/bin/assets/textures/*.*
 )
 
 file(GLOB ${PROJECT_NAME}_SHADERS
-    ${CMAKE_CURRENT_LIST_DIR}/../../bin/assets/shaders/*.*
+    ${CMAKE_CURRENT_LIST_DIR}/bin/assets/shaders/*.*
 )
 
 source_group("qrc"                              FILES ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
