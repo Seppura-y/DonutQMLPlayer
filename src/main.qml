@@ -308,6 +308,7 @@ ApplicationWindow
             visible: true
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.columnSpan: 2
             Component.onCompleted:
             {
                 print("DonutFramebufferItem onCompleted")

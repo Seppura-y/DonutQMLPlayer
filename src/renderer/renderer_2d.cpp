@@ -105,13 +105,13 @@ namespace Donut
 
 		////////////////////////////////////////////////////////////
 		// Text
-		//Ref<VertexArray> text_va_;
-		//Ref<VertexBuffer> text_vb_;
-		//Ref<Shader> text_shader_;
+		Ref<VertexArray> text_va_;
+		Ref<VertexBuffer> text_vb_;
+		Ref<Shader> text_shader_;
 
-		//uint32_t text_indices_count_ = 0;
-		//TextVertex* text_vertex_buffer_base_ = nullptr;
-		//TextVertex* text_vertex_buffer_ptr_ = nullptr;
+		uint32_t text_indices_count_ = 0;
+		TextVertex* text_vertex_buffer_base_ = nullptr;
+		TextVertex* text_vertex_buffer_ptr_ = nullptr;
 
 		float line_width_ = 2.0f;
 
@@ -169,7 +169,7 @@ namespace Donut
 		Ref<IndexBuffer> rectangle_ib;
 		rectangle_ib.reset(IndexBuffer::create(rectangle_indices, s_data.max_indices_));
 		s_data.rectangle_va_->setIndexBuffer(rectangle_ib);
-		//delete[] rectangle_indices;
+		delete[] rectangle_indices;
 
 		s_data.circle_va_ = VertexArray::create();
 
@@ -200,19 +200,19 @@ namespace Donut
 		s_data.line_vertex_buffer_base_ = new LineVertex[s_data.max_vertices_];
 
 
-		//s_data.text_va_ = VertexArray::create();
+		s_data.text_va_ = VertexArray::create();
 
-		//s_data.text_vb_.reset(VertexBuffer::create(s_data.max_indices_ * sizeof(TextVertex)));
-		//s_data.text_vb_->setLayout({
-		//	{ ShaderDataType::Float3,	"a_Position" },
-		//	{ ShaderDataType::Float4,	"a_Color"},
-		//	{ ShaderDataType::Float2,	"a_TexCoord"},
-		//	{ ShaderDataType::Int,		"a_EntityID"}
-		//	});
-		//s_data.text_va_->addVertexBuffer(s_data.text_vb_);
-		//s_data.text_vertex_buffer_base_ = new TextVertex[s_data.max_vertices_];
+		s_data.text_vb_.reset(VertexBuffer::create(s_data.max_indices_ * sizeof(TextVertex)));
+		s_data.text_vb_->setLayout({
+			{ ShaderDataType::Float3,	"a_Position" },
+			{ ShaderDataType::Float4,	"a_Color"},
+			{ ShaderDataType::Float2,	"a_TexCoord"},
+			{ ShaderDataType::Int,		"a_EntityID"}
+			});
+		s_data.text_va_->addVertexBuffer(s_data.text_vb_);
+		s_data.text_vertex_buffer_base_ = new TextVertex[s_data.max_vertices_];
 
-		//s_data.text_va_->setIndexBuffer(rectangle_ib);
+		s_data.text_va_->setIndexBuffer(rectangle_ib);
 
 		s_data.white_texture_ = Texture2D::createTexture(TextureSpecification());
 		uint32_t white_texture_data = 0xffffffff;
@@ -228,7 +228,7 @@ namespace Donut
 		//s_data.rectangle_shader_ = Shader::createShader("assets/shaders/300_shader.glsl");
 		s_data.rectangle_shader_ = Shader::createShader("assets/shaders/c7_spirv_shader.glsl");
 		s_data.line_shader_ = Shader::createShader("assets/shaders/c9_line_rendering.glsl");
-		//s_data.text_shader_ = Shader::createShader("assets/shaders/c10_text_rendering.glsl");
+		s_data.text_shader_ = Shader::createShader("assets/shaders/c10_text_rendering.glsl");
 		//s_data.single_shader_ = Shader::createShader("assets/shaders/c6_batch_texture_rendering_v2.glsl");
 		//s_data.single_shader_->bind();
 		//s_data.single_shader_->setIntArray("u_textures", samplers, s_data.max_texture_slots_);
@@ -268,8 +268,8 @@ namespace Donut
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
-		//s_data.text_indices_count_ = 0;
-		//s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -288,8 +288,8 @@ namespace Donut
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
-		//s_data.text_indices_count_ = 0;
-		//s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -314,8 +314,8 @@ namespace Donut
 		s_data.line_vertex_count_ = 0;
 		s_data.line_vertex_buffer_ptr_ = s_data.line_vertex_buffer_base_;
 
-		//s_data.text_indices_count_ = 0;
-		//s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
+		s_data.text_indices_count_ = 0;
+		s_data.text_vertex_buffer_ptr_ = s_data.text_vertex_buffer_base_;
 
 		s_data.texture_index_ = 1;
 	}
@@ -371,17 +371,17 @@ namespace Donut
 			s_data.statistics_.drawcalls_++;
 		}
 
-		//if (s_data.text_indices_count_)
-		//{
-		//	uint32_t data_size = (uint32_t)((uint8_t*)s_data.text_vertex_buffer_ptr_ - (uint8_t*)s_data.text_vertex_buffer_base_);
-		//	s_data.text_vb_->setData(s_data.text_vertex_buffer_base_, data_size);
+		if (s_data.text_indices_count_)
+		{
+			uint32_t data_size = (uint32_t)((uint8_t*)s_data.text_vertex_buffer_ptr_ - (uint8_t*)s_data.text_vertex_buffer_base_);
+			s_data.text_vb_->setData(s_data.text_vertex_buffer_base_, data_size);
 
-		//	s_data.font_atlas_texture_->bind(0);
+			//s_data.font_atlas_texture_->bind(0);
 
-		//	s_data.text_shader_->bind();
-		//	RenderCommand::drawIndices(s_data.text_va_, s_data.text_indices_count_);
-		//	s_data.statistics_.drawcalls_++;
-		//}
+			s_data.text_shader_->bind();
+			//RenderCommand::drawIndices(s_data.text_va_, s_data.text_indices_count_);
+			s_data.statistics_.drawcalls_++;
+		}
 	}
 
 

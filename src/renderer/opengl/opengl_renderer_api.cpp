@@ -50,7 +50,7 @@ namespace Donut
 		va->bind();
 		uint32_t indices_count = count ? count : va->getIndexBuffer()->getIndicesCount();
 		//OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
-		OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, 1, GL_UNSIGNED_INT, nullptr));
+		OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
 		GLenum error = OPENGL_EXTRA_FUNCTIONS(glGetError());
 		if (error != GL_NO_ERROR) {
 			// ¥Ú”°¥ÌŒÛ–≈œ¢

@@ -22,6 +22,7 @@ namespace Donut
 		inline void setViewportSize(float width, float height) { viewport_width_ = width; viewport_height_ = height; updateProjection(); }
 
 		const glm::mat4& getViewMatrix() const { return view_matrix_; }
+		void setViewMatirx(glm::mat4x4 mat) { view_matrix_ = mat; }
 		glm::mat4 getViewProjection() const { return projection_ * view_matrix_; }
 
 		glm::vec3 getUpDirection() const;
