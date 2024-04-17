@@ -8,7 +8,7 @@ import QtQml
 
 import Donut.DonutQMLPlayer
 
-Window
+ApplicationWindow
 {
     id: window
     visible: true
@@ -41,6 +41,7 @@ Window
         controlBar: controlBar
         contextMenu: contextMenu
         window: window
+        framebufferItem: frameItem
     }
 
     DropArea
@@ -301,11 +302,27 @@ Window
         }
 
         // Empty item as placeholder
-        Item
+        //Item
+        //{
+        //    Layout.fillHeight: true
+        //    Layout.fillWidth: true
+        //}
+
+        DonutFramebufferItem
         {
+            id: frameItem
+            visible: true
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.columnSpan: 2
+            Component.onCompleted:
+            {
+                print("DonutFramebufferItem onCompleted")
+                frameItem.update()
+                print("width : " + frameItem.width)
+            }
         }
+
 
         FileDialog
         {

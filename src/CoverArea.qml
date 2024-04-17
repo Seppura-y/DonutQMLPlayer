@@ -12,6 +12,7 @@ MouseArea
 	property var sideBar
 	property var titleBar
 	property var window
+	property var framebufferItem
 
 	property real lastMouseX: 0
 	property real lastMouseY: 0
@@ -27,6 +28,11 @@ MouseArea
 		if (mouse.button === Qt.LeftButton && !sideBar.contains(sideBar.mapFromItem(mouseArea, mouse.x, mouse.y)))
 		{
 			sideBar.visible = false
+		}
+		if(mouse.button === Qt.LeftButton && framebufferItem.contains(framebufferItem.mapFromItem(mouseArea, mouse.x, mouse.y)))
+		{
+			framebufferItem.mouseClickedInUI()
+			framebufferItem.update()
 		}
 
 		if (mouse.button === Qt.RightButton)
@@ -204,6 +210,8 @@ MouseArea
 			{
 				titleBar.visible = false
 			}
+
+			framebufferItem.update()
 		}
 	}
 }
