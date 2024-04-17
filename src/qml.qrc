@@ -41,7 +41,5 @@
         <file>VideoOptions.qml</file>
         <file>Settings.qml</file>
         <file>CoverArea.qml</file>
-        <file>q_shader_f.glsl</file>
-        <file>q_shader_v.glsl</file>
     </qresource>
 </RCC>

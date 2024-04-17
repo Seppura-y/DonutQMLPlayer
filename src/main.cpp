@@ -3,25 +3,11 @@
 #include <QQmlComponent>
 #include <QQuickWindow>
 
-#include "renderer.h"
-#include "renderer_2d.h"
-
 
 int main(int argc, char **argv)
 {
     qputenv("QSG_RHI_BACKEND", QByteArray("opengl"));
     QGuiApplication app(argc, argv);
-
-
-    auto format = QSurfaceFormat::defaultFormat();
-    format.setProfile(QSurfaceFormat::CoreProfile);
-#ifdef DEBUG_GL    
-    format.setOption(QSurfaceFormat::DebugContext);
-#endif    
-    QSurfaceFormat::setDefaultFormat(format);
-
-    Donut::Renderer::init();
-    Donut::Renderer2D::init();
 
     QQmlEngine engine;
 
@@ -41,7 +27,6 @@ int main(int argc, char **argv)
     {
         qDebug() << "QQmlComponent error : " << component.errorString();
     }
-
 
 
 
