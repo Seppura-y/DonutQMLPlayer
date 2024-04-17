@@ -14,7 +14,7 @@ namespace Donut
 	Ref<Subtexture> Subtexture::createFromCoordinate(const Ref<Texture2D>& texture, const glm::vec2& coord, const glm::vec2& cell_size, const glm::vec2& sprite_size)
 	{
 		glm::vec2 min = { (coord.x * sprite_size.x) / texture->getWidth(), (coord.y * sprite_size.y) / texture->getHeight() };
-		glm::vec2 max = { ((coord.x + cell_size.x) * sprite_size.x) / texture->getWidth(), ((coord.y + cell_size.y) * sprite_size.y) / texture->getHeight() };
+		glm::vec2 max = { ((coord.x + cell_size.x) * sprite_size.x) / texture->getWidth(), ((coord.y + cell_size.y)* sprite_size.y) / texture->getHeight() };
 		return createRef<Subtexture>(texture, min, max);
 	}
 

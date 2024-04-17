@@ -1,5 +1,5 @@
 #ifndef RENDER_COMMAND_H
-#define RENDER_COMMNAD_H
+#define RENDER_COMMAND_H
 
 #include "renderer_api.h"
 
@@ -8,10 +8,15 @@ namespace Donut
 	class RenderCommand
 	{
 	public:
+		inline static void init(void* ctx)
+		{
+			renderer_api_->init(ctx);
+		}
 		inline static void init()
 		{
 			renderer_api_->init();
 		}
+
 		inline static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 		{
 			renderer_api_->setViewport(x, y, width, height);

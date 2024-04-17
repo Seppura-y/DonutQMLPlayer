@@ -9,8 +9,8 @@ namespace Donut
 	{
 		switch (RendererAPI::getCurrentAPIType())
 		{
-		case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-		case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(spec);
+			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
+			case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(spec);
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 
@@ -20,8 +20,8 @@ namespace Donut
 	{
 		switch (RendererAPI::getCurrentAPIType())
 		{
-		case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-		case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(path);
+			case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
+			case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLTexture2D>(path);
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 

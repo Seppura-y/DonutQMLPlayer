@@ -3,9 +3,11 @@
 
 #include "renderer/vertex_array.h"
 
+#include <QOpenGLFunctions_4_5_Core>
+
 namespace Donut
 {
-	class OpenGLVertexArray : public VertexArray
+	class OpenGLVertexArray : public VertexArray, public QOpenGLFunctions_4_5_Core
 	{
 	public:
 		OpenGLVertexArray();
@@ -14,8 +16,8 @@ namespace Donut
 		virtual void addVertexBuffer(const Donut::Ref<VertexBuffer>& buffer) override;
 		virtual void setIndexBuffer(const Donut::Ref<IndexBuffer>& buffer) override;
 
-		virtual void bind() const override;
-		virtual void unBind() const override;
+		virtual void bind() override;
+		virtual void unBind() override;
 
 		virtual const std::vector<Donut::Ref<VertexBuffer>>& getVertexBuffers() const override { return vertex_buffers_; }
 		virtual const Donut::Ref<IndexBuffer>& getIndexBuffer() const override { return index_buffer_; }

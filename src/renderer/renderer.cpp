@@ -5,6 +5,13 @@ namespace Donut
 {
     Renderer::SceneData* Renderer::scene_data_ = new SceneData();
 
+    void Renderer::init(void* ctx)
+    {
+        //DN_PROFILE_FUNCTION();
+
+        RenderCommand::init(ctx);
+    }
+
     void Renderer::init()
     {
         RenderCommand::init();

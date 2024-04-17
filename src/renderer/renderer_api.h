@@ -1,9 +1,13 @@
 #ifndef RENDERER_API_H
 #define RENDERER_API_H
 
-#include <glm/glm.hpp>
 
 #include "vertex_array.h"
+#include "graphics_context.h"
+
+#include <glm/glm.hpp>
+
+#include "render_global.h"
 
 namespace Donut
 {
@@ -20,6 +24,7 @@ namespace Donut
 
 		virtual ~RendererAPI() = default;
 
+		virtual void init(void* ctx) = 0;
 		virtual void init() = 0;
 		virtual void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 		virtual void setClearColor(const glm::vec4& color) = 0;

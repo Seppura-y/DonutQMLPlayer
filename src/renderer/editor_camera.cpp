@@ -1,11 +1,14 @@
 #include "editor_camera.h"
 
+//#include "core/input.h"
+//#include "core/key_codes.h"
+//#include "core/mouse_codes.h"
+
 #include <glm/glm.hpp>
 
 #define GLM_ENABLE_EXPERIMANTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include <algorithm>
 namespace Donut
 {
 	EditorCamera::EditorCamera(float fov, float aspect_ratio, float near_clip, float far_clip)
@@ -15,6 +18,36 @@ namespace Donut
 		updateView();
 	}
 
+	//void EditorCamera::onUpdate(Timestep ts)
+	//{
+	//	if (Input::isKeyPressed(Key::LeftAlt))
+	//	{
+	//		const glm::vec2& mouse{ Input::getMouseX(), Input::getMouseY() };
+	//		glm::vec2 delta = (mouse - initial_mouse_position_) * 0.003f;
+	//		initial_mouse_position_ = mouse;
+
+	//		if (Input::isMouseButtonPressed(Mouse::ButtonMiddle))
+	//		{
+	//			mousePan(delta);
+	//		}
+	//		else if (Input::isMouseButtonPressed(Mouse::ButtonLeft))
+	//		{
+	//			mouseRotate(delta);
+	//		}
+	//		else if (Input::isMouseButtonPressed(Mouse::ButtonRight))
+	//		{
+	//			mouseZoom(delta.y);
+	//		}
+	//	}
+
+	//	updateView();
+	//}
+
+	//void EditorCamera::onEvent(Event& ev)
+	//{
+	//	EventDispatcher dispatcher(ev);
+	//	dispatcher.dispatch<MouseScrolledEvent>(DN_BIND_EVENT_FN(EditorCamera::onMouseScroll));
+	//}
 
 	glm::vec3 EditorCamera::getUpDirection() const
 	{
@@ -57,12 +90,19 @@ namespace Donut
 		view_matrix_ = glm::inverse(view_matrix_);
 	}
 
+	//bool EditorCamera::onMouseScroll(MouseScrolledEvent& e)
+	//{
+	//	float delta = e.getYOffset() * 0.1f;
+	//	mouseZoom(delta);
+	//	updateView();
+	//	return false;
+	//}
 
 	void EditorCamera::mousePan(const glm::vec2& delta)
 	{
-		//auto [x_speed, y_speed] = panSpeed();
-		//focal_point_ += -getRightDirection() * delta.x * x_speed * distance_;
-		//focal_point_ += getUpDirection() * delta.y * y_speed * distance_;
+		auto [x_speed, y_speed] = panSpeed();
+		focal_point_ += -getRightDirection() * delta.x * x_speed * distance_;
+		focal_point_ += getUpDirection() * delta.y * y_speed * distance_;
 	}
 
 	void EditorCamera::mouseRotate(const glm::vec2& delta)
@@ -87,7 +127,16 @@ namespace Donut
 		return focal_point_ - getForwardDirection() * distance_;
 	}
 
+	std::pair<float, float> EditorCamera::panSpeed() const
+	{
+		float x = std::min(viewport_width_ / 1000.0f, 2.4f); // max = 2.4f
+		float x_factor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
+		float y = std::min(viewport_height_ / 1000.0f, 2.4f); // max = 2.4f
+		float y_factor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+
+		return { x_factor, y_factor };
+	}
 
 	float EditorCamera::rotationSpeed() const
 	{

@@ -1,10 +1,39 @@
 #include "opengl_renderer_api.h"
-#include "render_global.h"
+#include "opengl/opengl_context.h"
 
-#include <QDebug>
+#include <QOpenGLContext>
 
+//#include <glad/glad.h>
 namespace Donut
 {
+	OpenGLRendererAPI::OpenGLRendererAPI()
+		: QOpenGLFunctions_4_5_Core()
+	{
+		//initializeOpenGLFunctions();
+	}
+
+	void OpenGLRendererAPI::init(void* ctx)
+	{
+		//DN_PROFILE_FUNCTION();
+		//initializeOpenGLFunctions();
+		//QOpenGLContext* context = QOpenGLContext::currentContext();
+		//if (context)
+		//{
+		//	glEnable(GL_BLEND);
+		//}
+		graphics_ctx_ = static_cast<OpenGLContext*>(ctx);
+		surface_ = graphics_ctx_->getSurface();
+		auto context = graphics_ctx_->getContext();
+		context->makeCurrent(surface_);
+
+		initializeOpenGLFunctions();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_SMOOTH);
+	}
+
 	void OpenGLRendererAPI::init()
 	{
 		context_ = new QOpenGLContext;
@@ -38,17 +67,21 @@ namespace Donut
 
 	void OpenGLRendererAPI::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glViewport(x, y, width, height));
+		glViewport(x, y, width, height);
 	}
 
 	void OpenGLRendererAPI::setClearColor(const glm::vec4& color)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glClearColor(color.r, color.g, color.b, color.a));
+		//auto context = graphics_ctx_->getContext();
+		//context->makeCurrent(surface_);
+		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
 	void OpenGLRendererAPI::clear()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+		//auto context = graphics_ctx_->getContext();
+		//context->makeCurrent(surface_);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va, uint32_t count)
@@ -56,25 +89,17 @@ namespace Donut
 		va->bind();
 		va->getIndexBuffer()->bind();
 		uint32_t indices_count = count ? count : va->getIndexBuffer()->getIndicesCount();
-		//OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
-		//const short* indices = (const short*)0;
-		OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
-		//OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, indices));
-		GLenum error = OPENGL_EXTRA_FUNCTIONS(glGetError());
-		if (error != GL_NO_ERROR) {
-			// ¥Ú”°¥ÌŒÛ–≈œ¢
-			qDebug() << "OpenGL error after glDrawElements: " << error;
-		}
+		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr);
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	void OpenGLRendererAPI::drawLines(const Donut::Ref<VertexArray>& va, uint32_t vertex_count)
 	{
 		va->bind();
-		OPENGL_EXTRA_FUNCTIONS(glDrawArrays(GL_LINES, 0, vertex_count));
+		glDrawArrays(GL_LINES, 0, vertex_count);
 	}
 
 	void OpenGLRendererAPI::setLineWidth(float width)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glLineWidth(width));
+		glLineWidth(width);
 	}
 }

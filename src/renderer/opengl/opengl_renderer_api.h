@@ -1,17 +1,18 @@
-#ifndef OPENGL_RENDERER_API_H
-#define OPENGL_RENDERER_API_H
+#ifndef OPENGL_RENDERER_H
+#define OEPNGL_RENDERER_H
 
 #include "renderer/renderer_api.h"
+#include "opengl/opengl_context.h"
 
-#include <QOpenGLExtraFunctions>
-#include <QOpenGLContext>
-#include <QOffscreenSurface>
+#include <QOpenGLFunctions_4_5_Core>
 
 namespace Donut
 {
-	class OpenGLRendererAPI : public RendererAPI, public QOpenGLExtraFunctions
+	class OpenGLRendererAPI : public RendererAPI, protected QOpenGLFunctions_4_5_Core
 	{
 	public:
+		OpenGLRendererAPI();
+		virtual void init(void* ctx) override;
 		virtual void init() override;
 		virtual void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 		virtual void setClearColor(const glm::vec4& color) override;
@@ -21,8 +22,10 @@ namespace Donut
 
 		virtual void setLineWidth(float width);
 	private:
+		OpenGLContext* graphics_ctx_;
+		QOffscreenSurface* surface_;
 		QOpenGLContext* context_ = nullptr;
-		QOffscreenSurface* offscreen_surface_ = nullptr;
+		QOffscreenSurface* offscreen_surface_;
 	};
 }
 #endif

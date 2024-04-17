@@ -2,8 +2,8 @@
 
 #include "renderer/renderer_api.h"
 #include "opengl/opengl_shader.h"
-#include "render_global.h"
 
+//#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Donut
@@ -20,21 +20,21 @@ namespace Donut
 		DN_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
-
+	
 
 	Ref<Shader> Shader::createShader(const std::string& name, const std::string& vertex_shader, const std::string& fragment_shader)
 	{
 		switch (RendererAPI::getApiType())
 		{
-		case RendererAPI::RendererAPIType::None:
-		{
-			//DN_CORE_WARN("RendererAPI::None");
-			return nullptr;
-		}
-		case RendererAPI::RendererAPIType::OpenGL:
-		{
-			return std::make_shared<OpenGLShader>(name, vertex_shader, fragment_shader);
-		}
+			case RendererAPI::RendererAPIType::None:
+			{
+				//DN_CORE_WARN("RendererAPI::None");
+				return nullptr;
+			}
+			case RendererAPI::RendererAPIType::OpenGL:
+			{
+				return std::make_shared<OpenGLShader>(name, vertex_shader, fragment_shader);
+			}
 		}
 
 		DN_CORE_ASSERT(false, "Unknown Renderer API");

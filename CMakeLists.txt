@@ -121,7 +121,6 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Network
     Qt6::OpenGL
     Qt6::OpenGLWidgets
-
 )
 
 # 项目输出路径

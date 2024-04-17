@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "renderer/buffers.h"
-#include "render_global.h"
 
 namespace Donut
 {
@@ -14,8 +13,8 @@ namespace Donut
 		virtual ~VertexArray() {}
 		virtual void addVertexBuffer(const Donut::Ref<VertexBuffer>& buffer) = 0;
 		virtual void setIndexBuffer(const Donut::Ref<IndexBuffer>& buffer) = 0;
-		virtual void bind() const = 0;
-		virtual void unBind() const = 0;
+		virtual void bind() = 0;
+		virtual void unBind() = 0;
 		virtual const std::vector<Donut::Ref<VertexBuffer>>& getVertexBuffers() const = 0;
 		virtual const Donut::Ref<IndexBuffer>& getIndexBuffer() const = 0;
 

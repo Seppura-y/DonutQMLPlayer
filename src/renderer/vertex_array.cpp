@@ -1,4 +1,3 @@
-
 #include "renderer/renderer_api.h"
 #include "renderer/vertex_array.h"
 
@@ -11,7 +10,7 @@ namespace Donut
 		switch (RendererAPI::getCurrentAPIType())
 		{
 		case RendererAPI::RendererAPIType::None: DN_CORE_ASSERT(false, "RendererAPI::RendererAPIType::None:"); return nullptr;
-		case RendererAPI::RendererAPIType::OpenGL: return std::make_shared<OpenGLVertexArray>();
+		case RendererAPI::RendererAPIType::OpenGL: return createRef<OpenGLVertexArray>();
 		}
 		DN_CORE_ASSERT(false, "unknown renderer api");
 

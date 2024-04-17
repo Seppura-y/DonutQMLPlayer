@@ -1,11 +1,13 @@
 #ifndef OPENGL_UNIFORM_BUFFER_H
 #define OPENGL_UNIFORM_BUFFER_H
 
-#include "uniform_buffer.h"
+#include "renderer/uniform_buffer.h"
+
+#include <QOpenGLFunctions_4_5_Core>
 
 namespace Donut
 {
-	class OpenGLUniformBuffer : public UniformBuffer
+	class OpenGLUniformBuffer : public UniformBuffer, protected QOpenGLFunctions_4_5_Core
 	{
 	public:
 		OpenGLUniformBuffer(uint32_t size, uint32_t binding);

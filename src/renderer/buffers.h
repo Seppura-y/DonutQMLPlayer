@@ -1,7 +1,11 @@
 #ifndef BUFFERS_H
 #define BUFFERS_H
 
+
 #include "render_global.h"
+#include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace Donut
 {
@@ -26,7 +30,7 @@ namespace Donut
 		case ShaderDataType::Mat4:		return 4 * 4 * 4;
 		case ShaderDataType::Bool:		return 1;
 		}
-		DN_CORE_ASSERT(false, "Unknown shader data type!");
+		//DN_CORE_ASSERT(false, "Unknown shader data type!");
 		return 0;
 	}
 
@@ -61,7 +65,7 @@ namespace Donut
 			case ShaderDataType::Bool:		return 1;
 			}
 
-			DN_CORE_ASSERT(false, "Unknown shader data type!");
+			//DN_CORE_ASSERT(false, "Unknown shader data type!");
 			return 0;
 		}
 	};
@@ -106,8 +110,8 @@ namespace Donut
 	public:
 		virtual ~VertexBuffer() {};
 
-		virtual void bind() const = 0;
-		virtual void unBind() const = 0;
+		virtual void bind() = 0;
+		virtual void unBind() = 0;
 
 		virtual void setLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& getLayout() const = 0;
@@ -123,8 +127,8 @@ namespace Donut
 	public:
 		virtual ~IndexBuffer() {};
 
-		virtual void bind() const = 0;
-		virtual void unBind() const = 0;
+		virtual void bind() = 0;
+		virtual void unBind() = 0;
 
 		virtual uint32_t getIndicesCount() const = 0;
 

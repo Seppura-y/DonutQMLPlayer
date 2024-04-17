@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include "render_global.h"
+
 #include <string>
 
 namespace Donut
@@ -39,7 +40,7 @@ namespace Donut
 
 		virtual const std::string& getPath() const = 0;
 
-		virtual void bind(uint32_t slot = 0) const = 0;
+		virtual void bind(uint32_t slot = 0) = 0;
 
 		virtual bool isLoaded() const = 0;
 

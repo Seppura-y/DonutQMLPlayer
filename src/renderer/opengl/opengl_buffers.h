@@ -2,12 +2,15 @@
 #define OPENGL_BUFFERS_H
 
 #include "renderer/buffers.h"
+
 #include <stdint.h>
+#include <QOpenGLFunctions_4_5_Core>
 
 
 namespace Donut
 {
-	class OpenGLVertexBuffer : public VertexBuffer
+
+	class OpenGLVertexBuffer : public VertexBuffer, public QOpenGLFunctions_4_5_Core
 	{
 	public:
 		OpenGLVertexBuffer(uint32_t size);
@@ -19,22 +22,22 @@ namespace Donut
 
 		virtual void setData(const void* data, uint32_t size) override;
 
-		virtual void bind() const override;
-		virtual void unBind() const override;
+		virtual void bind() override;
+		virtual void unBind()  override;
 
 	private:
 		uint32_t object_id_;
 		BufferLayout layout_;
 	};
 
-	class OpenGLIndexBuffer : public IndexBuffer
+	class OpenGLIndexBuffer : public IndexBuffer, public QOpenGLFunctions_4_5_Core
 	{
 	public:
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t size);
 		virtual ~OpenGLIndexBuffer();
 
-		virtual void bind() const override;
-		virtual void unBind() const override;
+		virtual void bind() override;
+		virtual void unBind() override;
 
 		virtual uint32_t getIndicesCount() const override;
 	private:

@@ -2,7 +2,7 @@
 #define EDITOR_CAMERA_H
 
 #include "camera.h"
-
+#include "render_global.h"
 
 #include <glm/glm.hpp>
 
@@ -14,7 +14,8 @@ namespace Donut
 		EditorCamera() = default;
 		EditorCamera(float fov, float aspect_ratio, float near_clip, float far_clip);
 
-
+		//void onUpdate(Timestep ts);
+		//void onEvent(Event& e);
 
 		inline float getDistance() const { return distance_; }
 		inline void setDistance(float distance) { distance_ = distance; }
@@ -22,7 +23,6 @@ namespace Donut
 		inline void setViewportSize(float width, float height) { viewport_width_ = width; viewport_height_ = height; updateProjection(); }
 
 		const glm::mat4& getViewMatrix() const { return view_matrix_; }
-		void setViewMatirx(glm::mat4x4 mat) { view_matrix_ = mat; }
 		glm::mat4 getViewProjection() const { return projection_ * view_matrix_; }
 
 		glm::vec3 getUpDirection() const;
@@ -37,13 +37,15 @@ namespace Donut
 		void updateProjection();
 		void updateView();
 
+		//bool onMouseScroll(MouseScrolledEvent& e);
+
 		void mousePan(const glm::vec2& delta);
 		void mouseRotate(const glm::vec2& delta);
 		void mouseZoom(float delta);
 
 		glm::vec3 calculatePosition() const;
 
-
+		std::pair<float, float> panSpeed() const;
 		float rotationSpeed() const;
 		float zoomSpeed() const;
 	private:

@@ -3,9 +3,11 @@
 
 #include "renderer/texture.h"
 
+#include <QOpenGLFunctions_4_5_Core>
+
 namespace Donut
 {
-	class OpenGLTexture2D : public Texture2D
+	class OpenGLTexture2D : public Texture2D, protected QOpenGLFunctions_4_5_Core
 	{
 	public:
 		OpenGLTexture2D(const TextureSpecification& spec);
@@ -23,7 +25,7 @@ namespace Donut
 
 		virtual const std::string& getPath() const override { return file_path_; }
 
-		virtual void bind(uint32_t slot = 0) const override;
+		virtual void bind(uint32_t slot = 0) override;
 
 		virtual bool isLoaded() const override { return is_loaded_; }
 

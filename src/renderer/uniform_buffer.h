@@ -1,6 +1,5 @@
 #ifndef UNIFORM_BUFFER_H
 #define UNIFORM_BUFFER_H
-
 #include "render_global.h"
 
 namespace Donut

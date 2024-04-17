@@ -1,6 +1,5 @@
 #include "opengl_buffers.h"
-
-#include "render_global.h"
+#include "opengl_functions.h"
 
 namespace Donut
 {
@@ -9,22 +8,32 @@ namespace Donut
 	////Vertex Buffer
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+		: QOpenGLFunctions_4_5_Core()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glGenBuffers(1, &object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ARRAY_BUFFER, object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW));
+		//DN_PROFILE_FUNCTION();
+
+		initializeOpenGLFunctions();
+
+		glCreateBuffers(1, &object_id_);
+		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+		: QOpenGLFunctions_4_5_Core()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glGenBuffers(1, &object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ARRAY_BUFFER, object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW));
+		//DN_PROFILE_FUNCTION();
+
+		glCreateBuffers(1, &object_id_);
+		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
+		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glDeleteBuffers(1, &object_id_));
+		//DN_PROFILE_FUNCTION();
+
+		glDeleteBuffers(1, &object_id_);
 	}
 
 	void OpenGLVertexBuffer::setLayout(const BufferLayout& layout)
@@ -39,19 +48,24 @@ namespace Donut
 
 	void OpenGLVertexBuffer::setData(const void* data, uint32_t size)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ARRAY_BUFFER, object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
+		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
-	void OpenGLVertexBuffer::bind() const
+	void OpenGLVertexBuffer::bind()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ARRAY_BUFFER, object_id_));
+		//DN_PROFILE_FUNCTION();
+
+		glBindBuffer(GL_ARRAY_BUFFER, object_id_);
 	}
 
-	void OpenGLVertexBuffer::unBind() const
+	void OpenGLVertexBuffer::unBind()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		//DN_PROFILE_FUNCTION();
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
+
 
 
 
@@ -67,26 +81,27 @@ namespace Donut
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	////Index Buffer
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
-		: indices_count_(count)
+		: QOpenGLFunctions_4_5_Core(), indices_count_(count)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glGenBuffers(1, &object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW));
+		initializeOpenGLFunctions();
+		glCreateBuffers(1, &object_id_);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_id_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glDeleteBuffers(1, &object_id_));
+		glDeleteBuffers(1, &object_id_);
 	}
 
-	void OpenGLIndexBuffer::bind() const
+	void OpenGLIndexBuffer::bind() 
 	{
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_id_));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_id_);
 	}
 
-	void OpenGLIndexBuffer::unBind() const
+	void OpenGLIndexBuffer::unBind() 
 	{
-		OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	uint32_t OpenGLIndexBuffer::getIndicesCount() const
 	{

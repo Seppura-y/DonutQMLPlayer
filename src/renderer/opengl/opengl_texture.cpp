@@ -1,18 +1,19 @@
 #include "opengl_texture.h"
 
 #include "stb_image.h"
-#include "render_global.h"
+
+//#include <glad/glad.h>
 
 namespace Donut
 {
-	namespace Utils
+	namespace Utils 
 	{
 		static GLenum donutImageFormatToGLDataFormat(ImageFormat format)
 		{
 			switch (format)
 			{
-			case ImageFormat::RGB8: return GL_RGB;
-			case ImageFormat::RGBA8: return GL_RGBA;
+				case ImageFormat::RGB8: return GL_RGB;
+				case ImageFormat::RGBA8: return GL_RGBA;
 			}
 
 			DN_CORE_ASSERT(false, "donutImageFormatToGLDataFormat : unknown format");
@@ -36,23 +37,26 @@ namespace Donut
 	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
 		: texture_spec_(spec), width_(spec.width_), height_(spec.height_)
 	{
+		//DN_PROFILE_FUNCTION();
+		initializeOpenGLFunctions();
 		internal_format_ = Utils::donutImageFormatToGLInternalFormat(texture_spec_.format_);
 		data_format_ = Utils::donutImageFormatToGLDataFormat(texture_spec_.format_);
 
-		OPENGL_EXTRA_FUNCTIONS(glGenTextures(1, &object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
-		OPENGL_EXTRA_FUNCTIONS(glTexStorage2D(GL_TEXTURE_2D, 1, internal_format_, width_, height_));
+		glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
+		glTextureStorage2D(object_id_, 1, internal_format_, width_, height_);
 
-		OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-		OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+		glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-		OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		: file_path_(path)
 	{
+		//DN_PROFILE_FUNCTION();
+		initializeOpenGLFunctions();
 		stbi_set_flip_vertically_on_load(1);
 		int width, height, channels;
 
@@ -81,7 +85,7 @@ namespace Donut
 				internal_format = GL_RGB8;
 				data_format = GL_RGB;
 			}
-
+		
 			internal_format_ = internal_format;
 			data_format_ = data_format;
 
@@ -91,17 +95,16 @@ namespace Donut
 			height_ = height;
 			channels_ = channels;
 
-			OPENGL_EXTRA_FUNCTIONS(glGenTextures(1, &object_id_));
-			OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
-			OPENGL_EXTRA_FUNCTIONS(glTexStorage2D(GL_TEXTURE_2D, 1, internal_format_, width_, height_));
+			glCreateTextures(GL_TEXTURE_2D, 1, &object_id_);
+			glTextureStorage2D(object_id_, 1, internal_format_, width_, height_);
 
-			OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-			OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+			glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-			OPENGL_EXTRA_FUNCTIONS(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+			glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			OPENGL_EXTRA_FUNCTIONS(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data));
+			glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
 
 			stbi_image_free(data);
 		}
@@ -109,14 +112,18 @@ namespace Donut
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glDeleteTextures(1, &object_id_));
+		//DN_PROFILE_FUNCTION();
+
+		glDeleteTextures(1, &object_id_);
 	}
 
 	void OpenGLTexture2D::setData(void* data, uint32_t size)
 	{
+		//DN_PROFILE_FUNCTION();
+
 		uint32_t bytes_per_pixel = data_format_ == GL_RGBA ? 4 : 3;
 		DN_CORE_ASSERT(size == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
-		OPENGL_EXTRA_FUNCTIONS(glTexSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data));
+		glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data);
 	}
 
 	uint32_t OpenGLTexture2D::getObjectId() const
@@ -124,10 +131,11 @@ namespace Donut
 		return object_id_;
 	}
 
-	void OpenGLTexture2D::bind(uint32_t slot) const
+	void OpenGLTexture2D::bind(uint32_t slot)
 	{
-		OPENGL_EXTRA_FUNCTIONS(glActiveTexture(GL_TEXTURE0 + slot));
-		OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
+		//DN_PROFILE_FUNCTION();
+
+		glBindTextureUnit(slot, object_id_);
 	}
 
 

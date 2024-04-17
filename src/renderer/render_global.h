@@ -14,7 +14,8 @@
 #endif
 
 #define OPENGL_FUNCTIONS(x) QOpenGLContext::currentContext()->functions()->x
-#define OPENGL_EXTRA_FUNCTIONS(x) QOpenGLContext::currentContext()->extraFunctions()->x
+#define OPENGL_EXTRA_FUNCTIONS(x) x
+//#define OPENGL_EXTRA_FUNCTIONS(x) QOpenGLContext::currentContext()->extraFunctions()->x
 
 namespace Donut
 {

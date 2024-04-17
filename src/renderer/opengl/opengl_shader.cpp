@@ -2,10 +2,17 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "render_global.h"
+//#include "render_global.h"
 
 #include <fstream>
 
+#include <QOpenGLFunctions_4_5_Core>
+#include <QOffscreenSurface>
+#include <QSurfaceFormat>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLShader>
+#include <QOpenGLContext>
+#define OPENGL_EXTRA_FUNCTIONS(x) QOpenGLContext::currentContext()->extraFunctions()->x
 namespace Donut
 {
 
@@ -44,7 +51,7 @@ namespace Donut
 
 	OpenGLShader::~OpenGLShader()
 	{
-		OPENGL_EXTRA_FUNCTIONS(glDeleteProgram(shader_id_));
+		QOpenGLContext::currentContext()->extraFunctions()->glDeleteProgram(shader_id_);
 	}
 
 	std::string OpenGLShader::readFile(const std::string& filepath)
@@ -94,7 +101,7 @@ namespace Donut
 
 	void OpenGLShader::compileShaders(const std::unordered_map<GLenum, std::string>& shader_sources)
 	{
-		GLuint program = OPENGL_EXTRA_FUNCTIONS(glCreateProgram());
+		GLuint program = QOpenGLContext::currentContext()->extraFunctions()->glCreateProgram();
 		DN_CORE_ASSERT(shader_sources.size() <= 2, "we only support 2 shaders for now");
 		std::array<GLenum, 2> glShaderIDs;
 		int shader_index = 0;
@@ -104,10 +111,10 @@ namespace Donut
 			GLenum type = kv.first;
 			const std::string& source = kv.second;
 
-			GLuint shader = OPENGL_EXTRA_FUNCTIONS(glCreateShader(type));
+			GLuint shader = QOpenGLContext::currentContext()->extraFunctions()->glCreateShader(type);
 
 			const GLchar* sourceCStr = source.c_str();
-			OPENGL_EXTRA_FUNCTIONS(glShaderSource(shader, 1, &sourceCStr, 0));
+			QOpenGLContext::currentContext()->extraFunctions()->glShaderSource(shader, 1, &sourceCStr, 0);
 
 			OPENGL_EXTRA_FUNCTIONS(glCompileShader(shader));
 
@@ -150,7 +157,7 @@ namespace Donut
 
 			OPENGL_EXTRA_FUNCTIONS(glGetProgramInfoLog(program, 512, nullptr, message));
 			qDebug() << message;
-			
+
 
 			// The maxLength includes the NULL character
 			//std::vector<GLchar> infoLog(maxLength);
