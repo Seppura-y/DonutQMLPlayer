@@ -8,8 +8,14 @@ namespace Donut
 	void OpenGLRendererAPI::init()
 	{
 		context_ = new QOpenGLContext;
-		auto format = QSurfaceFormat::defaultFormat();
+
+		QSurfaceFormat format;
+		format.setMajorVersion(4);
+		format.setMinorVersion(5);
 		format.setProfile(QSurfaceFormat::CoreProfile);
+
+		//auto format = QSurfaceFormat::defaultFormat();
+		//format.setProfile(QSurfaceFormat::CoreProfile);
 		context_->setFormat(format);
 
 		if (!context_->create())
@@ -48,9 +54,12 @@ namespace Donut
 	void OpenGLRendererAPI::drawIndices(const Donut::Ref<VertexArray>& va, uint32_t count)
 	{
 		va->bind();
+		va->getIndexBuffer()->bind();
 		uint32_t indices_count = count ? count : va->getIndexBuffer()->getIndicesCount();
 		//OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
+		//const short* indices = (const short*)0;
 		OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr));
+		//OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, indices));
 		GLenum error = OPENGL_EXTRA_FUNCTIONS(glGetError());
 		if (error != GL_NO_ERROR) {
 			// ¥Ú”°¥ÌŒÛ–≈œ¢
