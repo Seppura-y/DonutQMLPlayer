@@ -26,6 +26,12 @@ ApplicationWindow
     Material.accent: Material.Grey
     Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
 
+    DonutGLItem
+    {
+        id: glItem
+        anchors.fill: parent
+    }
+
     CoverArea
     {
         id: coverArea
