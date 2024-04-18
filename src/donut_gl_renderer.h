@@ -1,12 +1,14 @@
 #ifndef DONUT_GL_RENDERER_H
 #define DONUT_GL_RENDERER_H
 
+#include "opengl_shader.h"
+
 #include <QObject>
 #include <QQuickWindow>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLShaderProgram>
 
-class DonutGLItemRenderer : public QObject, protected QOpenGLFunctions
+class DonutGLItemRenderer : public QObject, public QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
 public:
@@ -28,6 +30,8 @@ private:
 	qreal m_t;
 	QOpenGLShaderProgram* m_program;
 	QQuickWindow* m_window;
+
+	std::shared_ptr<Donut::OpenGLShader> shader_;
 };
 
 #endif

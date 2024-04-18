@@ -6,12 +6,15 @@
 #include <QQuickOpenGLUtils>
 #include <QRunnable>
 
+DonutGLItemRenderer* DonutGLItem::s_renderer_ = nullptr;
+
 DonutGLItem::DonutGLItem(QQuickItem* parent)
     : QQuickItem(parent)
     , m_t(0)
-    , m_renderer(nullptr)
+    //, s_renderer_(nullptr)
 {
     connect(this, &QQuickItem::windowChanged, this, &DonutGLItem::handleWindowChanged);
+    connect(this, &DonutGLItem::sigItemInitialized, this, &DonutGLItem::onItemInitialized);
     startTimer(1000 / 60);
     setFlag(ItemHasContents, true);
 }
@@ -32,9 +35,29 @@ void DonutGLItem::setT(qreal t)
         window()->update();
 }
 
+void DonutGLItem::onItemInitialized()
+{
+    qDebug() << "DonutGLItem::onItemInitialized()";
+    if (!s_renderer_) {
+        s_renderer_ = new DonutGLItemRenderer();
+        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutGLItemRenderer::init, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutGLItemRenderer::paint, Qt::DirectConnection);
+    }
+}
+
 void DonutGLItem::timerEvent(QTimerEvent* ev)
 {
     update();
+}
+
+void DonutGLItem::mousePressEvent(QMouseEvent* ev)
+{
+    qDebug() << "DonutGLItem::mousePressEvent(QMouseEvent* ev)";
+}
+
+void DonutGLItem::wheelEvent(QWheelEvent* ev)
+{
+    qDebug() << "DonutGLItem::wheelEvent(QWheelEvent* ev)";
 }
 
 
@@ -54,38 +77,38 @@ void DonutGLItem::handleWindowChanged(QQuickWindow* win)
 
 void DonutGLItem::cleanup()
 {
-    delete m_renderer;
-    m_renderer = nullptr;
+    delete s_renderer_;
+    s_renderer_ = nullptr;
 }
 
 class CleanupJob : public QRunnable
 {
 public:
-    CleanupJob(DonutGLItemRenderer* renderer) : m_renderer(renderer) { }
-    void run() override { delete m_renderer; }
+    CleanupJob(DonutGLItemRenderer* renderer) : s_renderer_(renderer) { }
+    void run() override { delete s_renderer_; }
 private:
-    DonutGLItemRenderer* m_renderer;
+    DonutGLItemRenderer* s_renderer_;
 };
 
 
 void DonutGLItem::releaseResources()
 {
-    window()->scheduleRenderJob(new CleanupJob(m_renderer), QQuickWindow::BeforeSynchronizingStage);
-    m_renderer = nullptr;
+    window()->scheduleRenderJob(new CleanupJob(s_renderer_), QQuickWindow::BeforeSynchronizingStage);
+    s_renderer_ = nullptr;
 }
 
 
 
 void DonutGLItem::sync()
 {
-    if (!m_renderer) {
-        m_renderer = new DonutGLItemRenderer();
-        connect(window(), &QQuickWindow::beforeRendering, m_renderer, &DonutGLItemRenderer::init, Qt::DirectConnection);
-        connect(window(), &QQuickWindow::beforeRenderPassRecording, m_renderer, &DonutGLItemRenderer::paint, Qt::DirectConnection);
-    }
-    m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
-    m_renderer->setT(m_t);
-    m_renderer->setWindow(window());
+    //if (!s_renderer_) {
+    //    s_renderer_ = new DonutGLItemRenderer();
+    //    connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutGLItemRenderer::init, Qt::DirectConnection);
+    //    connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutGLItemRenderer::paint, Qt::DirectConnection);
+    //}
+    s_renderer_->setViewportSize(window()->size() * window()->devicePixelRatio());
+    s_renderer_->setT(m_t);
+    s_renderer_->setWindow(window());
 }
 
 
