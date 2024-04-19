@@ -20,6 +20,7 @@ namespace Donut
 		virtual ~OpenGLShader();
 
 		virtual const std::string& getName() { return name_; }
+		unsigned int getId() { return shader_id_; }
 
 		virtual void bind() const;
 		virtual void unBind() const;

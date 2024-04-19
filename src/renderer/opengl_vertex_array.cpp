@@ -58,12 +58,16 @@ namespace Donut
 			case ShaderDataType::Float4:
 			{
 				OPENGL_EXTRA_FUNCTIONS(glEnableVertexAttribArray(vertex_buffer_index_));
+
+				auto compo_count = element.getComponentCount();
+				auto type = shaderDataTypeToGLenumType(element.type_);
 				OPENGL_EXTRA_FUNCTIONS(glVertexAttribPointer(vertex_buffer_index_,
 					element.getComponentCount(),
 					shaderDataTypeToGLenumType(element.type_),
 					element.normalized_ ? GL_TRUE : GL_FALSE,
 					lay.getStride(),
-					(const void*)element.offset_));
+					(const void*)element.offset_)
+				);
 				vertex_buffer_index_++;
 				break;
 			}
