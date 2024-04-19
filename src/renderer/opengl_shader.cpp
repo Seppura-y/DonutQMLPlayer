@@ -1,5 +1,6 @@
 #include "opengl_shader.h"
 
+#include "renderer_global.h"
 #include "donut_gl_item.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -8,19 +9,9 @@
 
 #include <fstream>
 
-#define OPENGL_EXTRA_FUNCTIONS(x) DonutGLItem::getRenderer()->x
-#ifdef DN_ENABLE_ASSERTS
-#define DN_ASSERT(x, ...) { if(!(x)) { DN_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#define DN_CORE_ASSERT(x, ...) { if(!(x)) { DN_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#else
-#define DN_ASSERT(x, ...)
-#define DN_CORE_ASSERT(x, ...)
-#endif
-
 #include "opengl_shader.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
 
 #include <fstream>
 

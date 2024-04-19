@@ -101,11 +101,11 @@ void DonutGLItem::releaseResources()
 
 void DonutGLItem::sync()
 {
-    //if (!s_renderer_) {
-    //    s_renderer_ = new DonutGLItemRenderer();
-    //    connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutGLItemRenderer::init, Qt::DirectConnection);
-    //    connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutGLItemRenderer::paint, Qt::DirectConnection);
-    //}
+    if (!s_renderer_) {
+        s_renderer_ = new DonutGLItemRenderer();
+        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutGLItemRenderer::init, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutGLItemRenderer::paint, Qt::DirectConnection);
+    }
     s_renderer_->setViewportSize(window()->size() * window()->devicePixelRatio());
     s_renderer_->setT(m_t);
     s_renderer_->setWindow(window());
