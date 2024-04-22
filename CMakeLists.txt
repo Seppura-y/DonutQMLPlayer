@@ -31,11 +31,14 @@ file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/rendere
 file(GLOB ${PROJECT_NAME}_STBIMAGE_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.h)
 file(GLOB ${PROJECT_NAME}_STBIMAGE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.cpp)
 
+file(GLOB ${PROJECT_NAME}_SHADERS ${CMAKE_CURRENT_LIST_DIR}/bin/assets/shaders/*.glsl)
+
 source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
 source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES  ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//renderer"                    FILES  ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
 source_group("src//renderer//stb_image"         FILES  ${${PROJECT_NAME}_STBIMAGE_HEADERS} ${${PROJECT_NAME}_STBIMAGE_SOURCES})
+source_group("src//renderer//assets//shaders"   FILES  ${${PROJECT_NAME}_SHADERS})
 
 
 add_executable(${PROJECT_NAME}
@@ -51,6 +54,8 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_QRC_FILES}
     ${${PROJECT_NAME}_QML_FILES}
     ${${PROJECT_NAME}_QML_DIR}
+
+    ${${PROJECT_NAME}_SHADERS}
     # ${QRC_FILES}
 )
 
