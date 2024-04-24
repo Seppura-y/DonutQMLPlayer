@@ -6,6 +6,8 @@
 #include <QQuickOpenGLUtils>
 #include <QRunnable>
 
+#include <QDebug>
+
 DonutGLItemRenderer* DonutGLItem::s_renderer_ = nullptr;
 
 DonutGLItem::DonutGLItem(QQuickItem* parent)
@@ -106,6 +108,8 @@ void DonutGLItem::sync()
         connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutGLItemRenderer::init, Qt::DirectConnection);
         connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutGLItemRenderer::paint, Qt::DirectConnection);
     }
+    //qDebug() << "width : " << window()->size().width() << " height: " << window()->size().height();
+    //qDebug() << "ratio : " << window()->devicePixelRatio();
     s_renderer_->setViewportSize(window()->size() * window()->devicePixelRatio());
     s_renderer_->setT(m_t);
     s_renderer_->setWindow(window());

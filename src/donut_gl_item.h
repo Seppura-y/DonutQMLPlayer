@@ -42,6 +42,10 @@ private:
 	qreal m_t;
 protected:
 	static DonutGLItemRenderer* s_renderer_;
+
+	int width_;
+	int height_;
+	float aspect_ratio_;
 };
 
 #endif
