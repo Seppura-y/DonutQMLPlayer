@@ -35,7 +35,7 @@ namespace Donut
 	{
 		//DN_PROFILE_FUNCTION();
 
-		OPENGL_EXTRA_FUNCTIONS(glGenVertexArrays(1, &object_id_));
+		OPENGL_EXTRA_FUNCTIONS(glDeleteVertexArrays(1, &object_id_));
 	}
 
 	void OpenGLVertexArray::addVertexBuffer(const Donut::Ref<OpenGLVertexBuffer>& buffer)

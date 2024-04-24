@@ -120,6 +120,8 @@ void DonutGLItemRenderer::paint()
 
     s_data.rect_shader_->uploadUniformFloat("u_test", (float)m_t);
 
+    calculateAspectRatio();
+
     glDisable(GL_DEPTH_TEST);
 
     glEnable(GL_BLEND);
@@ -138,6 +140,11 @@ void DonutGLItemRenderer::setViewportSize(const QSize& size)
 {
     m_viewportSize = size;
     //qDebug() << "setViewportSize width : " << size.width() << " height: " << size.height();
+}
+
+void DonutGLItemRenderer::drawRectangle(glm::vec3 position)
+{
+
 }
 
 void DonutGLItemRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t count)

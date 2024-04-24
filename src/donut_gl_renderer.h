@@ -21,7 +21,7 @@ struct BatchRenderData
 	static const uint32_t max_indices_ = max_rects_ * 6;
 	static const uint32_t max_texture_slots_ = 32;
 
-	std::shared_ptr<Donut::OpenGLTexture2D> white_texture_;
+	std::shared_ptr <Donut::OpenGLTexture2D> white_texture_;
 
 	std::shared_ptr <Donut::OpenGLShader> rect_shader_;
 	std::shared_ptr <Donut::OpenGLVertexArray> rect_vao_;
@@ -54,7 +54,7 @@ public:
 	void setViewportSize(const QSize& size);
 	void setWindow(QQuickWindow* window) { m_window = window; }
 
-	void drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t vertex_count);
+	void drawRectangle(glm::vec3 position);
 
 public slots:
 	void init();
@@ -65,22 +65,16 @@ private:
 	void beginScene();
 	void endScene();
 
+	void calculateAspectRatio();
+
+private:
+	void drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t vertex_count);
 private:
 
 	QSize m_viewportSize;
 	qreal m_t;
 	QOpenGLShaderProgram* m_program;
 	QQuickWindow* m_window;
-
-	//std::shared_ptr<Donut::OpenGLShader> rect_shader_;
-	//std::shared_ptr < Donut::OpenGLVertexArray> rect_vao_;
-	//std::shared_ptr < Donut::OpenGLVertexBuffer> rect_vbo_;
-	//std::shared_ptr < Donut::OpenGLIndexBuffer> rect_ebo_;
-	//std::shared_ptr < Donut::OpenGLUniformBuffer> rect_ubo_;
-
-	//uint32_t rect_indices_count_ = 0;
-	//RectangleVertex* rect_vertex_buffer_base_ = nullptr;
-	//RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
 
 	BatchRenderData s_data;
 
