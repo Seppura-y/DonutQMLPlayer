@@ -30,7 +30,7 @@ Window
     {
         id: glItem
         anchors.fill: parent
-        SequentialAnimation on t 
+        SequentialAnimation on t
         {
             NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
             NumberAnimation { to: 0; duration: 2500; easing.type: Easing.OutQuad }
@@ -81,7 +81,7 @@ Window
         Action { text: qsTr("Video options"); onTriggered: sideBar.openVideoOptions() }
 
         Action { text: qsTr("Playlist"); onTriggered: sideBar.openPlaylist() }
-        
+
         delegate: MenuItem { height: 25 }
     }
 
@@ -131,7 +131,7 @@ Window
                 property bool mouseClicked: false
 
                 drag.target: handleRect
-                drag.axis: Drag.YAxis // ĞŞ¸ÄÎª Y ÖáÍÏ¶¯
+                drag.axis: Drag.YAxis // ä¿®æ”¹ä¸º Y è½´æ‹–åŠ¨
                 drag.minimumY: slider.topPadding
                 drag.maximumY: slider.height - slider.bottomPadding - handleRect.height
 
@@ -207,7 +207,7 @@ Window
                     id: contentRect
                     x: track.x - track.width
                     width: track.width
-                    // Îª½â¾ö³õÊ¼»¯ÖµÊ±£¬contentRectheightÎª¸ºÖµ£¬ÔÚonCompletedÖĞÉèÖÃ°ÑheightµÄ¸³ÖµÒÆµ½onValueChangedÖĞ
+                    // ä¸ºè§£å†³åˆå§‹åŒ–å€¼æ—¶ï¼ŒcontentRectheightä¸ºè´Ÿå€¼ï¼Œåœ¨onCompletedä¸­è®¾ç½®æŠŠheightçš„èµ‹å€¼ç§»åˆ°onValueChangedä¸­
                     //height: (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding)) - (handleRect.height / 2)
                     anchors.bottom: parent.bottom
                     color: "orange"

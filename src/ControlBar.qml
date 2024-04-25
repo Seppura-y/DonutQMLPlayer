@@ -1,3 +1,4 @@
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -7,7 +8,7 @@ Control
 {
     id: controlBar
 
-    
+
     FontLoader
     {
         id: fontAwesome
@@ -68,7 +69,7 @@ Control
             Layout.preferredHeight: 12
             stepSize: 1
             leftPadding: 0
-            MouseArea 
+            MouseArea
             {
                 anchors.fill: parent
                 property bool mouseClicked: false
@@ -85,7 +86,7 @@ Control
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
                 }
 
-                // ½â¾öSliderÍÏ²»µ½Ä©¶ËºÍ³¬³ö·¶Î§µÄÎÊÌâ
+                // ï¿½ï¿½ï¿½ï¿½Sliderï¿½Ï²ï¿½ï¿½ï¿½Ä©ï¿½ËºÍ³ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 onPressed:
                 {
                     mouseClicked = true
@@ -94,7 +95,7 @@ Control
                     handleRect.x = clickPos;
                 }
 
-                // ½â¾öSliderÍÏ²»µ½Ä©¶ËºÍ³¬³ö·¶Î§µÄÎÊÌâ
+                // ï¿½ï¿½ï¿½ï¿½Sliderï¿½Ï²ï¿½ï¿½ï¿½Ä©ï¿½ËºÍ³ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 onPositionChanged: (mouse)=>
                 {
                     if (drag.active)
@@ -165,7 +166,7 @@ Control
                 }
             }
 
-            //µ±´°¿Ú´óÐ¡·¢Éú±ä»¯Ê±£¬handleµÄÎ»ÖÃ¸ù¾ÝSliderµÄµ±Ç°Öµ¶¯Ì¬¸üÐÂ
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ä»¯Ê±ï¿½ï¿½handleï¿½ï¿½Î»ï¿½Ã¸ï¿½ï¿½ï¿½Sliderï¿½Äµï¿½Ç°Öµï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½
             onValueChanged:
             {
                 //var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
@@ -301,7 +302,7 @@ Control
                     print("speedDownButton onClicked")
                 }
             }
-        
+
             Item
             {
                 id: durationLabel
@@ -327,7 +328,7 @@ Control
                     color: "transparent"
                 }
             }
-            
+
             FontButton
             {
                 id: playModeButton
@@ -361,13 +362,13 @@ Control
                     print("volumeButton onClicked")
                 }
             }
-            
+
 
             FontButton {
                 id: settingsButton
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
-                
+
                 focusPolicy: Qt.NoFocus
                 txt: String.fromCodePoint(0x2699)
 
@@ -382,7 +383,7 @@ Control
                 id: fullscreenButton
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
-                
+
                 focusPolicy: Qt.NoFocus
                 txt: String.fromCodePoint(0xf065)
 
@@ -392,12 +393,12 @@ Control
                     print("fullscreenButton onClicked")
                 }
             }
-            
+
             FontButton {
                 id: sidebarButton
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
-                
+
                 focusPolicy: Qt.NoFocus
                 txt: String.fromCodePoint(0xf036)
 
@@ -407,7 +408,7 @@ Control
                     print("sidebarButton onClicked")
                 }
             }
-	    } // RowLayout
+        } // RowLayout
     } // ColumnLayout
 
 
