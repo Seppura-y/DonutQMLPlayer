@@ -22,60 +22,18 @@ static const uint32_t max_texture_slots_ = 32;
 
 glm::vec4 rect_vertex_positions_[4];
 
-struct RectangleVertex
-{
-    glm::vec2 position_;
-    //glm::vec4 color_;
-    //glm::vec2 tex_coordinate_;
-
-    //float texture_index_;
-    //float tiling_factor_;
-
-    //int entity_id_;
-};
-
-struct CircleVertex
-{
-    glm::vec3 world_position_;
-    glm::vec3 local_position_;
-    glm::vec4 color_;
-    float thickness_;
-    float fade_;
-
-    int entity_id_;
-};
-
-struct LineVertex
-{
-    glm::vec3 position_;
-    glm::vec4 color_;
-
-    int entity_id_;
-};
-
-struct TextVertex
-{
-    glm::vec3 position_;
-    glm::vec4 color_;
-    glm::vec2 tex_coordinate_;
-
-    int entity_id_;
-};
-
-//BatchRenderData DonutGLItemRenderer::s_data;
-
 void DonutGLItemRenderer::init()
 {
-    if (!s_data.rect_shader_)
+    if (!batch_data_.rect_shader_)
     {
         QSGRendererInterface* rif = m_window->rendererInterface();
         Q_ASSERT(rif->graphicsApi() == QSGRendererInterface::OpenGL || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
 
         initializeOpenGLFunctions();
 
-        s_data.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/scene_graph_shader.glsl");
+        batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/scene_graph_shader.glsl");
 
-        s_data.rect_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
+        batch_data_.rect_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
 
         //float values[] = {
         //    -1.0f, -1.0f,
@@ -91,14 +49,14 @@ void DonutGLItemRenderer::init()
              1024.0f,  600.0f
         };
 
-        s_data.rect_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(values, 32);
+        batch_data_.rect_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(values, 32);
 
-        s_data.rect_vbo_->setLayout({
+        batch_data_.rect_vbo_->setLayout({
             {Donut::ShaderDataType::Float2, "vertices"}
         });
-        s_data.rect_vao_->addVertexBuffer(s_data.rect_vbo_);
+        batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
 
-        s_data.rect_vertex_buffer_base_ = new RectangleVertex[max_vertices_];
+        batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[max_vertices_];
     }
 }
 
@@ -115,10 +73,10 @@ void DonutGLItemRenderer::paint()
     //glClearColor(0.8f, 0.58f, 0.38f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    s_data.rect_shader_->bind();
-    s_data.rect_vao_->bind();
+    batch_data_.rect_shader_->bind();
+    batch_data_.rect_vao_->bind();
 
-    s_data.rect_shader_->uploadUniformFloat("u_test", (float)m_t);
+    batch_data_.rect_shader_->uploadUniformFloat("u_test", (float)m_t);
 
     calculateAspectRatio();
 
@@ -156,20 +114,20 @@ void DonutGLItemRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>
 
 void DonutGLItemRenderer::flush()
 {
-    if (s_data.rect_indices_count_)
+    if (batch_data_.rect_indices_count_)
     {
-        uint32_t data_size = (uint32_t)((uint8_t*)s_data.rect_vertex_buffer_ptr_ - (uint8_t*)s_data.rect_vertex_buffer_base_);
-        s_data.rect_vbo_->setData(s_data.rect_vertex_buffer_base_, data_size);
+        uint32_t data_size = (uint32_t)((uint8_t*)batch_data_.rect_vertex_buffer_ptr_ - (uint8_t*)batch_data_.rect_vertex_buffer_base_);
+        batch_data_.rect_vbo_->setData(batch_data_.rect_vertex_buffer_base_, data_size);
 
 
         // bind textures
-        for (uint32_t i = 0; i < s_data.texture_index_; i++)
+        for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
         {
-            s_data.texture_slots_[i]->bind(i);
+            batch_data_.texture_slots_[i]->bind(i);
         }
-        s_data.rect_shader_->bind();
-        drawIndices(s_data.rect_vao_, s_data.rect_indices_count_);
-        //s_data.statistics_.drawcalls_++;
+        batch_data_.rect_shader_->bind();
+        drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_);
+        //batch_data_.statistics_.drawcalls_++;
     }
 }
 
@@ -212,5 +170,5 @@ void DonutGLItemRenderer::calculateAspectRatio()
     transformMatrix = glm::translate(transformMatrix, glm::vec3(translation, 0.0f)); // Æ½ÒÆ
     transformMatrix = glm::rotate(transformMatrix, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f)); // Ëõ·Å
-    s_data.rect_shader_->uploadUniformMat4fv("u_translation", transformMatrix);
+    batch_data_.rect_shader_->uploadUniformMat4fv("u_translation", transformMatrix);
 }

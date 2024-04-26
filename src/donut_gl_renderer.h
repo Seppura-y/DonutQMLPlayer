@@ -11,7 +11,17 @@
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLShaderProgram>
 
-struct RectangleVertex;
+struct RectangleVertex
+{
+	glm::vec2 position_;
+	//glm::vec4 color_;
+	//glm::vec2 tex_coordinate_;
+
+	//float texture_index_;
+	//float tiling_factor_;
+
+	//int entity_id_;
+};
 
 
 struct BatchRenderData
@@ -54,6 +64,9 @@ public:
 	void setViewportSize(const QSize& size);
 	void setWindow(QQuickWindow* window) { m_window = window; }
 
+
+	//void setViewport(int x, int y, int width, int height);
+
 	void drawRectangle(glm::vec3 position);
 
 public slots:
@@ -76,7 +89,7 @@ private:
 	QOpenGLShaderProgram* m_program;
 	QQuickWindow* m_window;
 
-	BatchRenderData s_data;
+	BatchRenderData batch_data_;
 
 };
 
