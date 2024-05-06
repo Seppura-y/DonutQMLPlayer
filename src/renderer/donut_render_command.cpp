@@ -4,6 +4,11 @@
 
 namespace Donut
 {
-	DonutRendererApi* DonutRenderCommand::renderer_api_ = new DonutGLRendererApi();
+	DonutGLRendererApi* DonutRenderCommand::renderer_api_ = nullptr;
+
+	void DonutRenderCommand::init()
+	{
+		renderer_api_ = new DonutGLRendererApi();
+	}
 
 }

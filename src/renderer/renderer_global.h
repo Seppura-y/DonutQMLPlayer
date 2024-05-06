@@ -17,8 +17,11 @@
 //#define OPENGL_FUNCTIONS(x) DonutScene::getRenderer()->x
 //#define OPENGL_EXTRA_FUNCTIONS(x) DonutScene::getRenderer()->x
 
-#define OPENGL_FUNCTIONS(x) DonutScene::getRendererApi()->x
-#define OPENGL_EXTRA_FUNCTIONS(x) DonutScene::getRendererApi()->x
+//#define OPENGL_FUNCTIONS(x) DonutScene::getRendererApi()->x
+//#define OPENGL_EXTRA_FUNCTIONS(x) DonutScene::getRendererApi()->x
+
+#define OPENGL_EXTRA_FUNCTIONS(x) Donut::DonutRenderCommand::getRendererApi()->x
+#define OPENGL_EXTRA_FUNCTIONS(x) Donut::DonutRenderCommand::getRendererApi()->x
 
 namespace Donut
 {

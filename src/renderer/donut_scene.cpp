@@ -22,8 +22,8 @@ DonutScene::DonutScene(QQuickItem* parent)
     setFlag(ItemHasContents, true);
 
     QSurfaceFormat format;
-    format.setMajorVersion(3);
-    format.setMinorVersion(3);
+    format.setMajorVersion(4);
+    format.setMinorVersion(5);
     format.setProfile(QSurfaceFormat::CoreProfile);
 
     context_ = new QOpenGLContext(this);
@@ -38,10 +38,11 @@ DonutScene::DonutScene(QQuickItem* parent)
     offscreen_surface_->create();
     context_->makeCurrent(offscreen_surface_);
 
-    renderer_api_ = new Donut::DonutGLRendererApi();
-    renderer_api_->init();
+    Donut::DonutRenderCommand::init();
+    //renderer_api_ = new Donut::DonutGLRendererApi();
+    //renderer_api_->init();
 
-    renderer_api_->glCreateProgram();
+    //renderer_api_->glCreateProgram();
 }
 
 DonutScene::~DonutScene()

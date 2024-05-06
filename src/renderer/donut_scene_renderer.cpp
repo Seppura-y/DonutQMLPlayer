@@ -30,7 +30,7 @@ void DonutSceneRenderer::init()
         QSGRendererInterface* rif = window_->rendererInterface();
         Q_ASSERT(rif->graphicsApi() == QSGRendererInterface::OpenGL || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
 
-        initializeOpenGLFunctions();
+        //initializeOpenGLFunctions();
 
         batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/scene_graph_shader.glsl");
 
@@ -128,12 +128,12 @@ void DonutSceneRenderer::paint()
 {
     window_->beginExternalCommands();
 
-    glViewport(0, 0, viewport_size_.width(), viewport_size_.height());
+    Donut::DonutRenderCommand::getRendererApi()->glViewport(0, 0, viewport_size_.width(), viewport_size_.height());
     //qDebug() << "setViewportSize width : " << viewport_size_.width() << " height: " << viewport_size_.height();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    Donut::DonutRenderCommand::getRendererApi()->glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //glClearColor(0.8f, 0.58f, 0.38f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    Donut::DonutRenderCommand::getRendererApi()->glClear(GL_COLOR_BUFFER_BIT);
 
     batch_data_.rect_shader_->bind();
     batch_data_.rect_vao_->bind();
@@ -142,12 +142,12 @@ void DonutSceneRenderer::paint()
 
     calculateAspectRatio();
 
-    glDisable(GL_DEPTH_TEST);
+    Donut::DonutRenderCommand::getRendererApi()->glDisable(GL_DEPTH_TEST);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    Donut::DonutRenderCommand::getRendererApi()->glEnable(GL_BLEND);
+    Donut::DonutRenderCommand::getRendererApi()->glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    Donut::DonutRenderCommand::getRendererApi()->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Not strictly needed for this example, but generally useful for when
     // mixing with raw OpenGL.
@@ -178,7 +178,7 @@ void DonutSceneRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>&
 {
     va->bind();
     uint32_t indices_count = count ? count : va->getIndexBuffer()->getIndicesCount();
-    glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr);
+    Donut::DonutRenderCommand::getRendererApi()->glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
 void DonutSceneRenderer::flush()

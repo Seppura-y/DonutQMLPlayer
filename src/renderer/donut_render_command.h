@@ -2,6 +2,7 @@
 #define DONUT_RENDER_COMMAND_H
 
 #include "donut_renderer_api.h"
+#include "donut_gl_renderer_api.h"
 
 namespace Donut
 {
@@ -11,11 +12,11 @@ namespace Donut
 		DonutRenderCommand() = default;
 		~DonutRenderCommand() = default;
 
-		inline static void init()
-		{
-		}
+		static void init();
+
+		static DonutGLRendererApi* getRendererApi() { return renderer_api_; }
 	private:
-		static DonutRendererApi* renderer_api_;
+		static DonutGLRendererApi* renderer_api_;
 	};
 }
 
