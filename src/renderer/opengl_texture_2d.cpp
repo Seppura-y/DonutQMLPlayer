@@ -2,7 +2,7 @@
 
 #include "stb_image.h"
 
-#include "donut_gl_item.h"
+#include "donut_scene.h"
 #include "renderer_global.h"
 
 namespace Donut
@@ -105,6 +105,19 @@ namespace Donut
 
 			stbi_image_free(data);
 		}
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+	{
+		internal_format_ = GL_RGBA8, data_format_ = GL_RGBA;
+		OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));
+		OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+
+		OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+		OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+		OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT));
+		OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()

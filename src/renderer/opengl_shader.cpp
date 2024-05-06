@@ -1,7 +1,7 @@
 #include "opengl_shader.h"
 
+#include "donut_scene.h"
 #include "renderer_global.h"
-#include "donut_gl_item.h"
 
 #include <glm/gtc/type_ptr.hpp>
 

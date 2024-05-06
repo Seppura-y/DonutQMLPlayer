@@ -11,8 +11,14 @@
 #define DN_CORE_ASSERT(x, ...)
 #endif
 
-#define OPENGL_FUNCTIONS(x) DonutGLItem::getRenderer()->x
-#define OPENGL_EXTRA_FUNCTIONS(x) DonutGLItem::getRenderer()->x
+//#define OPENGL_FUNCTIONS(x) DonutGLItem::getRenderer()->x
+//#define OPENGL_EXTRA_FUNCTIONS(x) DonutGLItem::getRenderer()->x
+
+//#define OPENGL_FUNCTIONS(x) DonutScene::getRenderer()->x
+//#define OPENGL_EXTRA_FUNCTIONS(x) DonutScene::getRenderer()->x
+
+#define OPENGL_FUNCTIONS(x) DonutScene::getRendererApi()->x
+#define OPENGL_EXTRA_FUNCTIONS(x) DonutScene::getRendererApi()->x
 
 namespace Donut
 {

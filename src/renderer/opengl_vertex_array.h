@@ -17,19 +17,19 @@ namespace Donut
 		OpenGLVertexArray();
 		virtual ~OpenGLVertexArray();
 
-		virtual void addVertexBuffer(const Donut::Ref<OpenGLVertexBuffer>& buffer);
-		virtual void setIndexBuffer(const Donut::Ref<OpenGLIndexBuffer>& buffer);
+		virtual void addVertexBuffer(const Ref<OpenGLVertexBuffer>& buffer);
+		virtual void setIndexBuffer(const Ref<OpenGLIndexBuffer>& buffer);
 
 		virtual void bind() const;
 		virtual void unBind() const;
 
-		virtual const std::vector<Donut::Ref<OpenGLVertexBuffer>>& getVertexBuffers() const { return vertex_buffers_; }
-		virtual const Donut::Ref<OpenGLIndexBuffer>& getIndexBuffer() const { return index_buffer_; }
+		virtual const std::vector<Ref<OpenGLVertexBuffer>>& getVertexBuffers() const { return vertex_buffers_; }
+		virtual const Ref<OpenGLIndexBuffer>& getIndexBuffer() const { return index_buffer_; }
 	private:
 		unsigned int object_id_;
 		unsigned int vertex_buffer_index_ = 0;
-		std::vector<Donut::Ref<OpenGLVertexBuffer>> vertex_buffers_;
-		Donut::Ref<OpenGLIndexBuffer> index_buffer_;
+		std::vector<Ref<OpenGLVertexBuffer>> vertex_buffers_;
+		Ref<OpenGLIndexBuffer> index_buffer_;
 	};
 }
 #endif

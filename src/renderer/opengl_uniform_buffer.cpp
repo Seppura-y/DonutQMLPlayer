@@ -1,6 +1,6 @@
 #include "opengl_uniform_buffer.h"
 
-#include "donut_gl_item.h"
+#include "donut_scene.h"
 #include "renderer_global.h"
 
 namespace Donut

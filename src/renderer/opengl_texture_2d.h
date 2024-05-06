@@ -30,6 +30,7 @@ namespace Donut
 	public:
 		OpenGLTexture2D(const TextureSpecification& spec);
 		OpenGLTexture2D(const std::string& path);
+		OpenGLTexture2D(uint32_t width, uint32_t height);
 		virtual ~OpenGLTexture2D();
 
 		virtual const TextureSpecification& getSpecification() const { return texture_spec_; }

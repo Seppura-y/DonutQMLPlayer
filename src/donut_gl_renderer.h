@@ -11,50 +11,52 @@
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLShaderProgram>
 
-struct RectangleVertex
-{
-	glm::vec2 position_;
-	//glm::vec4 color_;
-	//glm::vec2 tex_coordinate_;
 
-	//float texture_index_;
-	//float tiling_factor_;
-
-	//int entity_id_;
-};
-
-
-struct BatchRenderData
-{
-	static const uint32_t max_rects_ = 20000;
-	static const uint32_t max_vertices_ = max_rects_ * 4;
-	static const uint32_t max_indices_ = max_rects_ * 6;
-	static const uint32_t max_texture_slots_ = 32;
-
-	std::shared_ptr <Donut::OpenGLTexture2D> white_texture_;
-
-	std::shared_ptr <Donut::OpenGLShader> rect_shader_;
-	std::shared_ptr <Donut::OpenGLVertexArray> rect_vao_;
-	std::shared_ptr <Donut::OpenGLVertexBuffer> rect_vbo_;
-	std::shared_ptr <Donut::OpenGLIndexBuffer> rect_ebo_;
-	std::shared_ptr <Donut::OpenGLUniformBuffer> rect_ubo_;
-
-	uint32_t rect_indices_count_ = 0;
-	RectangleVertex* rect_vertex_buffer_base_ = nullptr;
-	RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
-
-	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
-	uint32_t texture_index_ = 1;
-
-	glm::vec4 rect_vertex_positions_[4];
-
-	glm::mat4 view_projection_;
-	std::shared_ptr<Donut::OpenGLUniformBuffer> camera_ubo_;
-};
 
 class DonutGLItemRenderer : public QObject, public QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
+
+	struct RectangleVertex
+	{
+		glm::vec2 position_;
+		//glm::vec4 color_;
+		//glm::vec2 tex_coordinate_;
+
+		//float texture_index_;
+		//float tiling_factor_;
+
+		//int entity_id_;
+	};
+
+
+	struct BatchRenderData
+	{
+		static const uint32_t max_rects_ = 20000;
+		static const uint32_t max_vertices_ = max_rects_ * 4;
+		static const uint32_t max_indices_ = max_rects_ * 6;
+		static const uint32_t max_texture_slots_ = 32;
+
+		std::shared_ptr <Donut::OpenGLTexture2D> white_texture_;
+
+		std::shared_ptr <Donut::OpenGLShader> rect_shader_;
+		std::shared_ptr <Donut::OpenGLVertexArray> rect_vao_;
+		std::shared_ptr <Donut::OpenGLVertexBuffer> rect_vbo_;
+		std::shared_ptr <Donut::OpenGLIndexBuffer> rect_ebo_;
+		std::shared_ptr <Donut::OpenGLUniformBuffer> rect_ubo_;
+
+		uint32_t rect_indices_count_ = 0;
+		RectangleVertex* rect_vertex_buffer_base_ = nullptr;
+		RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
+
+		std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
+		uint32_t texture_index_ = 1;
+
+		glm::vec4 rect_vertex_positions_[4];
+
+		glm::mat4 view_projection_;
+		std::shared_ptr<Donut::OpenGLUniformBuffer> camera_ubo_;
+	};
 public:
 	DonutGLItemRenderer() : m_t(0), m_program(0) {}
 	~DonutGLItemRenderer();

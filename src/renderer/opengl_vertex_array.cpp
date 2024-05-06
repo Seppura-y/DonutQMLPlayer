@@ -1,6 +1,6 @@
 #include "opengl_vertex_array.h"
 
-#include "donut_gl_item.h"
+#include "donut_scene.h"
 #include "renderer_global.h"
 
 namespace Donut

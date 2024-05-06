@@ -26,11 +26,11 @@ Window
     Material.accent: Material.Grey
     Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
 
-    DonutGLItem
+    DonutScene
     {
-        id: glItem
+        id: glScene
         anchors.fill: parent
-        SequentialAnimation on t
+        SequentialAnimation on delta_t_
         {
             NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
             NumberAnimation { to: 0; duration: 2500; easing.type: Easing.OutQuad }
@@ -40,7 +40,7 @@ Window
 
         Component.onCompleted:
         {
-            glItem.sigItemInitialized()
+            glScene.sigItemInitialized()
         }
     }
 
