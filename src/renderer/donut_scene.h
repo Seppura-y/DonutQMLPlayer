@@ -26,6 +26,8 @@ public:
 	static DonutSceneRenderer* getRenderer() { return s_renderer_; }
 	static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
 
+	void setViewportSize(const QSize& size);
+
 signals:
 	void tChanged();
 	void sigItemInitialized();
@@ -35,9 +37,11 @@ public slots:
 	void cleanup();
 
 private slots:
-	void handleWindowChanged(QQuickWindow* win);
+	void onWindowChanged(QQuickWindow* win);
 
 	void onItemInitialized();
+
+	void onUpdate();
 
 protected:
 	void timerEvent(QTimerEvent* ev) override;
@@ -51,7 +55,7 @@ private:
 	qreal delta_t_;
 protected:
 	static DonutSceneRenderer* s_renderer_;
-	//Donut::DonutSceneCamera scene_camera_;
+	Donut::DonutSceneCamera scene_camera_;
 	////Donut::OrthographicCameraController camera_controller_;
 
 	//int width_;
@@ -62,6 +66,14 @@ protected:
 	static Donut::DonutGLRendererApi* renderer_api_;
 	QOpenGLContext* context_ = nullptr;
 	QOffscreenSurface* offscreen_surface_ = nullptr;
+
+	int width_ = 0;
+	int height_ = 0;
+	float aspect_ratio_ = 1.0f;
+	glm::vec2 viewport_size_{ 0 };
+
+	std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
+
 };
 
 

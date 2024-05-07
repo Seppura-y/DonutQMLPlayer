@@ -16,7 +16,7 @@ DonutScene::DonutScene(QQuickItem* parent)
     , delta_t_(0)
     //, s_renderer_(nullptr)
 {
-    connect(this, &QQuickItem::windowChanged, this, &DonutScene::handleWindowChanged);
+    connect(this, &QQuickItem::windowChanged, this, &DonutScene::onWindowChanged);
     connect(this, &DonutScene::sigItemInitialized, this, &DonutScene::onItemInitialized);
     startTimer(1000 / 60);
     setFlag(ItemHasContents, true);
@@ -61,14 +61,38 @@ void DonutScene::setT(qreal t)
         window()->update();
 }
 
+void DonutScene::setViewportSize(const QSize& size)
+{
+    viewport_size_ = { size.width(), size.height()};
+
+    width_ = size.width();
+    height_ = size.height();
+    aspect_ratio_ = (float)width_ / (float)height_;
+
+    scene_camera_.setOrthographicSize(height_);
+    scene_camera_.setViewportSize(width_, height_);
+    qDebug() << "DonutSceneRenderer::setViewportSize width : " << size.width() << " height: " << size.height();
+}
+
 void DonutScene::onItemInitialized()
 {
     qDebug() << "DonutScene::onItemInitialized()";
     if (!s_renderer_) {
         s_renderer_ = new DonutSceneRenderer();
-        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
-        connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
+        //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
+        //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
     }
+}
+
+void DonutScene::onUpdate()
+{
+    s_renderer_->beginScene(scene_camera_);
+
+    s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 100.5f, 100.5f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+
+    s_renderer_->endScene();
 }
 
 void DonutScene::timerEvent(QTimerEvent* ev)
@@ -93,7 +117,7 @@ void DonutScene::geometryChange(const QRectF& newGeometry, const QRectF& oldGeom
 }
 
 
-void DonutScene::handleWindowChanged(QQuickWindow* win)
+void DonutScene::onWindowChanged(QQuickWindow* win)
 {
 
     if (win) {

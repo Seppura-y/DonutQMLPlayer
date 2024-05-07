@@ -23,6 +23,8 @@
 #define OPENGL_EXTRA_FUNCTIONS(x) Donut::DonutRenderCommand::getRendererApi()->x
 #define OPENGL_EXTRA_FUNCTIONS(x) Donut::DonutRenderCommand::getRendererApi()->x
 
+#define OPENGL_COMMAND(x) Donut::DonutRenderCommand::getRendererApi()->x
+
 namespace Donut
 {
 	template<typename T>

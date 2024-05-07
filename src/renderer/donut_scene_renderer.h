@@ -14,16 +14,15 @@
 
 #include <QObject>
 #include <QQuickWindow>
-#include <QOpenGLFunctions_4_5_Core>
-#include <QOpenGLShaderProgram>
+
 
 struct RectangleVertex
 {
 	glm::vec2 position_;
-	//glm::vec4 color_;
-	//glm::vec2 tex_coordinate_;
+	glm::vec4 color_;
+	glm::vec2 tex_coordinate_;
 
-	//float texture_index_;
+	float texture_index_;
 	//float tiling_factor_;
 
 	//int entity_id_;
@@ -58,7 +57,7 @@ struct BatchRenderData
 	std::shared_ptr<Donut::OpenGLUniformBuffer> camera_ubo_;
 };
 
-class DonutSceneRenderer : public QObject, public QOpenGLFunctions_4_5_Core
+class DonutSceneRenderer : public QObject
 {
 	Q_OBJECT
 
@@ -74,26 +73,28 @@ public:
 
 	//void setViewport(int x, int y, int width, int height);
 
-	void drawRectangle(glm::vec3 position);
+	void drawRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 color);
 
 public slots:
 	void init();
 	void initForVideoRender();
 	void paint();
 
-private:
+public:
 	void flush();
+	void flushAndReset();
+
 	void beginScene();
 
 	void beginScene(Donut::Camera camera);
 	void beginScene(Donut::Camera camera, const glm::mat4& transform);
 
 	void endScene();
-
+private:
 	void calculateAspectRatio();
 
 private:
-	void drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t vertex_count);
+	//void drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t vertex_count);
 private:
 
 	QSize viewport_size_;

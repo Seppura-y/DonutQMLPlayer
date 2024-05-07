@@ -17,6 +17,7 @@ namespace Donut
 		virtual void setClearColor(const glm::vec4& color) override;
 		virtual void clear() override;
 		virtual void drawIndices(const Donut::Ref<OpenGLVertexArray>& va, uint32_t count = 0) override;
+		virtual void drawArrays(uint32_t count = 0) override;
 	private:
 	
 	};
