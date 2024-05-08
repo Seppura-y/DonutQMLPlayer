@@ -109,30 +109,42 @@ void DonutSceneRenderer::initForVideoRender()
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
         batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
 
-        uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
+        //uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
+        //uint32_t offset = 0;
+        //for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
+        //{
+        //    rectangle_indices[i + 0] = offset + 0;
+        //    rectangle_indices[i + 1] = offset + 1;
+        //    rectangle_indices[i + 2] = offset + 2;
+
+        //    rectangle_indices[i + 3] = offset + 2;
+        //    rectangle_indices[i + 4] = offset + 3;
+        //    rectangle_indices[i + 5] = offset + 0;
+
+        //    offset += 4;
+        //}
+
         uint32_t offset = 0;
-        for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
-        {
-            rectangle_indices[i + 0] = offset + 0;
-            rectangle_indices[i + 1] = offset + 1;
-            rectangle_indices[i + 2] = offset + 2;
+        uint32_t* rectangle_indices = new uint32_t[6]{1};
+        rectangle_indices[0] = offset + 0;
+        rectangle_indices[1] = offset + 1;
+        rectangle_indices[2] = offset + 2;
 
-            rectangle_indices[i + 3] = offset + 2;
-            rectangle_indices[i + 4] = offset + 3;
-            rectangle_indices[i + 5] = offset + 0;
+        rectangle_indices[3] = offset + 2;
+        rectangle_indices[4] = offset + 3;
+        rectangle_indices[5] = offset + 0;
 
-            offset += 4;
-        }
-
-        std::shared_ptr<Donut::OpenGLIndexBuffer> rectangle_ib = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
-        batch_data_.rect_vao_->setIndexBuffer(rectangle_ib);
+        batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, 6));
+        
+        //batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
+        batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
         delete[] rectangle_indices;
 
-        batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
-        uint32_t white_texture_data = 0xffffffff;
-        batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+        //batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
+        //uint32_t white_texture_data = 0xffffffff;
+        //batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
 
-        batch_data_.texture_slots_[0] = batch_data_.white_texture_;
+        //batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
         batch_data_.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
@@ -275,50 +287,53 @@ void DonutSceneRenderer::drawFlatRectangle(glm::vec3 position, glm::vec2 size)
 void DonutSceneRenderer::flush()
 {
     window_->beginExternalCommands();
-    //OPENGL_COMMAND(setViewport(0, 0, viewport_size_.width(), viewport_size_.height()));
+    //OPENGL_EXTRA_FUNCTIONS(setViewport(0, 0, viewport_size_.width(), viewport_size_.height()));
 
-    //OPENGL_COMMAND(setClearColor(glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }));
-    //OPENGL_COMMAND(clear());
+    //OPENGL_EXTRA_FUNCTIONS(setClearColor(glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }));
+    //OPENGL_EXTRA_FUNCTIONS(clear());
 
-    OPENGL_COMMAND(glDisable(GL_DEPTH_TEST));
+    OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
 
-    OPENGL_COMMAND(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
+    OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
 
-    //if (batch_data_.rect_indices_count_)
-    //{
-    //    batch_data_.rect_vao_->bind();
-    //    batch_data_.rect_vbo_->bind();
-    //    batch_data_.rect_shader_->bind();
-    //    //uint32_t data_size = ((uint8_t*)batch_data_.rect_vertex_buffer_ptr_ - (uint8_t*)batch_data_.rect_vertex_buffer_base_);
-    //    //batch_data_.rect_vbo_->setData(batch_data_.rect_vertex_buffer_base_, data_size);
+    if (batch_data_.rect_indices_count_)
+    {
+        batch_data_.rect_vao_.get()->bind();
+        //batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
 
+        uint32_t* rectangle_indices = new uint32_t[6];
+        uint32_t offset = 0;
 
-    //    // bind textures
-    //    //for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
-    //    //{
-    //    //    batch_data_.texture_slots_[i]->bind(i);
-    //    //}
+        rectangle_indices[0] = offset + 0;
+        rectangle_indices[1] = offset + 1;
+        rectangle_indices[2] = offset + 2;
 
-    //    //window_->beginExternalCommands();
-    //    OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
-    //    //batch_data_.statistics_.drawcalls_++;
-    //    //OPENGL_EXTRA_FUNCTIONS(drawArrays(4));
+        rectangle_indices[3] = offset + 2;
+        rectangle_indices[4] = offset + 3;
+        rectangle_indices[5] = offset + 0;
 
-    //    //for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
-    //    //{
-    //    //    batch_data_.texture_slots_[i]->bind(i);
-    //    //}
-    //    //batch_data_.rect_vao_->getIndexBuffer()->bind();
-    //    //OPENGL_COMMAND(glDrawElements(GL_TRIANGLES, batch_data_.rect_indices_count_, GL_UNSIGNED_INT, 0));
+        uint32_t obj_id;
+        OPENGL_EXTRA_FUNCTIONS(glGenBuffers(1, &obj_id));
+        OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_id));
+        OPENGL_EXTRA_FUNCTIONS(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint32_t), rectangle_indices, GL_STATIC_DRAW));
+        
 
-    //}
+        OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_id));
 
-    batch_data_.rect_vao_->bind();
-    batch_data_.rect_vbo_->bind();
-    //batch_data_.rect_shader_->bind();
-    uint32_t data_size = ((uint8_t*)batch_data_.flat_vertex_buffer_ptr_ - (uint8_t*)batch_data_.flat_vertex_buffer_base_);
-    batch_data_.rect_vbo_->setData(batch_data_.flat_vertex_buffer_base_, data_size);
-    OPENGL_EXTRA_FUNCTIONS(drawArrays(data_size / sizeof(FlatColorVertex)));
+        OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        //OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, 6));
+
+        //OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
+        //batch_data_.statistics_.drawcalls_++;
+        //OPENGL_EXTRA_FUNCTIONS(drawArrays(4));
+    }
+
+    //batch_data_.rect_vao_->bind();
+    //batch_data_.rect_vbo_->bind();
+    ////batch_data_.rect_shader_->bind();
+    //uint32_t data_size = ((uint8_t*)batch_data_.flat_vertex_buffer_ptr_ - (uint8_t*)batch_data_.flat_vertex_buffer_base_);
+    //batch_data_.rect_vbo_->setData(batch_data_.flat_vertex_buffer_base_, data_size);
+    //OPENGL_EXTRA_FUNCTIONS(drawArrays(data_size / sizeof(FlatColorVertex)));
 
     QQuickOpenGLUtils::resetOpenGLState();
     window_->endExternalCommands();
