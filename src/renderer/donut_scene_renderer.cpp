@@ -109,34 +109,24 @@ void DonutSceneRenderer::initForVideoRender()
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
         batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
 
-        //uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
-        //uint32_t offset = 0;
-        //for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
-        //{
-        //    rectangle_indices[i + 0] = offset + 0;
-        //    rectangle_indices[i + 1] = offset + 1;
-        //    rectangle_indices[i + 2] = offset + 2;
-
-        //    rectangle_indices[i + 3] = offset + 2;
-        //    rectangle_indices[i + 4] = offset + 3;
-        //    rectangle_indices[i + 5] = offset + 0;
-
-        //    offset += 4;
-        //}
-
+        uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
         uint32_t offset = 0;
-        uint32_t* rectangle_indices = new uint32_t[6]{1};
-        rectangle_indices[0] = offset + 0;
-        rectangle_indices[1] = offset + 1;
-        rectangle_indices[2] = offset + 2;
+        for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
+        {
+            rectangle_indices[i + 0] = offset + 0;
+            rectangle_indices[i + 1] = offset + 1;
+            rectangle_indices[i + 2] = offset + 2;
 
-        rectangle_indices[3] = offset + 2;
-        rectangle_indices[4] = offset + 3;
-        rectangle_indices[5] = offset + 0;
+            rectangle_indices[i + 3] = offset + 2;
+            rectangle_indices[i + 4] = offset + 3;
+            rectangle_indices[i + 5] = offset + 0;
 
-        batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, 6));
-        
-        //batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
+            offset += 4;
+        }
+
+        // 这里用Qt的OpenGL接口，无法在创建EBO时同时传递数据，要另外调用setData，原因未知
+        batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
+        batch_data_.rect_ebo_->setData(rectangle_indices, batch_data_.max_indices_);
         batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
         delete[] rectangle_indices;
 
@@ -292,42 +282,25 @@ void DonutSceneRenderer::flush()
     //OPENGL_EXTRA_FUNCTIONS(setClearColor(glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }));
     //OPENGL_EXTRA_FUNCTIONS(clear());
 
+    // 加上下面两行，否则鼠标移动到按钮时，渲染图会跟着变色
+    // glDisable(GL_DEPTH_TEST) 禁用深度测试，否则渲染图会覆盖UI控件
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
-
-    OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
+    //OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
+    OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     if (batch_data_.rect_indices_count_)
     {
         batch_data_.rect_vao_.get()->bind();
-        //batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
 
-        uint32_t* rectangle_indices = new uint32_t[6];
-        uint32_t offset = 0;
+        batch_data_.rect_ebo_->bind();
 
-        rectangle_indices[0] = offset + 0;
-        rectangle_indices[1] = offset + 1;
-        rectangle_indices[2] = offset + 2;
+        OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
 
-        rectangle_indices[3] = offset + 2;
-        rectangle_indices[4] = offset + 3;
-        rectangle_indices[5] = offset + 0;
-
-        uint32_t obj_id;
-        OPENGL_EXTRA_FUNCTIONS(glGenBuffers(1, &obj_id));
-        OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_id));
-        OPENGL_EXTRA_FUNCTIONS(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint32_t), rectangle_indices, GL_STATIC_DRAW));
-        
-
-        OPENGL_EXTRA_FUNCTIONS(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj_id));
-
-        OPENGL_EXTRA_FUNCTIONS(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-        //OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, 6));
-
-        //OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
-        //batch_data_.statistics_.drawcalls_++;
-        //OPENGL_EXTRA_FUNCTIONS(drawArrays(4));
     }
 
+
+    // 以下测试flat rect 绘制
     //batch_data_.rect_vao_->bind();
     //batch_data_.rect_vbo_->bind();
     ////batch_data_.rect_shader_->bind();
