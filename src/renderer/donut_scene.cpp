@@ -81,18 +81,27 @@ void DonutScene::onItemInitialized()
         s_renderer_ = new DonutSceneRenderer();
         //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
         //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
-        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForRectRender, Qt::DirectConnection);
+        //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
         connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
     }
 }
 
 void DonutScene::onUpdate()
 {
+    //window()->beginExternalCommands();
     s_renderer_->beginScene(scene_camera_);
 
-    s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 100.5f, 100.5f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
+    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
+    s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
+    //s_renderer_->drawFlatRectangle(glm::vec3{ -1.0f, -1.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
+    //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+    //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.0f }, glm::vec2{ 1000.5f, 1000.5f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 
     s_renderer_->endScene();
+    //s_renderer_->paint();
+    //window()->endExternalCommands();
 }
 
 void DonutScene::timerEvent(QTimerEvent* ev)

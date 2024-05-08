@@ -18,7 +18,7 @@
 
 struct RectangleVertex
 {
-	glm::vec2 position_;
+	glm::vec4 position_;
 	glm::vec4 color_;
 	glm::vec2 tex_coordinate_;
 
@@ -26,6 +26,11 @@ struct RectangleVertex
 	//float tiling_factor_;
 
 	//int entity_id_;
+};
+
+struct FlatColorVertex
+{
+	glm::vec4 position_;
 };
 
 
@@ -47,6 +52,9 @@ struct BatchRenderData
 	uint32_t rect_indices_count_ = 0;
 	RectangleVertex* rect_vertex_buffer_base_ = nullptr;
 	RectangleVertex* rect_vertex_buffer_ptr_ = nullptr;
+
+	FlatColorVertex* flat_vertex_buffer_base_ = nullptr;
+	FlatColorVertex* flat_vertex_buffer_ptr_ = nullptr;
 
 	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
 	uint32_t texture_index_ = 1;
@@ -75,9 +83,13 @@ public:
 
 	void drawRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 color);
 
+	void drawFlatRectangle(glm::vec3 position, glm::vec2 size);
+
 public slots:
 	void init();
 	void initForVideoRender();
+
+	void initForRectRender();
 	void paint();
 
 public:
