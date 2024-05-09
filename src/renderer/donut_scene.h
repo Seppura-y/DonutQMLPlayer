@@ -32,6 +32,7 @@ public:
 signals:
 	void tChanged();
 	void sigItemInitialized();
+	void sigSceneUpdate();
 
 public slots:
 	void sync();

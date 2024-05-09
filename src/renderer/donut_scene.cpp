@@ -25,9 +25,9 @@ public:
         //scene_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
         //scene_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
 
-        scene_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
-        scene_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
-        scene_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
+        scene_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 0.4f });
+        scene_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 0.3f });
+        scene_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.1f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
 
         scene_renderer_->endScene();
     }
@@ -40,9 +40,27 @@ public:
 
     //void prepare() override;
     //void render(const RenderState* state) override;
-    //void releaseResources() override;
-    //RenderingFlags flags() const override;
-    //QSGRenderNode::StateFlags changedStates() const override;
+    void releaseResources() override
+    {
+
+    }
+
+    // 必须重写这个函数，否则程序崩溃
+    RenderingFlags flags() const override
+    {
+        //We are rendering 2D content directly into the scene graph using QRhi, no
+        //direct usage of a 3D API.Hence NoExternalRendering.This is a minor
+        //optimization.
+        //Additionally, the node takes the item transform into account by relying
+        //on projectionMatrix() and matrix() (see prepare()) and never rendering at
+        //other Z coordinates.Hence DepthAwareRendering.This is a potentially
+        //bigger optimization.
+        return QSGRenderNode::NoExternalRendering | QSGRenderNode::DepthAwareRendering;
+    }
+    QSGRenderNode::StateFlags changedStates() const override
+    {
+        return QSGRenderNode::StateFlag::ViewportState | QSGRenderNode::StateFlag::CullState;
+    }
 private:
     DonutSceneRenderer* scene_renderer_;
     QQuickWindow* window_;
@@ -54,6 +72,7 @@ DonutScene::DonutScene(QQuickItem* parent)
     , delta_t_(0)
     //, s_renderer_(nullptr)
 {
+    connect(this, &DonutScene::sigSceneUpdate, this, &DonutScene::update);
     connect(this, &QQuickItem::windowChanged, this, &DonutScene::onWindowChanged);
     connect(this, &DonutScene::sigItemInitialized, this, &DonutScene::onItemInitialized);
     startTimer(1000 / 60);
@@ -131,24 +150,19 @@ void DonutScene::onItemInitialized()
 
 void DonutScene::onUpdate()
 {
-    //window()->beginExternalCommands();
     //s_renderer_->beginScene(scene_camera_);
-
-    ////s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
-    ////s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
 
     //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
     //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
     //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
 
     //s_renderer_->endScene();
-    //s_renderer_->paint();
-    //window()->endExternalCommands();
 }
 
 void DonutScene::timerEvent(QTimerEvent* ev)
 {
     update();
+    emit sigSceneUpdate();
 }
 
 void DonutScene::mousePressEvent(QMouseEvent* ev)
@@ -177,6 +191,7 @@ QSGNode* DonutScene::updatePaintNode(QSGNode* old, UpdatePaintNodeData* data)
     // ... 设置node的属性和准备渲染数据 ...
 
     node->setRenderer(s_renderer_, scene_camera_);
+    node->markDirty(QSGNode::DirtyForceUpdate);
 
     return node;
 }
