@@ -11,6 +11,44 @@
 DonutSceneRenderer* DonutScene::s_renderer_ = nullptr;
 Donut::DonutGLRendererApi* DonutScene::renderer_api_ = nullptr;
 
+class DonutRenderNode : public QSGRenderNode
+{
+public:
+    DonutRenderNode(QQuickWindow* window) : window_(window)
+    {
+
+    }
+    void render(const RenderState* state) override
+    {
+        scene_renderer_->beginScene(scene_camera_);
+
+        //scene_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
+        //scene_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
+
+        scene_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
+        scene_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
+        scene_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
+
+        scene_renderer_->endScene();
+    }
+
+    void setRenderer(DonutSceneRenderer* renderer, Donut::DonutSceneCamera camera)
+    {
+        scene_renderer_ = renderer;
+        scene_camera_ = camera;
+    }
+
+    //void prepare() override;
+    //void render(const RenderState* state) override;
+    //void releaseResources() override;
+    //RenderingFlags flags() const override;
+    //QSGRenderNode::StateFlags changedStates() const override;
+private:
+    DonutSceneRenderer* scene_renderer_;
+    QQuickWindow* window_;
+    Donut::DonutSceneCamera scene_camera_;
+};
+
 DonutScene::DonutScene(QQuickItem* parent)
     : QQuickItem(parent)
     , delta_t_(0)
@@ -94,16 +132,16 @@ void DonutScene::onItemInitialized()
 void DonutScene::onUpdate()
 {
     //window()->beginExternalCommands();
-    s_renderer_->beginScene(scene_camera_);
+    //s_renderer_->beginScene(scene_camera_);
 
-    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
-    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
+    ////s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
+    ////s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
 
-    s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
-    s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
-    s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
+    //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
+    //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
+    //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
 
-    s_renderer_->endScene();
+    //s_renderer_->endScene();
     //s_renderer_->paint();
     //window()->endExternalCommands();
 }
@@ -128,6 +166,21 @@ void DonutScene::geometryChange(const QRectF& newGeometry, const QRectF& oldGeom
     qDebug() << "DonutScene::geometryChange()" << newGeometry.width() << " : " << newGeometry.height();
 
 }
+
+QSGNode* DonutScene::updatePaintNode(QSGNode* old, UpdatePaintNodeData* data)
+{
+    DonutRenderNode* node = static_cast<DonutRenderNode*>(old);
+    if (!node) {
+        node = new DonutRenderNode(window());
+    }
+
+    // ... 设置node的属性和准备渲染数据 ...
+
+    node->setRenderer(s_renderer_, scene_camera_);
+
+    return node;
+}
+
 
 
 void DonutScene::onWindowChanged(QQuickWindow* win)
@@ -172,8 +225,8 @@ void DonutScene::sync()
 {
     if (!s_renderer_) {
         s_renderer_ = new DonutSceneRenderer();
-        connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
-        connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
+        //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
+        //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
     }
     //qDebug() << "width : " << window()->size().width() << " height: " << window()->size().height();
     //qDebug() << "ratio : " << window()->devicePixelRatio();

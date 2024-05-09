@@ -10,6 +10,7 @@
 #include "donut_gl_renderer_api.h"
 #include <QQuickItem>
 #include <QOffscreenSurface>
+#include <QSGRenderNode>
 
 class DonutScene : public QQuickItem
 {
@@ -49,6 +50,8 @@ protected:
 	void wheelEvent(QWheelEvent* ev) override;
 
 	void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+
+	QSGNode* updatePaintNode(QSGNode* old, UpdatePaintNodeData* data) override;
 private:
 	void releaseResources() override;
 
@@ -74,6 +77,7 @@ protected:
 
 	std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
 
+	friend class DonutRenderNode;
 };
 
 
