@@ -25,7 +25,7 @@ public:
 	void setT(qreal t);
 
 	static DonutSceneRenderer* getRenderer() { return s_renderer_; }
-	static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
+	//static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
 
 	void setViewportSize(const QSize& size);
 
@@ -67,7 +67,7 @@ protected:
 	//float aspect_ratio_;
 
 	//Donut::DonutRenderCommand render_command_;
-	static Donut::DonutGLRendererApi* renderer_api_;
+	//static Donut::DonutGLRendererApi* renderer_api_;
 	QOpenGLContext* context_ = nullptr;
 	QOffscreenSurface* offscreen_surface_ = nullptr;
 

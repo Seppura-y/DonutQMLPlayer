@@ -9,7 +9,7 @@
 #include <QDebug>
 
 DonutSceneRenderer* DonutScene::s_renderer_ = nullptr;
-Donut::DonutGLRendererApi* DonutScene::renderer_api_ = nullptr;
+//Donut::DonutGLRendererApi* DonutScene::renderer_api_ = nullptr;
 
 class DonutRenderNode : public QSGRenderNode
 {
