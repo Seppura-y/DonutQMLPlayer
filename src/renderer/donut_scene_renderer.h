@@ -14,7 +14,6 @@
 
 #include <QObject>
 #include <QQuickWindow>
-#include <QSGRenderNode>
 
 
 struct RectangleVertex

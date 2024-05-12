@@ -26,33 +26,21 @@ Window
     Material.accent: Material.Grey
     Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
 
-    //DonutScene
-    //{
-    //    id: glScene
-    //    anchors.fill: parent
-    //    SequentialAnimation on delta_t_
-    //    {
-    //        NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
-    //        NumberAnimation { to: 0; duration: 2500; easing.type: Easing.OutQuad }
-    //        loops: Animation.Infinite
-    //        running: true
-    //    }
-    //
-    //    Component.onCompleted:
-    //    {
-    //        glScene.sigItemInitialized()
-    //    }
-    //}
-
-    DonutFramebufferScene
+    DonutScene
     {
-        id: fboScene
+        id: glScene
         anchors.fill: parent
-
+        SequentialAnimation on delta_t_
+        {
+            NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
+            NumberAnimation { to: 0; duration: 2500; easing.type: Easing.OutQuad }
+            loops: Animation.Infinite
+            running: true
+        }
 
         Component.onCompleted:
         {
-            fboScene.sigItemInitialized()
+            glScene.sigItemInitialized()
         }
     }
 
@@ -66,7 +54,7 @@ Window
         contextMenu: contextMenu
         window: window
     }
-    
+
     DropArea
     {
         id: dropArea
@@ -77,7 +65,7 @@ Window
             PlaylistModel.addLocalFiles(drop.urls);
         }
     }
-    
+
     Menu
     {
         id: contextMenu
@@ -88,15 +76,15 @@ Window
         Action { text: qsTr("Play next"); onTriggered: print("contextMenu : Play next") }
         Action { text: qsTr("Play previous"); onTriggered: print("contextMenu : Play previous") }
         Action { text: qsTr("Mute"); onTriggered: print("contextMenu : Mute") }
-    
+
         MenuSeparator { padding: 0 }
         Action { text: qsTr("Video options"); onTriggered: sideBar.openVideoOptions() }
-    
+
         Action { text: qsTr("Playlist"); onTriggered: sideBar.openPlaylist() }
-    
+
         delegate: MenuItem { height: 25 }
     }
-    
+
     Popup
     {
         id: volumePopup
@@ -120,7 +108,7 @@ Window
         //    anchors.fill: parent
         //    orientation: Qt.Vertical
         //}
-    
+
         Slider
         {
             id: slider
@@ -136,17 +124,17 @@ Window
             bottomPadding: 0
             //leftPadding: 0
             //rightPadding: 0
-    
+
             MouseArea
             {
                 anchors.fill: parent
                 property bool mouseClicked: false
-    
+
                 drag.target: handleRect
                 drag.axis: Drag.YAxis // 修改为 Y 轴拖动
                 drag.minimumY: slider.topPadding
                 drag.maximumY: slider.height - slider.bottomPadding - handleRect.height
-    
+
                 onClicked: (mouse) =>
                 {
                     var clickPos = mouse.y - (handleRect.height / 2)
@@ -171,7 +159,7 @@ Window
                 }
                 onReleased: mouseClicked = false
             } // MouseArea
-    
+
             handle: Rectangle
             {
                 id: handleRect
@@ -202,7 +190,7 @@ Window
                     }
                 }
             } // handle: Rectangle
-    
+
             background: Rectangle
             {
                 id: track
@@ -211,7 +199,7 @@ Window
                 color: "#bdbebf"
                 radius: 8
             }
-    
+
             contentItem: Item
             {
                 Rectangle
@@ -226,20 +214,20 @@ Window
                     radius: 8
                 }
             }
-    
+
             onValueChanged:
             {
                 contentRect.height = (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding)) - (handleRect.height / 2)
             }
-    
+
             Component.onCompleted:
             {
                 contentRect.height = track.height
             }
         } // Slider
-    
+
     }
-    
+
     // Titlebar, Controlbar and sidebar
     GridLayout
     {
@@ -249,7 +237,7 @@ Window
         columns: 2
         rowSpacing: 0
         columnSpacing: 0
-    
+
         // Titlebar
         Rectangle
         {
@@ -259,59 +247,59 @@ Window
             Layout.minimumHeight: 28
             Layout.columnSpan: 2
             z: 100
-    
+
             RowLayout
             {
                 anchors.fill: parent
                 spacing: 0
-    
+
                 Item
                 {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                 }
-    
+
                 FontButton
                 {
                     id: miniButton
                     Layout.preferredWidth: 26
                     Layout.preferredHeight: 26
-    
+
                     focusPolicy: Qt.NoFocus
                     txt: String.fromCodePoint(0x2013)
-    
+
                     onButtonClicked:
                     {
                         window.showMinimized()
                         print("nextButton onClicked")
                     }
                 }
-    
+
                 FontButton
                 {
                     id: maxButton
                     Layout.preferredWidth: 26
                     Layout.preferredHeight: 26
-    
+
                     focusPolicy: Qt.NoFocus
                     txt: String.fromCodePoint(0x23f9)
-    
+
                     onButtonClicked:
                     {
                         window.visibility == Window.Maximized ? window.showNormal() : window.showMaximized()
                         print("nextButton onClicked")
                     }
                 }
-    
+
                 FontButton
                 {
                     id: closeButton
                     Layout.preferredWidth: 26
                     Layout.preferredHeight: 26
-    
+
                     focusPolicy: Qt.NoFocus
                     txt: String.fromCodePoint(0x00d7)
-    
+
                     onButtonClicked:
                     {
                         window.close()
@@ -319,18 +307,18 @@ Window
                     }
                 }
             }
-    
-    
-    
+
+
+
         }
-    
+
         // Empty item as placeholder
         Item
         {
             Layout.fillHeight: true
             Layout.fillWidth: true
         }
-    
+
         FileDialog
         {
             id: fileDialog
@@ -338,7 +326,7 @@ Window
             fileMode: FileDialog.OpenFiles
             onAccepted: PlaylistModel.addLocalFiles(fileDialog.selectedFiles)
         }
-    
+
         // Sidebar
         SideBar
         {
@@ -350,17 +338,17 @@ Window
             onOpenFileRequested: fileDialog.open()
             //onOpenUrlRequested: openUrlDialog.visible = true
         }
-    
+
         // Controlbar
         ControlBar
         {
             id: controlBar
-    
+
             Layout.columnSpan: 2
             Layout.fillWidth: true
             Layout.minimumHeight: 50
             Layout.bottomMargin: 1
-    
+
             duration: 360
             focusPolicy: Qt.ClickFocus
             z: 100

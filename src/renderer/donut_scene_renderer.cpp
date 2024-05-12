@@ -212,17 +212,14 @@ void DonutSceneRenderer::paint()
 
 void DonutSceneRenderer::setViewportSize(const QSize& size)
 {
+    viewport_size_ = size;
 
     width_ = size.width();
-    height_ = size.height() - 50;
-    aspect_ratio_ = (float)size.width() / (float)size.height();
+    height_ = size.height();
+    aspect_ratio_ = (float)width_ / (float)height_;
 
-    viewport_size_ = QSize(width_, height_);
-
-    OPENGL_EXTRA_FUNCTIONS(setViewport(0, -28, width_, height_));
-
-    //scene_camera_.setOrthographicSize(height_);
-    //scene_camera_.setViewportSize(width_, height_);
+    scene_camera_.setOrthographicSize(height_);
+    scene_camera_.setViewportSize(width_, height_);
     //qDebug() << "DonutSceneRenderer::setViewportSize width : " << size.width() << " height: " << size.height();
 }
 
@@ -286,15 +283,10 @@ void DonutSceneRenderer::flush()
     //OPENGL_EXTRA_FUNCTIONS(clear());
 
     // 加上下面两行，否则鼠标移动到按钮时，渲染图会跟着变色
-    // --glDisable(GL_DEPTH_TEST) 禁用深度测试，否则渲染图会覆盖UI控件
-    // --glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    //OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
+    // glDisable(GL_DEPTH_TEST) 禁用深度测试，否则渲染图会覆盖UI控件
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
     //OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
-
-    OPENGL_EXTRA_FUNCTIONS(glEnable(GL_DEPTH_TEST));
-    OPENGL_EXTRA_FUNCTIONS(glEnable(GL_BLEND));
-    //OPENGL_EXTRA_FUNCTIONS(glDepthFunc(GL_GREATER));
-    //OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
     OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     if (batch_data_.rect_indices_count_)
