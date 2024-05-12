@@ -45,7 +45,7 @@ public:
 
     }
 
-    // ±ØÐëÖØÐ´Õâ¸öº¯Êý£¬·ñÔò³ÌÐò±ÀÀ£
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     RenderingFlags flags() const override
     {
         //We are rendering 2D content directly into the scene graph using QRhi, no
@@ -139,10 +139,10 @@ void DonutScene::onItemInitialized()
         //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
         //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
         
-        // glDrawArrays ²âÊÔ ---- initForRectRender
+        // glDrawArrays ï¿½ï¿½ï¿½ï¿½ ---- initForRectRender
         //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForRectRender, Qt::DirectConnection);
         
-        // glDrawElements »æÖÆ ---- initForVideoRender
+        // glDrawElements ï¿½ï¿½ï¿½ï¿½ ---- initForVideoRender
         connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
         connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
     }
@@ -188,7 +188,7 @@ QSGNode* DonutScene::updatePaintNode(QSGNode* old, UpdatePaintNodeData* data)
         node = new DonutRenderNode(window());
     }
 
-    // ... ÉèÖÃnodeµÄÊôÐÔºÍ×¼±¸äÖÈ¾Êý¾Ý ...
+    // ... ï¿½ï¿½ï¿½ï¿½nodeï¿½ï¿½ï¿½ï¿½ï¿½Ôºï¿½×¼ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½ ...
 
     node->setRenderer(s_renderer_, scene_camera_);
     node->markDirty(QSGNode::DirtyForceUpdate);
