@@ -8,6 +8,8 @@
 #include "opengl_framebuffer.h"
 #include "donut_render_command.h"
 #include "donut_gl_renderer_api.h"
+#include "opengl_texture_2d.h"
+
 #include <QQuickItem>
 #include <QOffscreenSurface>
 
@@ -74,6 +76,7 @@ protected:
 
 	std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
 
+	std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
 };
 
 

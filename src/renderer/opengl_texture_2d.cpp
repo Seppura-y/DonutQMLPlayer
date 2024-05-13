@@ -108,6 +108,7 @@ namespace Donut
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+		: width_(width), height_(height)
 	{
 		internal_format_ = GL_RGBA8, data_format_ = GL_RGBA;
 		OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));

@@ -43,6 +43,8 @@ DonutScene::DonutScene(QQuickItem* parent)
     //renderer_api_->init();
 
     //renderer_api_->glCreateProgram();
+
+    test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
 }
 
 DonutScene::~DonutScene()
@@ -100,9 +102,11 @@ void DonutScene::onUpdate()
     //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
 
     s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.1f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
-    s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
-    s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
-
+    //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
+    //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
+    test_texture_->bind();
+    //s_renderer_->drawTexturedRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.f, 1.f }, test_texture_, glm::vec4{ 1.f, 1.f,1.f, 1.f });
+    s_renderer_->drawTexturedRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.f, 1.f }, glm::vec4{ 1.f, 1.f,1.f, 1.f });
     s_renderer_->endScene();
     //s_renderer_->paint();
     //window()->endExternalCommands();

@@ -85,15 +85,10 @@ void DonutSceneRenderer::initForVideoRender()
         Q_ASSERT(rif->graphicsApi() == QSGRendererInterface::OpenGL
             || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
 
-        //int samplers[batch_data_.max_texture_slots_];
-        //for (uint32_t i = 0; i < batch_data_.max_texture_slots_; i++)
-        //{
-        //    samplers[i] = i;
-        //}
+
 
         batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/texture.glsl");
         batch_data_.rect_shader_->bind();
-        //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
 
         batch_data_.rect_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
         batch_data_.rect_vao_->bind();
@@ -107,6 +102,7 @@ void DonutSceneRenderer::initForVideoRender()
             });
 
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
+        batch_data_.rect_shader_->setInt("u_tex", 1);
         batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
 
         uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
@@ -130,11 +126,18 @@ void DonutSceneRenderer::initForVideoRender()
         batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
         delete[] rectangle_indices;
 
-        //batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
-        //uint32_t white_texture_data = 0xffffffff;
-        //batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+        batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
+        uint32_t white_texture_data = 0xffffffff;
+        batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
 
-        //batch_data_.texture_slots_[0] = batch_data_.white_texture_;
+        int samplers[batch_data_.max_texture_slots_];
+        for (uint32_t i = 0; i < batch_data_.max_texture_slots_; i++)
+        {
+            samplers[i] = i;
+        }
+        batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+
+        batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
         batch_data_.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
@@ -249,7 +252,6 @@ void DonutSceneRenderer::drawRectangle(glm::vec3 position, glm::vec2 size, glm::
         uint32_t data_size = (uint32_t)((uint8_t*)batch_data_.rect_vertex_buffer_ptr_ - (uint8_t*)batch_data_.rect_vertex_buffer_base_);
         int a = 1;
     }
-    uint32_t data_size = (uint32_t)((uint8_t*)batch_data_.rect_vertex_buffer_ptr_ - (uint8_t*)batch_data_.rect_vertex_buffer_base_);
     batch_data_.rect_indices_count_ += 6;
 }
 
@@ -265,6 +267,112 @@ void DonutSceneRenderer::drawFlatRectangle(glm::vec3 position, glm::vec2 size)
         batch_data_.flat_vertex_buffer_ptr_->position_ = (transform * batch_data_.rect_vertex_positions_[i]);
         batch_data_.flat_vertex_buffer_ptr_++;
     }
+}
+
+void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& texture, glm::vec4 tintcolor)
+{
+    if (batch_data_.rect_indices_count_ >= batch_data_.max_indices_)
+    {
+        flushAndReset();
+    }
+
+    const float tiling_factor = 1.0f;
+    const size_t rect_vertex_count = 4;
+    float texture_index = 0.0f;
+
+    const glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+    for (uint32_t i = 1; i < batch_data_.texture_index_; i++)
+    {
+        // 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+        if (*batch_data_.texture_slots_[i].get() == *texture.get())
+        {
+            texture_index = (float)i;
+            break;
+        }
+    }
+
+    if (texture_index == 0.0f)
+    {
+        if (batch_data_.texture_index_ >= BatchRenderData::max_texture_slots_)
+        {
+            flushAndReset();
+        }
+
+        texture_index = (float)batch_data_.texture_index_;
+        batch_data_.texture_slots_[batch_data_.texture_index_] = texture;
+        batch_data_.texture_index_++;
+    }
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+
+    for (size_t i = 0; i < rect_vertex_count; i++)
+    {
+        batch_data_.rect_vertex_buffer_ptr_->position_ = transform * batch_data_.rect_vertex_positions_[i];
+        batch_data_.rect_vertex_buffer_ptr_->color_ = color;
+        batch_data_.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+        batch_data_.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+        //batch_data_.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+        batch_data_.rect_vertex_buffer_ptr_++;
+    }
+    batch_data_.rect_indices_count_ += 6;
+}
+
+void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 tintcolor)
+{
+    if (batch_data_.rect_indices_count_ >= batch_data_.max_indices_)
+    {
+        flushAndReset();
+    }
+
+    const float tiling_factor = 1.0f;
+    const size_t rect_vertex_count = 4;
+    float texture_index = 0.0f;
+
+    const glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+    batch_data_.white_texture_->bind();
+    for (uint32_t i = 1; i < batch_data_.texture_index_; i++)
+    {
+        // 获取raw指针，然后解引用，以调用operator==(const Texture& other)
+        if (*batch_data_.texture_slots_[i].get() == *batch_data_.white_texture_.get())
+        {
+            texture_index = (float)i;
+            break;
+        }
+    }
+
+    if (texture_index == 0.0f)
+    {
+        if (batch_data_.texture_index_ >= BatchRenderData::max_texture_slots_)
+        {
+            flushAndReset();
+        }
+
+        texture_index = (float)batch_data_.texture_index_;
+        batch_data_.texture_slots_[batch_data_.texture_index_] = batch_data_.white_texture_;
+        batch_data_.texture_index_++;
+    }
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+
+    for (size_t i = 0; i < rect_vertex_count; i++)
+    {
+        batch_data_.rect_vertex_buffer_ptr_->position_ = transform * batch_data_.rect_vertex_positions_[i];
+        batch_data_.rect_vertex_buffer_ptr_->color_ = color;
+        batch_data_.rect_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+        batch_data_.rect_vertex_buffer_ptr_->texture_index_ = texture_index;
+        //batch_data_.rect_vertex_buffer_ptr_->tiling_factor_ = tiling_factor;
+
+        batch_data_.rect_vertex_buffer_ptr_++;
+    }
+    batch_data_.rect_indices_count_ += 6;
 }
 
 //void DonutSceneRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t count)
@@ -292,8 +400,17 @@ void DonutSceneRenderer::flush()
     if (batch_data_.rect_indices_count_)
     {
         batch_data_.rect_vao_.get()->bind();
-
+        
         batch_data_.rect_ebo_->bind();
+
+        // bind textures
+        for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
+        {
+            batch_data_.texture_slots_[i]->bind(i);
+        }
+        batch_data_.rect_shader_->bind();
+        //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+        batch_data_.rect_shader_->setInt("u_tex", 1);
 
         OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
 

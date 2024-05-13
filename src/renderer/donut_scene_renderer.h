@@ -85,6 +85,9 @@ public:
 
 	void drawFlatRectangle(glm::vec3 position, glm::vec2 size);
 
+	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& texture, glm::vec4 tintcolor);
+	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 tintcolor);
+
 public slots:
 	void init();
 	void initForVideoRender();
