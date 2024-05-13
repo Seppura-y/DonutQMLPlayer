@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <algorithm>
+static std::shared_ptr<Donut::OpenGLTexture2D> cat_texture;
 
 DonutSceneRenderer::~DonutSceneRenderer()
 {
@@ -102,7 +103,7 @@ void DonutSceneRenderer::initForVideoRender()
             });
 
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
-        batch_data_.rect_shader_->setInt("u_tex", 1);
+
         batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
 
         uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
@@ -135,14 +136,19 @@ void DonutSceneRenderer::initForVideoRender()
         {
             samplers[i] = i;
         }
-        batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
 
+        batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
+        batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+        batch_data_.rect_shader_->setInt("u_tex", 1);
         batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
         batch_data_.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+
+        cat_texture = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
     }
 }
 
@@ -287,6 +293,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
     {
         // 获取raw指针，然后解引用，以调用operator==(const Texture& other)
         if (*batch_data_.texture_slots_[i].get() == *texture.get())
+        //if (*batch_data_.texture_slots_[i].get() == *cat_texture.get())
         {
             texture_index = (float)i;
             break;
@@ -302,6 +309,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 
         texture_index = (float)batch_data_.texture_index_;
         batch_data_.texture_slots_[batch_data_.texture_index_] = texture;
+        //batch_data_.texture_slots_[batch_data_.texture_index_] = cat_texture;
         batch_data_.texture_index_++;
     }
 
@@ -406,11 +414,12 @@ void DonutSceneRenderer::flush()
         // bind textures
         for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
         {
+            auto tex = batch_data_.texture_slots_[i];
             batch_data_.texture_slots_[i]->bind(i);
         }
         batch_data_.rect_shader_->bind();
         //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
-        batch_data_.rect_shader_->setInt("u_tex", 1);
+        //batch_data_.rect_shader_->setInt("u_tex", 1);
 
         OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
 

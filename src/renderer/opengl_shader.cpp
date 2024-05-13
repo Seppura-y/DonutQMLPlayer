@@ -264,6 +264,7 @@ namespace Donut
 
 	void OpenGLShader::uploadUniformMat4fv(const std::string& name, const glm::mat4& matrix)
 	{
+		this->bind();
 		GLint location = OPENGL_EXTRA_FUNCTIONS(glGetUniformLocation(shader_id_, name.c_str()));
 		OPENGL_EXTRA_FUNCTIONS(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));
 	}
