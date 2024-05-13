@@ -56,7 +56,7 @@ namespace Donut
 
 		float aspect_ratio_ = 1.0f;
 
-		float zoom_level_ = 1.0f;
+		float zoom_level_ = 0.2f;
 	};
 }
 

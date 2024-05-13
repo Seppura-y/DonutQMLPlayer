@@ -90,8 +90,8 @@ void DonutScene::onItemInitialized()
         connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
     
         connect(window(), &QQuickWindow::sceneGraphInitialized, this, [this]() {
-            //test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
-            test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/RPG Base/RPGpack_sheet_2X.png");
+            test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
+            //test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/RPG Base/RPGpack_sheet_2X.png");
             }, Qt::DirectConnection);
     }
 }
