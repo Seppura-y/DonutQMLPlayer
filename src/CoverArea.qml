@@ -67,6 +67,12 @@ MouseArea
 		if(mouseY > window.height - 8) activeEdges |= Qt.BottomEdge
 		moveable = (activeEdges === 0)
 
+		if(!controlBar.contains(controlBar.mapFromItem(mouseArea, mouse.x, mouse.y))
+			&& !titleBar.contains(titleBar.mapFromItem(mouseArea, mouse.x, mouse.y)))
+		{
+			moveable = false
+		}
+
 		if(Qt.platform.os !== "osx")
 		{
 			if(activeEdges !== 0)

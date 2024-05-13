@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <algorithm>
-static std::shared_ptr<Donut::OpenGLTexture2D> cat_texture;
 
 DonutSceneRenderer::~DonutSceneRenderer()
 {
@@ -146,9 +145,6 @@ void DonutSceneRenderer::initForVideoRender()
         batch_data_.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
-
-
-        cat_texture = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
     }
 }
 
