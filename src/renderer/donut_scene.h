@@ -77,6 +77,8 @@ protected:
 	std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
 
 	std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
+
+	float zoom_level_ = 1.0f;
 };
 
 

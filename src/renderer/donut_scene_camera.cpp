@@ -40,10 +40,10 @@ namespace Donut
     {
         if (projection_type_ == ProjectionType::Orthographic)
         {
-            float ortho_left = -orthographic_size_ * aspect_ratio_ * 0.5f;
-            float ortho_right = orthographic_size_ * aspect_ratio_ * 0.5f;
-            float ortho_bottom = -orthographic_size_ * 0.5f;
-            float ortho_top = orthographic_size_ * 0.5f;
+            float ortho_left = -orthographic_size_ * aspect_ratio_ * 0.5f * zoom_level_;
+            float ortho_right = orthographic_size_ * aspect_ratio_ * 0.5f * zoom_level_;
+            float ortho_bottom = -orthographic_size_ * 0.5f * zoom_level_;
+            float ortho_top = orthographic_size_ * 0.5f * zoom_level_;
 
             projection_ = glm::ortho(
                 ortho_left, ortho_right,

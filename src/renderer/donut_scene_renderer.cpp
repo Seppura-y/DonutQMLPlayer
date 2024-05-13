@@ -309,9 +309,11 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
         batch_data_.texture_index_++;
     }
 
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+    auto scale_matrix = glm::scale(glm::mat4(1.0f), (texture->getRatio() > 1 ? glm::vec3{size.x, size.y * texture->getRatio(), 1.0f}
+    : glm::vec3{size.x * texture->getRatio(), size.y, 1.0f}));
 
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * scale_matrix;
 
     for (size_t i = 0; i < rect_vertex_count; i++)
     {
@@ -394,10 +396,6 @@ void DonutSceneRenderer::flush()
     //OPENGL_EXTRA_FUNCTIONS(setClearColor(glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }));
     //OPENGL_EXTRA_FUNCTIONS(clear());
 
-    // 加上下面两行，否则鼠标移动到按钮时，渲染图会跟着变色
-    // glDisable(GL_DEPTH_TEST) 禁用深度测试，否则渲染图会覆盖UI控件
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    //OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
     OPENGL_EXTRA_FUNCTIONS(glEnable(GL_DEPTH_TEST));
     //OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
     OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -415,11 +413,8 @@ void DonutSceneRenderer::flush()
             batch_data_.texture_slots_[i]->bind(i);
         }
         batch_data_.rect_shader_->bind();
-        //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
-        //batch_data_.rect_shader_->setInt("u_tex", 1);
 
         OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
-
     }
 
 

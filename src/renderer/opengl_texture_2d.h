@@ -37,6 +37,7 @@ namespace Donut
 
 		virtual uint32_t getWidth() const { return width_; }
 		virtual uint32_t getHeight() const { return height_; }
+		float getRatio() const { return (float)width_ / (float)height_; }
 
 		virtual void setData(void* data, uint32_t size);
 
@@ -57,6 +58,7 @@ namespace Donut
 		uint32_t width_;
 		uint32_t height_;
 		uint32_t channels_;
+		float aspect_ratio_;
 
 		uint32_t object_id_;
 

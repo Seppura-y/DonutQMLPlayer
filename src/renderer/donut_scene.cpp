@@ -103,8 +103,8 @@ void DonutScene::onUpdate()
     //s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
     //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
 
-    s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 0.5f, 1.f }, test_texture_, glm::vec4{ 1.f, 1.f,1.f, 1.f });
-    s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
+    s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.f, 1.f }, test_texture_, glm::vec4{ 1.f, 1.f,1.f, 1.f });
+    //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
     //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
     //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
     //test_texture_->bind();
@@ -121,18 +121,33 @@ void DonutScene::timerEvent(QTimerEvent* ev)
 
 void DonutScene::mousePressEvent(QMouseEvent* ev)
 {
-    qDebug() << "DonutScene::mousePressEvent(QMouseEvent* ev)";
+
 }
 
 void DonutScene::wheelEvent(QWheelEvent* ev)
 {
-    qDebug() << "DonutScene::wheelEvent(QWheelEvent* ev)";
+    QPoint delta = ev->angleDelta();
+    if (!delta.isNull())
+    {
+        // right handed
+        // get closer, then, we should decrease the z level of the camera
+        // QML中设置其他控件的z值为100，但是这里zoomlevel小于0.12，就开始会覆盖GUI，所以暂时限制为最小0.15
+        if (delta.y() > 0 && zoom_level_ > 0.15f)
+        {
+            zoom_level_ -= 0.01f;
+            scene_camera_.setZoomLevel(zoom_level_);
+        }
+        else if (delta.y() < 0 && zoom_level_ < 1.5f)
+        {
+            zoom_level_ += 0.01f;
+            scene_camera_.setZoomLevel(zoom_level_);
+        }
+    }
 }
 
 void DonutScene::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    qDebug() << "DonutScene::geometryChange()" << newGeometry.width() << " : " << newGeometry.height();
-
+    scene_camera_.setViewportSize(newGeometry.width(), newGeometry.height());
 }
 
 

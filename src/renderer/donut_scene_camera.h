@@ -19,6 +19,8 @@ namespace Donut
 
 		void setViewportSize(uint32_t width, uint32_t height);
 
+		void setZoomLevel(float value) { zoom_level_ = value; recalculateProjection(); }
+
 
 		ProjectionType getProjectionType()const { return projection_type_; }
 		void setProjectionType(ProjectionType type) { projection_type_ = type; recalculateProjection(); }
@@ -53,6 +55,8 @@ namespace Donut
 		float perspective_far_ = 1.0f;
 
 		float aspect_ratio_ = 1.0f;
+
+		float zoom_level_ = 1.0f;
 	};
 }
 
