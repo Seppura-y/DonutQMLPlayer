@@ -397,7 +397,8 @@ void DonutSceneRenderer::flush()
     // 加上下面两行，否则鼠标移动到按钮时，渲染图会跟着变色
     // glDisable(GL_DEPTH_TEST) 禁用深度测试，否则渲染图会覆盖UI控件
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
+    //OPENGL_EXTRA_FUNCTIONS(glDisable(GL_DEPTH_TEST));
+    OPENGL_EXTRA_FUNCTIONS(glEnable(GL_DEPTH_TEST));
     //OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE));
     OPENGL_EXTRA_FUNCTIONS(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
