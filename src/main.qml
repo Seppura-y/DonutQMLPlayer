@@ -14,8 +14,8 @@ Window
     visible: true
     minimumWidth: 800
     minimumHeight: 450
-    width: 1024
-    height: 600
+    width: 1280
+    height: 720
     title: "DonutQMLPlayer"
 
     property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"

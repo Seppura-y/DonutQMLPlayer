@@ -309,8 +309,8 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
         batch_data_.texture_index_++;
     }
 
-    auto scale_matrix = glm::scale(glm::mat4(1.0f), (texture->getRatio() > 1 ? glm::vec3{size.x, size.y * texture->getRatio(), 1.0f}
-    : glm::vec3{size.x * texture->getRatio(), size.y, 1.0f}));
+    auto scale_matrix = glm::scale(glm::mat4(1.0f), (texture->getRatio() > 1 ? glm::vec3{ size.x * texture->getRatio(), size.y, 1.0f }
+    : glm::vec3{ size.x, size.y * texture->getRatio(), 1.0f }));
 
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
         * scale_matrix;
