@@ -6,6 +6,7 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer
     ${CMAKE_CURRENT_LIST_DIR}/src/media
+    ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data
     ${CMAKE_CURRENT_LIST_DIR}/src/handler
 )
 
@@ -34,6 +35,8 @@ file(GLOB ${PROJECT_NAME}_HANDLER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/handler/
 
 file(GLOB ${PROJECT_NAME}_MEDIA_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/media/*.h)
 file(GLOB ${PROJECT_NAME}_MEDIA_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/media/*.cpp)
+file(GLOB ${PROJECT_NAME}_MEDIA_DATA_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data/*.h)
+file(GLOB ${PROJECT_NAME}_MEDIA_DATA_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data/*.cpp)
 
 file(GLOB ${PROJECT_NAME}_STBIMAGE_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.h)
 file(GLOB ${PROJECT_NAME}_STBIMAGE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.cpp)
@@ -45,6 +48,7 @@ source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FIL
 source_group("src"                              FILES  ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//renderer"                    FILES  ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
 source_group("src//media"                       FILES  ${${PROJECT_NAME}_MEDIA_HEADERS} ${${PROJECT_NAME}_MEDIA_SOURCES})
+source_group("src//media//media_data"           FILES  ${${PROJECT_NAME}_MEDIA_DATA_HEADERS} ${${PROJECT_NAME}_MEDIA_DATA_SOURCES})
 source_group("src//handler"                     FILES  ${${PROJECT_NAME}_HANDLER_HEADERS} ${${PROJECT_NAME}_HANDLER_SOURCES})
 source_group("src//renderer//stb_image"         FILES  ${${PROJECT_NAME}_STBIMAGE_HEADERS} ${${PROJECT_NAME}_STBIMAGE_SOURCES})
 source_group("src//renderer//assets//shaders"   FILES  ${${PROJECT_NAME}_SHADERS})
@@ -59,6 +63,9 @@ add_executable(${PROJECT_NAME}
 
     ${${PROJECT_NAME}_MEDIA_HEADERS}
     ${${PROJECT_NAME}_MEDIA_SOURCES}
+
+    ${${PROJECT_NAME}_MEDIA_DATA_HEADERS}
+    ${${PROJECT_NAME}_MEDIA_DATA_SOURCES}
     
     ${${PROJECT_NAME}_HANDLER_HEADERS}
     ${${PROJECT_NAME}_HANDLER_SOURCES}
@@ -100,6 +107,12 @@ set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/glm
     ${CMAKE_CURRENT_LIST_DIR}/include/stb_image
+    ${CMAKE_CURRENT_LIST_DIR}/include/ffmpeg
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    DN_PLATFORM_WINDOWS
+    DN_BUILD_STATIC
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE

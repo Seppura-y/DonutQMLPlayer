@@ -1,17 +1,18 @@
 #ifndef DONUT_AV_DEMUXER_H
 #define DONUT_AV_DEMUXER_H
 
-#include "core.h"
+//#include "core.h"
 #include "donut_av_format_base.h"
 #include "donut_av_packet.h"
 
 struct AVPacket;
 struct AVStream;
+struct AVFormatContext;
 
 namespace Donut
 {
 
-	class DONUT_API DonutAVDemuxer : public DonutAVFormatBase
+	class DonutAVDemuxer : public DonutAVFormatBase
 	{
 	public:
 		AVFormatContext* openContext(const char* url);
