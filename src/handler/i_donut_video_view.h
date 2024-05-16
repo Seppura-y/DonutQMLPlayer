@@ -3,11 +3,13 @@
 
 #include "i_donut_av_base_handler.h"
 
-class IDonutVideoView : public IDonutAVBaseHandler
+namespace Donut
 {
-public:
-	virtual void update(void* data) override;
+	class IDonutVideoView : public IDonutAVBaseHandler
+	{
+	public:
+		virtual void updateHandler(void* data) override;
 
-};
-
+	};
+}
 #endif

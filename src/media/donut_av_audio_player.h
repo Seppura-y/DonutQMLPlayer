@@ -1,7 +1,8 @@
 #ifndef DONUT_AV_AUDIO_PLAYER_H
 #define DONUT_AV_AUDIO_PLAYER_H
 
-#include "donut_av_data_tools.h"
+#include "core.h"
+#include "donut_av_datas.h"
 
 #define AUDIO_U8        0x0008  /**< Unsigned 8-bit samples */
 #define AUDIO_S8        0x8008  /**< Signed 8-bit samples */

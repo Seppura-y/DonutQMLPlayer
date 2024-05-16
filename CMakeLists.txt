@@ -5,6 +5,7 @@ project(DonutQMLPlayer)
 include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_LIST_DIR}/src/renderer
+    ${CMAKE_CURRENT_LIST_DIR}/src/log
     ${CMAKE_CURRENT_LIST_DIR}/src/media
     ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data
     ${CMAKE_CURRENT_LIST_DIR}/src/handler
@@ -27,6 +28,9 @@ file(GLOB ${PROJECT_NAME}_QRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.qrc)
 file(GLOB ${PROJECT_NAME}_QML_FILES  ${CMAKE_CURRENT_LIST_DIR}/src/*.qml)
 file(GLOB ${PROJECT_NAME}_QML_DIR  ${CMAKE_CURRENT_LIST_DIR}/src/qmldir)
 
+FILE(GLOB ${PROJECT_NAME}_LOG_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/log/*.h)
+FILE(GLOB ${PROJECT_NAME}_LOG_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/log/*.cpp)
+
 file(GLOB ${PROJECT_NAME}_RENDERER_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/renderer/*.h)
 file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/renderer/*.cpp)
 
@@ -46,6 +50,7 @@ file(GLOB ${PROJECT_NAME}_SHADERS ${CMAKE_CURRENT_LIST_DIR}/bin/assets/shaders/*
 source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
 source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FILES})
 source_group("src"                              FILES  ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
+source_group("src//log"                         FILES  ${${PROJECT_NAME}_LOG_HEADERS} ${${PROJECT_NAME}_LOG_SOURCES})
 source_group("src//renderer"                    FILES  ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
 source_group("src//media"                       FILES  ${${PROJECT_NAME}_MEDIA_HEADERS} ${${PROJECT_NAME}_MEDIA_SOURCES})
 source_group("src//media//media_data"           FILES  ${${PROJECT_NAME}_MEDIA_DATA_HEADERS} ${${PROJECT_NAME}_MEDIA_DATA_SOURCES})
@@ -60,6 +65,9 @@ add_executable(${PROJECT_NAME}
 
     ${${PROJECT_NAME}_RENDERER_HEADERS}
     ${${PROJECT_NAME}_RENDERER_SOURCES}
+
+    ${${PROJECT_NAME}_LOG_HEADERS}
+    ${${PROJECT_NAME}_LOG_SOURCES}
 
     ${${PROJECT_NAME}_MEDIA_HEADERS}
     ${${PROJECT_NAME}_MEDIA_SOURCES}
@@ -104,15 +112,21 @@ qt_add_qml_module(
 
 set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})
 
+target_link_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/lib
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/glm
     ${CMAKE_CURRENT_LIST_DIR}/include/stb_image
     ${CMAKE_CURRENT_LIST_DIR}/include/ffmpeg
+    ${CMAKE_CURRENT_LIST_DIR}/include/spdlog/include
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     DN_PLATFORM_WINDOWS
     DN_BUILD_STATIC
+    __STDC_CONSTANT_MACROS
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE
@@ -128,6 +142,16 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Network
     Qt6::OpenGL
 
+    SDL2
+    SDL2main
+
+    avcodec
+    avdevice
+    avfilter
+    avformat
+    avutil
+    swresample
+    swscale
 )
 
 # 项目输出路径

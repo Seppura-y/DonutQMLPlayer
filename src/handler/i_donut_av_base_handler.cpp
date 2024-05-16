@@ -3,23 +3,25 @@
 #include <iostream>
 #include <sstream>
 
-
-void IDonutAVBaseHandler::addNode(IDonutAVBaseHandler* node)
+namespace Donut
 {
-    if (!node) return;
-    std::lock_guard<std::mutex> lock(mtx_);
-    hander_nodes_.emplace_back(node);
-}
 
-void IDonutAVBaseHandler::notify(void* data)
-{
-    if (!data) return;
-    std::lock_guard<std::mutex> lock(mtx_);
-
-    for (auto node : hander_nodes_)
+    void IDonutAVBaseHandler::addNode(IDonutAVBaseHandler* node)
     {
-        node->update(data);
+        if (!node) return;
+        std::lock_guard<std::mutex> lock(mtx_);
+        hander_nodes_.emplace_back(node);
     }
+
+    void IDonutAVBaseHandler::notify(void* data)
+    {
+        if (!data) return;
+        std::lock_guard<std::mutex> lock(mtx_);
+
+        for (auto node : hander_nodes_)
+        {
+            node->updateHandler(data);
+        }
+    }
+
 }
-
-

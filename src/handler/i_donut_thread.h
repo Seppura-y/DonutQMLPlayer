@@ -4,29 +4,31 @@
 #include <thread>
 #include <mutex>
 
-class IDonutThread
+namespace Donut
 {
-public:
-	IDonutThread() = default;
-	virtual ~IDonutThread() {}
+	class IDonutThread
+	{
+	public:
+		IDonutThread() {};
+		virtual ~IDonutThread() {}
 
-	virtual void start();
-	virtual void stop();
-	virtual void pause();
+		virtual void start();
+		virtual void stop();
+		virtual void pause();
 
-	bool isExit() { return is_exit_; }
-protected:
-	virtual void threadLoop() = 0;
+		bool isExit() { return is_exit_; }
+	protected:
+		virtual void threadLoop() = 0;
 
-protected:
-	std::mutex mtx_;
-	std::thread worker_;
+	protected:
+		std::mutex mtx_;
+		std::thread worker_;
 
-	bool is_exit_ = true;
-	bool is_pause_ = false;
+		bool is_exit_ = true;
+		bool is_pause_ = false;
 
-	int thread_index_ = 0;
-};
+		int thread_index_ = 0;
+	};
 
-
+}
 #endif

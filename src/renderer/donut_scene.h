@@ -16,81 +16,83 @@
 #include <QQuickItem>
 #include <QOffscreenSurface>
 
-class DonutScene : public QQuickItem, public IDonutVideoView
+namespace Donut
 {
-	Q_OBJECT
-	Q_PROPERTY(qreal delta_t_ READ t WRITE setT NOTIFY tChanged)
-	QML_ELEMENT
-public:
-	DonutScene(QQuickItem* parent = nullptr);
-	~DonutScene();
+	class DonutScene : public QQuickItem, public IDonutVideoView
+	{
+		Q_OBJECT
+			Q_PROPERTY(qreal delta_t_ READ t WRITE setT NOTIFY tChanged)
+			QML_ELEMENT
+	public:
+		DonutScene(QQuickItem* parent = nullptr);
+		~DonutScene();
 
-	//////////// for test ////////////
-	qreal t() const { return delta_t_; }
-	void setT(qreal t);
-	/////////////////////////////////
+		//////////// for test ////////////
+		qreal t() const { return delta_t_; }
+		void setT(qreal t);
+		/////////////////////////////////
 
 
-	static DonutSceneRenderer* getRenderer() { return s_renderer_; }
-	static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
+		static DonutSceneRenderer* getRenderer() { return s_renderer_; }
+		static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
 
-	void setViewportSize(const QSize& size);
+		void setViewportSize(const QSize& size);
 
-signals:
-	void tChanged();
-	void sigItemInitialized();
+	signals:
+		void tChanged();
+		void sigItemInitialized();
 
-public slots:
-	void sync();
-	void cleanup();
+	public slots:
+		void sync();
+		void cleanup();
 
-private slots:
-	void onWindowChanged(QQuickWindow* win);
+	private slots:
+		void onWindowChanged(QQuickWindow* win);
 
-	void onItemInitialized();
+		void onItemInitialized();
 
-	void onUpdate();
+		void onUpdate();
 
-// IDonutAVBaseHandler
-public :
-	virtual void update(void* data) override;
-protected:
-	void threadLoop() override;
-protected:
-	void timerEvent(QTimerEvent* ev) override;
-	void mousePressEvent(QMouseEvent* ev) override;
-	void wheelEvent(QWheelEvent* ev) override;
+		// IDonutAVBaseHandler
+	public:
+		virtual void updateHandler(void* data) override;
+	protected:
+		void threadLoop() override;
+	protected:
+		void timerEvent(QTimerEvent* ev) override;
+		void mousePressEvent(QMouseEvent* ev) override;
+		void wheelEvent(QWheelEvent* ev) override;
 
-	void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
-private:
-	void releaseResources() override;
+		void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+	private:
+		void releaseResources() override;
 
-	qreal delta_t_;
-protected:
-	static DonutSceneRenderer* s_renderer_;
-	Donut::DonutSceneCamera scene_camera_;
-	////Donut::OrthographicCameraController camera_controller_;
+		qreal delta_t_;
+	protected:
+		static DonutSceneRenderer* s_renderer_;
+		Donut::DonutSceneCamera scene_camera_;
+		////Donut::OrthographicCameraController camera_controller_;
 
-	//int width_;
-	//int height_;
-	//float aspect_ratio_;
+		//int width_;
+		//int height_;
+		//float aspect_ratio_;
 
-	//Donut::DonutRenderCommand render_command_;
-	static Donut::DonutGLRendererApi* renderer_api_;
-	QOpenGLContext* context_ = nullptr;
-	QOffscreenSurface* offscreen_surface_ = nullptr;
+		//Donut::DonutRenderCommand render_command_;
+		static Donut::DonutGLRendererApi* renderer_api_;
+		QOpenGLContext* context_ = nullptr;
+		QOffscreenSurface* offscreen_surface_ = nullptr;
 
-	int width_ = 0;
-	int height_ = 0;
-	float aspect_ratio_ = 1.0f;
-	glm::vec2 viewport_size_{ 0 };
+		int width_ = 0;
+		int height_ = 0;
+		float aspect_ratio_ = 1.0f;
+		glm::vec2 viewport_size_{ 0 };
 
-	std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
+		std::shared_ptr<Donut::OpenGLFramebuffer> framebuffer_;
 
-	std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
+		std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
 
-	float zoom_level_ = 0.2f;
-};
-
+		float zoom_level_ = 0.2f;
+	};
+}
 
 #endif

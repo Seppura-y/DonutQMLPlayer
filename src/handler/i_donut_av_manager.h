@@ -1,7 +1,7 @@
 #ifndef I_DONUT_AV_MANAGER_H
 #define I_DONUT_AV_MANAGER_H
 
-#include "i_donut_thread.h"
+//#include "i_donut_thread.h"
 #include "i_donut_video_view.h"
 #include "donut_av_demux_handler.h"
 #include "donut_av_decode_handler.h"
@@ -15,7 +15,7 @@ struct AVFrame;
 
 namespace Donut
 {
-
+	class IDonutThread;
 
 	class IDonutAVManager : public QObject, public IDonutThread
 	{
@@ -28,7 +28,7 @@ namespace Donut
 		static IDonutAVManager* getInstance(DonuAVManagerType type);
 
 		virtual int initManager() = 0;
-		virtual int initManager(AVCodecParameters* param);
+		//virtual int initManager(AVCodecParameters* param);
 		virtual int initManager(int width, int height, DonutPixFormat fmt = DonutPixFormat::DONUT_PIX_FORMAT_YUV420P, void* win_id = nullptr) = 0;
 		virtual int initManager(int width, int height, int fmt, void* win_id = nullptr) = 0;
 
@@ -37,9 +37,9 @@ namespace Donut
 
 		virtual void setWindowId(void* win_id) { window_id_ = win_id; };
 
-		virtual int renderFrame(AVFrame* frame);
-		virtual int renderPackedData(uint8_t* buffer, int size) = 0;
-		virtual int renderYuvData(uint8_t* y_buffer, int y_size, uint8_t* u_buffer, int u_size, uint8_t* v_buffer, int v_size) = 0;
+		//virtual int renderFrame(AVFrame* frame);
+		//virtual int renderPackedData(uint8_t* buffer, int size) = 0;
+		//virtual int renderYuvData(uint8_t* y_buffer, int y_size, uint8_t* u_buffer, int u_size, uint8_t* v_buffer, int v_size) = 0;
 
 		virtual void setTargetUrl(std::string url) = 0;
 

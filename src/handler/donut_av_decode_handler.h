@@ -19,7 +19,7 @@ namespace Donut
 		int openDecoder(AVCodecParameters* param);
 		int openDecoder(std::shared_ptr<DonutAVParamWarpper> param);
 		int openDecoder(std::shared_ptr<DonutAVStream> param);
-		void update(void* data) override;
+		void updateHandler(void* data) override;
 
 		template<typename T>
 		void handle(std::shared_ptr<T> data);
@@ -43,6 +43,11 @@ namespace Donut
 		std::shared_ptr<DonutAVFrameQueue> frame_queue_;
 		std::shared_ptr<DonutAVPacketQueue> packet_queue_;
 	};
+
+	template<typename T>
+	inline void DonutAVDecodeHandler::handle(std::shared_ptr<T> data)
+	{
+	}
 
 }
 

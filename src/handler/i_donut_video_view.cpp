@@ -1,5 +1,8 @@
 #include "i_donut_video_view.h"
 
-void IDonutVideoView::update(void* data)
+namespace Donut
 {
+	void IDonutVideoView::updateHandler(void* data)
+	{
+	}
 }

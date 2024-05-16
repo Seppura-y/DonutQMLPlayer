@@ -26,7 +26,8 @@ enum class DonuAVManagerType
 {
     DONUT_AV_MANAGER_TYPE_SDL = 0,
     DONUT_AV_MANAGER_TYPE_GL = 1,
-    DONUT_AV_MANAGER_TYPE_FFP = 2
+    DONUT_AV_MANAGER_TYPE_FFP = 2,
+    DONUT_AV_MANAGER_TYPE_QML = 3
 };
 
 enum class DonutPixFormat

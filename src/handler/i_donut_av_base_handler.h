@@ -5,20 +5,22 @@
 
 #include <vector>
 
-class IDonutAVBaseHandler : public IDonutThread
+namespace Donut
 {
-public:
-	IDonutAVBaseHandler(){}
-	virtual ~IDonutAVBaseHandler() {}
+	class IDonutAVBaseHandler : public IDonutThread
+	{
+	public:
+		IDonutAVBaseHandler() {}
+		virtual ~IDonutAVBaseHandler() {}
 
-	void addNode(IDonutAVBaseHandler* node);
-	void notify(void* data);
-	virtual void update(void* data) {}
-protected:
-	virtual void threadLoop() = 0;
-private:
-	std::vector<IDonutAVBaseHandler*> hander_nodes_;
-};
-
+		void addNode(IDonutAVBaseHandler* node);
+		void notify(void* data);
+		virtual void updateHandler(void* data) {}
+	protected:
+		virtual void threadLoop() = 0;
+	private:
+		std::vector<IDonutAVBaseHandler*> hander_nodes_;
+	};
+}
 
 #endif
