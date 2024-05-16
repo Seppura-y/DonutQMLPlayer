@@ -115,6 +115,14 @@ void DonutScene::onUpdate()
     //window()->endExternalCommands();
 }
 
+void DonutScene::update(void* data)
+{
+}
+
+void DonutScene::threadLoop()
+{
+}
+
 void DonutScene::timerEvent(QTimerEvent* ev)
 {
     update();

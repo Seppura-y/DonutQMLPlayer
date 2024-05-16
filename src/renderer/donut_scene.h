@@ -3,6 +3,9 @@
 
 #include "donut_scene_renderer.h"
 #include "donut_scene_camera.h"
+
+#include "i_donut_video_view.h"
+
 #include "orthographic_camera_controller.h"
 
 #include "opengl_framebuffer.h"
@@ -13,7 +16,7 @@
 #include <QQuickItem>
 #include <QOffscreenSurface>
 
-class DonutScene : public QQuickItem
+class DonutScene : public QQuickItem, public IDonutVideoView
 {
 	Q_OBJECT
 	Q_PROPERTY(qreal delta_t_ READ t WRITE setT NOTIFY tChanged)
@@ -22,8 +25,11 @@ public:
 	DonutScene(QQuickItem* parent = nullptr);
 	~DonutScene();
 
+	//////////// for test ////////////
 	qreal t() const { return delta_t_; }
 	void setT(qreal t);
+	/////////////////////////////////
+
 
 	static DonutSceneRenderer* getRenderer() { return s_renderer_; }
 	static Donut::DonutGLRendererApi* getRendererApi() { return renderer_api_; }
@@ -45,6 +51,11 @@ private slots:
 
 	void onUpdate();
 
+// IDonutAVBaseHandler
+public :
+	virtual void update(void* data) override;
+protected:
+	void threadLoop() override;
 protected:
 	void timerEvent(QTimerEvent* ev) override;
 	void mousePressEvent(QMouseEvent* ev) override;

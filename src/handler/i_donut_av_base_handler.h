@@ -12,7 +12,7 @@ public:
 	virtual ~IDonutAVBaseHandler() {}
 
 	void addNode(IDonutAVBaseHandler* node);
-	void update(void* data) {}
+	virtual void update(void* data) {}
 	void notify(void* data);
 protected:
 	virtual void threadLoop() = 0;
