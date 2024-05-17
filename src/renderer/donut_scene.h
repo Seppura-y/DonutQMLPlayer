@@ -21,8 +21,8 @@ namespace Donut
 	class DonutScene : public QQuickItem, public IDonutVideoView
 	{
 		Q_OBJECT
-			Q_PROPERTY(qreal delta_t_ READ t WRITE setT NOTIFY tChanged)
-			QML_ELEMENT
+		Q_PROPERTY(qreal delta_t_ READ t WRITE setT NOTIFY tChanged)
+		QML_ELEMENT
 	public:
 		DonutScene(QQuickItem* parent = nullptr);
 		~DonutScene();

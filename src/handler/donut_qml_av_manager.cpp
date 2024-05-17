@@ -103,3 +103,17 @@ void Donut::DonutQMLAVManager::onStop()
 void Donut::DonutQMLAVManager::onSetPlaybackRate(float rate)
 {
 }
+
+void Donut::DonutQMLAVManager::onVideoViewInitialized(QObject* view)
+{
+
+	this->video_view_ = dynamic_cast<IDonutVideoView*>(view);
+	if (this->video_view_)
+	{
+		video_view_->updateHandler(nullptr);
+	}
+	else
+	{
+		qDebug() << "video_view_ is nullptr";
+	}
+}

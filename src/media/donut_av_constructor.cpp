@@ -2,7 +2,7 @@
 
 namespace Donut
 {
-    IDonutAVManager* Donut::DonutAVConstructor::constructPlayer(DonuAVManagerType type)
+    DonutQMLAVManager* Donut::DonutAVConstructor::constructPlayer(DonuAVManagerType type)
     {
         return nullptr;
     }

@@ -28,6 +28,7 @@ Window
 
     DonutQMLAVManager
     {
+        id: qmlAVManager
 
     }
 
@@ -376,4 +377,10 @@ Window
             }
         } // ControlBar
     } // GridLayout
+
+
+    Component.onCompleted:
+    {
+        qmlAVManager.onVideoViewInitialized(glScene)
+    }
 }

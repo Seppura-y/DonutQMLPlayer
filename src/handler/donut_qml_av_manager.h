@@ -12,12 +12,10 @@
 namespace Donut
 {
 	class DonutQMLAVManager : public QQuickItem, public IDonutThread
-	//class DonutQMLAVManager : public QObject, public IDonutAVManager
 	{
 		Q_OBJECT
 		QML_ELEMENT
 	public:
-		//DonutQMLAVManager(QObject* parent = nullptr);
 		DonutQMLAVManager(QQuickItem* parent = nullptr);
 		virtual ~DonutQMLAVManager();
 
@@ -67,6 +65,8 @@ namespace Donut
 		virtual void onStop();
 
 		virtual void onSetPlaybackRate(float rate);
+
+		void onVideoViewInitialized(QObject* view);
 
 	signals:
 		void sigUpdateTimePos(QTime value);
