@@ -107,7 +107,10 @@ qt_add_qml_module(
     ${PROJECT_NAME}
     VERSION 1.0
     URI Donut.DonutQMLPlayer
-    SOURCES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
+    SOURCES
+    ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES}
+    #${${PROJECT_NAME}_HANDLER_HEADERS} ${${PROJECT_NAME}_HANDLER_SOURCES}
+    ${${CMAKE_CURRENT_LIST_DIR}/src/handler/donut_qml_av_manager.h} ${${CMAKE_CURRENT_LIST_DIR}/src/handler/donut_qml_av_manager.cpp}
 )
 
 set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR})

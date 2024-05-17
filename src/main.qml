@@ -26,6 +26,11 @@ Window
     Material.accent: Material.Grey
     Universal.theme: SkinColor.darkMode ? Universal.Dark : Universal.Light
 
+    DonutQMLAVManager
+    {
+
+    }
+
     DonutScene
     {
         id: glScene

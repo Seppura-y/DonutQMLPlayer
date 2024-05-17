@@ -6,6 +6,8 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
+#include "donut_qml_av_manager.h"
+
 //解析字符串中的opengl版本号
 bool parseOpenGLVersion(const QByteArray& versionString, int& major, int& minor)
 {
@@ -107,6 +109,8 @@ int main(int argc, char **argv)
     QQmlEngine engine;
 
     QQmlComponent component(&engine);
+
+    //qmlRegisterType<Donut::DonutQMLAVManager>("DonutQMLPlayer", 1, 0, "DonutQMLAVManager");
 
     qputenv("QT_QUICK_CONTROLS_MATERIAL_VARIANT", QByteArrayLiteral("Dense"));
     qputenv("QT_QUICK_CONTROLS_STYLE", QByteArrayLiteral("Material"));
