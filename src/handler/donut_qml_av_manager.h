@@ -16,11 +16,11 @@ namespace Donut
 		Q_OBJECT
 		QML_ELEMENT
 	public:
-
+		explicit DonutQMLAVManager(QQuickItem* parent = nullptr);
 		virtual ~DonutQMLAVManager();
 
 		static DonutQMLAVManager* getInstance();
-		static QObject* singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine);
+		//static QObject* singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
 		virtual void threadLoop() {}
@@ -104,7 +104,7 @@ namespace Donut
 		void sigStop();
 
 	private:
-		explicit DonutQMLAVManager(QQuickItem* parent = nullptr);
+
 
 
 	protected:

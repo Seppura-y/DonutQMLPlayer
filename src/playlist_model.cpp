@@ -1,4 +1,7 @@
 #include "playlist_model.h"
+
+#include "donut_qml_av_manager.h"
+
 #include <QFileInfo>
 
 PlaylistModel* PlaylistModel::s_instance_ = nullptr;
@@ -87,7 +90,7 @@ void PlaylistModel::clear()
 
 void PlaylistModel::playItem(int index)
 {
-
+	Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile("sdf");
 }
 
 void PlaylistModel::playNextItem()

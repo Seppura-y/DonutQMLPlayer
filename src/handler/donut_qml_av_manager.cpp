@@ -9,6 +9,12 @@ namespace Donut
 	DonutQMLAVManager::DonutQMLAVManager(QQuickItem* parent)
 		: QQuickItem(parent)
 	{
+		if (s_instance_)
+		{
+			delete s_instance_;
+		}
+
+		s_instance_ = this;
 	}
 
 
@@ -26,12 +32,12 @@ namespace Donut
 		return s_instance_;
 	}
 
-	QObject* DonutQMLAVManager::singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine)
-	{
-		Q_UNUSED(engine)
-		Q_UNUSED(scriptEngine)
-		return DonutQMLAVManager::getInstance();
-	}
+	//QObject* DonutQMLAVManager::singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine)
+	//{
+	//	Q_UNUSED(engine)
+	//	Q_UNUSED(scriptEngine)
+	//	return DonutQMLAVManager::getInstance();
+	//}
 
 	int DonutQMLAVManager::initManager()
 	{
@@ -175,5 +181,6 @@ namespace Donut
 
 	void DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
+		qDebug() << path;
 	}
 }
