@@ -13,6 +13,8 @@
 #include "donut_gl_renderer_api.h"
 #include "opengl_texture_2d.h"
 
+#include "donut_qml_av_manager.h"
+
 #include <QQuickItem>
 #include <QOffscreenSurface>
 
@@ -38,6 +40,9 @@ namespace Donut
 
 		void setViewportSize(const QSize& size);
 
+
+		// player
+		Q_INVOKABLE void setQMLAvManager(DonutQMLAVManager* manager);
 	signals:
 		void tChanged();
 		void sigItemInitialized();
@@ -52,6 +57,7 @@ namespace Donut
 		void onItemInitialized();
 
 		void onUpdate();
+
 
 		// IDonutAVBaseHandler
 	public:
@@ -92,6 +98,8 @@ namespace Donut
 		std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
 
 		float zoom_level_ = 0.2f;
+
+		DonutQMLAVManager* av_manager_ = nullptr;
 	};
 }
 

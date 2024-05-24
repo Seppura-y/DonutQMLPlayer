@@ -76,6 +76,11 @@ namespace Donut
         qDebug() << "DonutSceneRenderer::setViewportSize width : " << size.width() << " height: " << size.height();
     }
 
+    void DonutScene::setQMLAvManager(DonutQMLAVManager* manager)
+    {
+        av_manager_ = manager;
+    }
+
     void DonutScene::onItemInitialized()
     {
         qDebug() << "DonutScene::onItemInitialized()";

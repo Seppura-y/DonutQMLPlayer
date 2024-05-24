@@ -6,7 +6,7 @@ import QtQuick.Controls.Material
 import QtQuick.Controls.Universal
 import QtQml
 
-import Donut.DonutQMLPlayer
+import Donut.DonutQMLPlayer 1.0
 
 Window
 {
@@ -30,6 +30,10 @@ Window
     {
         id: qmlAVManager
 
+        Component.onCompleted:
+        {
+            console.log("DonutQMLAVManager initialized")
+        }
     }
 
     DonutScene
@@ -47,6 +51,8 @@ Window
         Component.onCompleted:
         {
             glScene.sigItemInitialized()
+            //qmlAVManager.onVideoViewInitialized(glScene)
+            //qmlAVManager.initManager()
         }
     }
 
@@ -381,6 +387,8 @@ Window
 
     Component.onCompleted:
     {
-        qmlAVManager.onVideoViewInitialized(glScene)
+        //qmlAVManager.onVideoViewInitialized(glScene)
+
+        //glScene.setQMLAvManager(qmlAVManager)
     }
 }

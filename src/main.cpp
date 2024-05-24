@@ -106,30 +106,39 @@ int main(int argc, char **argv)
     QSurfaceFormat::setDefaultFormat(fmt);
 
 
-    QQmlEngine engine;
+    //QQmlEngine engine;
+    QQmlApplicationEngine engine;
 
     QQmlComponent component(&engine);
 
     //qmlRegisterType<Donut::DonutQMLAVManager>("DonutQMLPlayer", 1, 0, "DonutQMLAVManager");
 
+    qmlRegisterSingletonType<Donut::DonutQMLAVManager>("DonutQMLPlayer", 1, 0, "DonutQMLAVManager", Donut::DonutQMLAVManager::singletonProvider);
+
+
+
     qputenv("QT_QUICK_CONTROLS_MATERIAL_VARIANT", QByteArrayLiteral("Dense"));
     qputenv("QT_QUICK_CONTROLS_STYLE", QByteArrayLiteral("Material"));
 
-    component.loadUrl(QUrl(QStringLiteral("qrc:/main.qml")));
-    if(component.isError())
-    {
-        qDebug() << "QQmlComponent error : " << component.errorString();
-    }
+    //component.loadUrl(QUrl(QStringLiteral("qrc:/main.qml")));
+    //if(component.isError())
+    //{
+    //    qDebug() << "QQmlComponent error : " << component.errorString();
+    //}
 
-    std::unique_ptr<QQuickWindow> winObject(static_cast<QQuickWindow*>(component.create()));
-    if(component.isError())
-    {
-        qDebug() << "QQmlComponent error : " << component.errorString();
-    }
+    //std::unique_ptr<QQuickWindow> winObject(static_cast<QQuickWindow*>(component.create()));
+    //if(component.isError())
+    //{
+    //    qDebug() << "QQmlComponent error : " << component.errorString();
+    //}
 
 
 
-    winObject->show();
+    //winObject->show();
+
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    if (engine.rootObjects().isEmpty())
+        return -1;
 
     return app.exec();
 }

@@ -16,14 +16,18 @@ namespace Donut
 		Q_OBJECT
 		QML_ELEMENT
 	public:
-		DonutQMLAVManager(QQuickItem* parent = nullptr);
+
 		virtual ~DonutQMLAVManager();
+
+		static DonutQMLAVManager* getInstance();
+		static QObject* singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine);
+
 
 		virtual void threadLoop() {}
 		virtual void update() {}
 
 
-		virtual int initManager();
+		Q_INVOKABLE virtual int initManager();
 		//virtual int initManager(AVCodecParameters* param);
 		virtual int initManager(int width, int height, DonutPixFormat fmt = DonutPixFormat::DONUT_PIX_FORMAT_YUV420P, void* win_id = nullptr);
 		virtual int initManager(int width, int height, int fmt, void* win_id = nullptr);
@@ -39,7 +43,6 @@ namespace Donut
 
 		virtual void setTargetUrl(std::string url);
 
-		// for vlc
 	public:
 		virtual void updateTimePos(qint64 value);
 		virtual void updateTotalDuration(QTime value);
@@ -66,7 +69,17 @@ namespace Donut
 
 		virtual void onSetPlaybackRate(float rate);
 
+		//********************* QML *********************
+	public:
+		Q_INVOKABLE void setDemuxer(DonutAVDemuxHandler* demuxer);
+		Q_INVOKABLE void setVideoDecoder(DonutAVDecodeHandler* decoder);
+		Q_INVOKABLE void setAudioDecoder(DonutAVDecodeHandler* decoder);
+		Q_INVOKABLE void setVideoView(IDonutVideoView* view);
+	public slots:
 		void onVideoViewInitialized(QObject* view);
+
+		void onOpenMediaFile(QString path);
+		//********************* QML *********************
 
 	signals:
 		void sigUpdateTimePos(QTime value);
@@ -90,6 +103,9 @@ namespace Donut
 		void sigPauseStat(bool bPaused);
 		void sigStop();
 
+	private:
+		explicit DonutQMLAVManager(QQuickItem* parent = nullptr);
+
 
 	protected:
 		int width_ = -1;
@@ -111,6 +127,9 @@ namespace Donut
 		DonutAVDemuxHandler* demux_handler_ = nullptr;
 		DonutAVDecodeHandler* a_decode_handler_ = nullptr;
 		DonutAVDecodeHandler* v_decode_handler_ = nullptr;
+
+		static DonutQMLAVManager* s_instance_;
 	};
 }
+
 #endif

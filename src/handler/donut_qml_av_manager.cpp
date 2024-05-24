@@ -2,118 +2,178 @@
 
 #include <QTime>
 
-Donut::DonutQMLAVManager::DonutQMLAVManager(QQuickItem* parent)
-	: QQuickItem(parent)
+namespace Donut
 {
-}
+	DonutQMLAVManager* DonutQMLAVManager::s_instance_ = nullptr;
 
-
-Donut::DonutQMLAVManager::~DonutQMLAVManager()
-{
-}
-
-int Donut::DonutQMLAVManager::initManager()
-{
-	return 0;
-}
-
-int Donut::DonutQMLAVManager::initManager(int width, int height, DonutPixFormat fmt, void* win_id)
-{
-	return 0;
-}
-
-int Donut::DonutQMLAVManager::initManager(int width, int height, int fmt, void* win_id)
-{
-	return 0;
-}
-
-void Donut::DonutQMLAVManager::destroyManager()
-{
-}
-
-void Donut::DonutQMLAVManager::resetManager()
-{
-}
-
-void Donut::DonutQMLAVManager::setTargetUrl(std::string url)
-{
-}
-
-void Donut::DonutQMLAVManager::updateTimePos(qint64 value)
-{
-}
-
-void Donut::DonutQMLAVManager::updateTotalDuration(QTime value)
-{
-}
-
-void Donut::DonutQMLAVManager::updateSoundVolume(int value)
-{
-}
-
-void Donut::DonutQMLAVManager::mediaEndReached()
-{
-}
-
-void Donut::DonutQMLAVManager::setPlaying()
-{
-}
-
-void Donut::DonutQMLAVManager::setPause()
-{
-}
-
-void Donut::DonutQMLAVManager::setStop()
-{
-}
-
-void Donut::DonutQMLAVManager::setTimePos(double value)
-{
-}
-
-void Donut::DonutQMLAVManager::setSoundVolume(int value)
-{
-}
-
-void Donut::DonutQMLAVManager::onSeekingTimePos(double value)
-{
-
-}
-
-void Donut::DonutQMLAVManager::onSeekForward()
-{
-}
-
-void Donut::DonutQMLAVManager::onSeekBackward()
-{
-}
-
-void Donut::DonutQMLAVManager::onSetSoundVolume(int value)
-{
-}
-
-void Donut::DonutQMLAVManager::onPlayOrPause(bool status)
-{
-}
-
-void Donut::DonutQMLAVManager::onStop()
-{
-}
-
-void Donut::DonutQMLAVManager::onSetPlaybackRate(float rate)
-{
-}
-
-void Donut::DonutQMLAVManager::onVideoViewInitialized(QObject* view)
-{
-
-	this->video_view_ = dynamic_cast<IDonutVideoView*>(view);
-	if (this->video_view_)
+	DonutQMLAVManager::DonutQMLAVManager(QQuickItem* parent)
+		: QQuickItem(parent)
 	{
-		video_view_->updateHandler(nullptr);
 	}
-	else
+
+
+	DonutQMLAVManager::~DonutQMLAVManager()
 	{
-		qDebug() << "video_view_ is nullptr";
+	}
+
+	DonutQMLAVManager* DonutQMLAVManager::getInstance()
+	{
+		if (!s_instance_)
+		{
+			s_instance_ = new DonutQMLAVManager();
+		}
+
+		return s_instance_;
+	}
+
+	QObject* DonutQMLAVManager::singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine)
+	{
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+		return DonutQMLAVManager::getInstance();
+	}
+
+	int DonutQMLAVManager::initManager()
+	{
+		demux_handler_ = new DonutAVDemuxHandler();
+		a_decode_handler_ = new DonutAVDecodeHandler();
+		v_decode_handler_ = new DonutAVDecodeHandler();
+
+		demux_handler_->addNode(a_decode_handler_);
+		demux_handler_->addNode(v_decode_handler_);
+
+		if (video_view_)
+		{
+			v_decode_handler_->addNode(video_view_);
+		}
+		else
+		{
+			return -1;
+		}
+		return 0;
+	}
+
+	int DonutQMLAVManager::initManager(int width, int height, DonutPixFormat fmt, void* win_id)
+	{
+		return 0;
+	}
+
+	int DonutQMLAVManager::initManager(int width, int height, int fmt, void* win_id)
+	{
+		return 0;
+	}
+
+	void DonutQMLAVManager::destroyManager()
+	{
+	}
+
+	void DonutQMLAVManager::resetManager()
+	{
+	}
+
+	void DonutQMLAVManager::setTargetUrl(std::string url)
+	{
+	}
+
+	void DonutQMLAVManager::updateTimePos(qint64 value)
+	{
+	}
+
+	void DonutQMLAVManager::updateTotalDuration(QTime value)
+	{
+	}
+
+	void DonutQMLAVManager::updateSoundVolume(int value)
+	{
+	}
+
+	void DonutQMLAVManager::mediaEndReached()
+	{
+	}
+
+	void DonutQMLAVManager::setPlaying()
+	{
+	}
+
+	void DonutQMLAVManager::setPause()
+	{
+	}
+
+	void DonutQMLAVManager::setStop()
+	{
+	}
+
+	void DonutQMLAVManager::setTimePos(double value)
+	{
+	}
+
+	void DonutQMLAVManager::setSoundVolume(int value)
+	{
+	}
+
+	void DonutQMLAVManager::onSeekingTimePos(double value)
+	{
+
+	}
+
+	void DonutQMLAVManager::onSeekForward()
+	{
+	}
+
+	void DonutQMLAVManager::onSeekBackward()
+	{
+	}
+
+	void DonutQMLAVManager::onSetSoundVolume(int value)
+	{
+	}
+
+	void DonutQMLAVManager::onPlayOrPause(bool status)
+	{
+	}
+
+	void DonutQMLAVManager::onStop()
+	{
+	}
+
+	void DonutQMLAVManager::onSetPlaybackRate(float rate)
+	{
+	}
+
+	void DonutQMLAVManager::onVideoViewInitialized(QObject* view)
+	{
+		this->video_view_ = dynamic_cast<IDonutVideoView*>(view);
+		if (this->video_view_)
+		{
+			video_view_->updateHandler(nullptr);
+		}
+		else
+		{
+			qDebug() << "video_view_ is nullptr";
+		}
+	}
+
+	void DonutQMLAVManager::setDemuxer(DonutAVDemuxHandler* demuxer)
+	{
+		demux_handler_ = demuxer;
+	}
+
+	void DonutQMLAVManager::setVideoDecoder(DonutAVDecodeHandler* decoder)
+	{
+		v_decode_handler_ = decoder;
+	}
+
+	void DonutQMLAVManager::setAudioDecoder(DonutAVDecodeHandler* decoder)
+	{
+		a_decode_handler_ = decoder;
+	}
+
+	void DonutQMLAVManager::setVideoView(IDonutVideoView* view)
+	{
+		video_view_ = view;
+	}
+
+	void DonutQMLAVManager::onOpenMediaFile(QString path)
+	{
 	}
 }
