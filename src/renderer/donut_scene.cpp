@@ -80,7 +80,7 @@ namespace Donut
     {
         qDebug() << "DonutScene::onItemInitialized()";
         if (!s_renderer_) {
-            s_renderer_ = new DonutSceneRenderer();
+            //s_renderer_ = new DonutSceneRenderer();
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
 
@@ -88,8 +88,11 @@ namespace Donut
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForRectRender, Qt::DirectConnection);
 
             // glDrawElements »æÖÆ ---- initForVideoRender
-            connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
-            connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
+            //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+            //connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
+            
+            //connect(window(), &QQuickWindow::afterSynchronizing, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+            //connect(window(), &QQuickWindow::afterRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
 
             connect(window(), &QQuickWindow::sceneGraphInitialized, this, [this]() {
                 test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/cat.jpg");
@@ -204,15 +207,19 @@ namespace Donut
     {
         if (!s_renderer_) {
             s_renderer_ = new DonutSceneRenderer();
-            connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
-            connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
+            //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
+            //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
+            
+            connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+            connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
+        
         }
         //qDebug() << "width : " << window()->size().width() << " height: " << window()->size().height();
         //qDebug() << "ratio : " << window()->devicePixelRatio();
         //qDebug() << "effective ratio : " << window()->effectiveDevicePixelRatio();
 
         s_renderer_->setViewportSize(window()->size() * window()->devicePixelRatio());
-        s_renderer_->setT(delta_t_);
+        //s_renderer_->setT(delta_t_);
         s_renderer_->setWindow(window());
     }
 }
