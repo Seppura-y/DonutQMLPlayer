@@ -14,6 +14,30 @@ namespace Donut
 
 	int Donut::DonutAVDemuxHandler::openAVSource(const char* url, int timeout)
 	{
+		this->url_ = url;
+		this->timeout_threshold_ = timeout;
+
+		demuxer_.closeContext();
+
+		AVFormatContext* fmt_ctx = demuxer_.openContext(url_.c_str());
+		if (!fmt_ctx)
+		{
+			//DN_CORE_ERROR("demuxer_.openContext failed");
+
+			return -1;
+		}
+
+		demuxer_.setFormatContext(fmt_ctx);
+		demuxer_.setTimeoutThreshold(timeout_threshold_);
+
+		has_audio_ = demuxer_.hasAudio();
+		has_video_ = demuxer_.hasVideo();
+
+		audio_index_ = demuxer_.getAudioIndex();
+		video_index_ = demuxer_.getVideoIndex();
+
+		this->total_duration_ = demuxer_.getTotalDuration();
+
 		return 0;
 	}
 

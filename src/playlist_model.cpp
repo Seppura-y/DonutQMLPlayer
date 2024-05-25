@@ -90,7 +90,11 @@ void PlaylistModel::clear()
 
 void PlaylistModel::playItem(int index)
 {
-	Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile("sdf");
+	if (index >= 0 && index < titles_.count())
+	{
+		Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile(file_urls_[index].toLocalFile());
+	}
+	
 }
 
 void PlaylistModel::playNextItem()

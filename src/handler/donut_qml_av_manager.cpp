@@ -15,6 +15,8 @@ namespace Donut
 		}
 
 		s_instance_ = this;
+
+		initManager();
 	}
 
 
@@ -182,5 +184,10 @@ namespace Donut
 	void DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		qDebug() << path;
+		if (demux_handler_)
+		{
+			demux_handler_->openAVSource(path.toStdString().c_str());
+			//demux_handler_->start();
+		}
 	}
 }
