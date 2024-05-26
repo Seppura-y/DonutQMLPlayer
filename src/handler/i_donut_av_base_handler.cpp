@@ -10,7 +10,7 @@ namespace Donut
     {
         if (!node) return;
         std::lock_guard<std::mutex> lock(mtx_);
-        hander_nodes_.emplace_back(node);
+        handler_nodes_.emplace_back(node);
     }
 
     void IDonutAVBaseHandler::notify(void* data)
@@ -18,7 +18,7 @@ namespace Donut
         if (!data) return;
         std::lock_guard<std::mutex> lock(mtx_);
 
-        for (auto node : hander_nodes_)
+        for (auto node : handler_nodes_)
         {
             node->updateHandler(data);
         }

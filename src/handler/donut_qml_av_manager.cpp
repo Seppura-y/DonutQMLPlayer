@@ -187,7 +187,7 @@ namespace Donut
 		if (demux_handler_)
 		{
 			demux_handler_->openAVSource(path.toStdString().c_str());
-			//demux_handler_->start();
+			demux_handler_->start();
 		}
 	}
 }

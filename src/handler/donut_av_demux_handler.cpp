@@ -1,5 +1,10 @@
 #include "donut_av_demux_handler.h"
 
+extern"C"
+{
+#include <libavformat/avformat.h>
+}
+
 namespace Donut
 {
 
@@ -68,6 +73,36 @@ namespace Donut
 
 	void Donut::DonutAVDemuxHandler::threadLoop()
 	{
+		AVPacket* demux_pkt = av_packet_alloc();
+		while (!is_exit_)
+		{
+			if (is_pause_)
+			{
+				std::this_thread::sleep_for(std::chrono::microseconds(1));
+				continue;
+			}
+
+			if (demuxer_.readPacket(demux_pkt) != 0)
+			{
+				if (!demuxer_.isNetworkConnected())
+				{
+					openAVSource(url_.c_str(), timeout_threshold_);
+				}
+
+				av_packet_unref(demux_pkt);
+				std::this_thread::sleep_for(std::chrono::microseconds(1));
+				continue;
+			}
+
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+			
+			if (handler_nodes_.size() != 0)
+				notify(demux_pkt);
+			else
+				av_packet_unref(demux_pkt);
+		}
+
+		av_packet_free(&demux_pkt);
 	}
 
 }

@@ -18,8 +18,8 @@ namespace Donut
 		virtual void updateHandler(void* data) {}
 	protected:
 		virtual void threadLoop() = 0;
-	private:
-		std::vector<IDonutAVBaseHandler*> hander_nodes_;
+	protected:
+		std::vector<IDonutAVBaseHandler*> handler_nodes_;
 	};
 }
 

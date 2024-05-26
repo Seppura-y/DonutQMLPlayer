@@ -1,9 +1,11 @@
 #include "donut_av_decode_handler.h"
 
+extern"C"
+{
+    #include <libavformat/avformat.h>
+}
 namespace Donut
 {
-
-
     Donut::DonutAVDecodeHandler::DonutAVDecodeHandler()
     {
     }
@@ -24,6 +26,8 @@ namespace Donut
 
     void Donut::DonutAVDecodeHandler::updateHandler(void* data)
     {
+        auto pkt = reinterpret_cast<AVPacket*>(data);
+        av_packet_unref(pkt);
     }
 
     AVFrame* Donut::DonutAVDecodeHandler::getDecodedFrame()
