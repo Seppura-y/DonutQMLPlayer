@@ -47,12 +47,22 @@ namespace Donut
 		a_decode_handler_ = new DonutAVDecodeHandler();
 		v_decode_handler_ = new DonutAVDecodeHandler();
 
+		v_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
+		v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
+		v_clock_ = std::make_shared<DonutAVClock>();
+
+		a_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
+		a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
+		a_clock_ = std::make_shared<DonutAVClock>();
+
 		demux_handler_->addNode(a_decode_handler_);
 		demux_handler_->addNode(v_decode_handler_);
 
 		if (video_view_)
 		{
 			v_decode_handler_->addNode(video_view_);
+			v_decode_handler_->setPacketQueue(v_packet_queue_);
+			v_decode_handler_->setFrameQueue(v_frame_queue_);
 		}
 		else
 		{

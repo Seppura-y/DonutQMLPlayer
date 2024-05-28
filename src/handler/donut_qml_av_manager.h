@@ -129,6 +129,14 @@ namespace Donut
 		DonutAVDecodeHandler* v_decode_handler_ = nullptr;
 
 		static DonutQMLAVManager* s_instance_;
+
+		std::shared_ptr<DonutAVPacketQueue> video_packet_queue_;
+		std::shared_ptr<DonutAVFrameQueue>	video_frame_queue_;
+		std::shared_ptr<DonutAVClock> video_clock_;
+
+		std::shared_ptr<DonutAVPacketQueue> audio_packet_queue_;
+		std::shared_ptr<DonutAVFrameQueue>	audio_frame_queue_;
+		std::shared_ptr<DonutAVClock> audio_clock_;
 	};
 }
 
