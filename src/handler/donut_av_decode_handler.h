@@ -28,7 +28,7 @@ namespace Donut
 		AVFrame* getDecodedFrame();
 
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue> frame_queue);
-		void setPacketQueue(std::shared_ptr<DonutAVPacketQueue>& packet_queue);
+		void setPacketQueue(std::shared_ptr<DonutAVPacketQueue> packet_queue);
 	protected:
 		void threadLoop() override;
 	private:
@@ -42,6 +42,8 @@ namespace Donut
 		std::unique_ptr<DonutAVDataCache<AVFrame*>> cache_;
 		std::shared_ptr<DonutAVFrameQueue> frame_queue_;
 		std::shared_ptr<DonutAVPacketQueue> packet_queue_;
+
+		int stream_index_ = -1;
 	};
 
 	template<typename T>

@@ -16,7 +16,7 @@ namespace Donut
 
 		s_instance_ = this;
 
-		initManager();
+		//initManager();
 	}
 
 
@@ -63,6 +63,9 @@ namespace Donut
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			v_decode_handler_->setFrameQueue(v_frame_queue_);
+
+			a_decode_handler_->setPacketQueue(a_packet_queue_);
+			a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
 		else
 		{
@@ -163,6 +166,12 @@ namespace Donut
 		this->video_view_ = dynamic_cast<IDonutVideoView*>(view);
 		if (this->video_view_)
 		{
+
+			//v_decode_handler_->addNode(video_view_);
+			//v_decode_handler_->setPacketQueue(v_packet_queue_);
+			//v_decode_handler_->setFrameQueue(v_frame_queue_);
+			//
+
 			video_view_->updateHandler(nullptr);
 		}
 		else
@@ -197,6 +206,7 @@ namespace Donut
 		if (demux_handler_)
 		{
 			demux_handler_->openAVSource(path.toStdString().c_str());
+			
 			demux_handler_->start();
 		}
 	}
