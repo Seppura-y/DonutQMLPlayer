@@ -27,13 +27,13 @@ namespace Donut
 		virtual void update() {}
 
 
+		Q_INVOKABLE virtual int resetManager();
 		Q_INVOKABLE virtual int initManager();
 		//virtual int initManager(AVCodecParameters* param);
 		virtual int initManager(int width, int height, DonutPixFormat fmt = DonutPixFormat::DONUT_PIX_FORMAT_YUV420P, void* win_id = nullptr);
 		virtual int initManager(int width, int height, int fmt, void* win_id = nullptr);
 
 		virtual void destroyManager();
-		virtual void resetManager();
 
 		virtual void setWindowId(void* win_id) { window_id_ = win_id; };
 
@@ -137,6 +137,8 @@ namespace Donut
 		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
 		std::shared_ptr<DonutAVFrameQueue>	a_frame_queue_;
 		std::shared_ptr<DonutAVClock> a_clock_;
+
+		std::string current_url_;
 	};
 }
 

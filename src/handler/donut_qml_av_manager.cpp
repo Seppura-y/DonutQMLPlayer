@@ -41,6 +41,57 @@ namespace Donut
 	//	return DonutQMLAVManager::getInstance();
 	//}
 
+	int DonutQMLAVManager::resetManager()
+	{
+		if (demux_handler_)
+		{
+			delete demux_handler_;
+			demux_handler_ = nullptr;
+		}
+
+
+		{
+			if (a_decode_handler_)
+			{
+				delete a_decode_handler_;
+				a_decode_handler_ = nullptr;
+			}
+
+			if (a_packet_queue_)
+			{
+				a_packet_queue_->packetQueueDestroy();
+				a_packet_queue_.reset();
+			}
+
+			if (a_frame_queue_)
+			{
+				a_frame_queue_->frameQueueDestroy();
+				a_frame_queue_.reset();
+			}
+		}
+
+		{
+			if (v_decode_handler_)
+			{
+				delete v_decode_handler_;
+				v_decode_handler_ = nullptr;
+			}
+
+			if (v_packet_queue_)
+			{
+				v_packet_queue_->packetQueueDestroy();
+				v_packet_queue_.reset();
+			}
+
+			if (v_frame_queue_)
+			{
+				v_frame_queue_->frameQueueDestroy();
+				v_frame_queue_.reset();
+			}
+		}
+		return 0;
+	}
+
 	int DonutQMLAVManager::initManager()
 	{
 		demux_handler_ = new DonutAVDemuxHandler();
@@ -88,9 +139,6 @@ namespace Donut
 	{
 	}
 
-	void DonutQMLAVManager::resetManager()
-	{
-	}
 
 	void DonutQMLAVManager::setTargetUrl(std::string url)
 	{
@@ -163,15 +211,10 @@ namespace Donut
 
 	void DonutQMLAVManager::onVideoViewInitialized(QObject* view)
 	{
-		this->video_view_ = dynamic_cast<IDonutVideoView*>(view);
-		if (this->video_view_)
+		video_view_ = dynamic_cast<IDonutVideoView*>(view);
+		if (video_view_)
 		{
-
-			//v_decode_handler_->addNode(video_view_);
-			//v_decode_handler_->setPacketQueue(v_packet_queue_);
-			//v_decode_handler_->setFrameQueue(v_frame_queue_);
-			//
-
+			initManager();
 			video_view_->updateHandler(nullptr);
 		}
 		else
@@ -202,12 +245,21 @@ namespace Donut
 
 	void DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
-		qDebug() << path;
+		if (path.toStdString() != current_url_)
+		{
+			resetManager();
+		}
+
+		initManager();
+
 		if (demux_handler_)
 		{
-			demux_handler_->openAVSource(path.toStdString().c_str());
+			if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
+			{
+
+				demux_handler_->start();
+			}
 			
-			demux_handler_->start();
 		}
 	}
 }

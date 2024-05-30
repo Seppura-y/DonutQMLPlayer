@@ -142,6 +142,7 @@ int DonutAVPacketQueue::pakcetQueueInit()
 void DonutAVPacketQueue::packetQueueFlush()
 {
 	std::unique_lock<std::mutex> lock(mtx_);
+	if (pkt_list_.size() == 0) return;
 	
 	while (std::shared_ptr<DonutAVPacket> pkt = pkt_list_.front())
 	{

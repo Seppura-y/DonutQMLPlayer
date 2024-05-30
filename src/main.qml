@@ -51,8 +51,8 @@ Window
         Component.onCompleted:
         {
             glScene.sigItemInitialized()
+            //qmlAVManager.initManager()
             qmlAVManager.onVideoViewInitialized(glScene)
-            qmlAVManager.initManager()
         }
     }
 
