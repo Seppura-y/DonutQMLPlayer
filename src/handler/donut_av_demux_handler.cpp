@@ -48,12 +48,12 @@ namespace Donut
 
 	std::shared_ptr<DonutAVParamWarpper> Donut::DonutAVDemuxHandler::copyVideoParameters()
 	{
-		return std::shared_ptr<DonutAVParamWarpper>();
+		return demuxer_.copyVideoParameters();
 	}
 
 	std::shared_ptr<DonutAVParamWarpper> Donut::DonutAVDemuxHandler::copyAudioParameters()
 	{
-		return std::shared_ptr<DonutAVParamWarpper>();
+		return demuxer_.copyAudioParameters();
 	}
 
 	int Donut::DonutAVDemuxHandler::copyCodecExtraData(uint8_t* buffer, int& size)

@@ -78,7 +78,8 @@ namespace Donut
 	public slots:
 		void onVideoViewInitialized(QObject* view);
 
-		void onOpenMediaFile(QString path);
+		int onOpenMediaFile(QString path);
+		int onMediaPlayStart();
 		//********************* QML *********************
 
 	signals:

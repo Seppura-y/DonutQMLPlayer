@@ -1,5 +1,7 @@
 #include "donut_av_packet.h"
 
+#include "log.h"
+
 extern"C"
 {
 #include <libavformat/avformat.h>
@@ -108,14 +110,17 @@ int DonutAVPacketQueue::packetQueuePut(std::shared_ptr<DonutAVPacket>& pkt)
 	pkt->setSerial(serial_);
 
 	{
+		DN_CORE_WARN("DonutAVPacketQueue::packetQueuePut lock");
+
 		std::unique_lock<std::mutex> lock(mtx_);
 		if (abort_request_)
 		{
 			return -1;
 		}
 
+		int before = pkt.use_count();
 		pkt_list_.push(pkt);
-
+		int after = pkt.use_count();
 		nb_packets_++;
 		size_ += pkt->getSize();
 		duration_ += pkt->getDuration();
@@ -141,11 +146,13 @@ int DonutAVPacketQueue::pakcetQueueInit()
 
 void DonutAVPacketQueue::packetQueueFlush()
 {
+	cond_.notify_all();
 	std::unique_lock<std::mutex> lock(mtx_);
 	if (pkt_list_.size() == 0) return;
 	
-	while (std::shared_ptr<DonutAVPacket> pkt = pkt_list_.front())
+	while (pkt_list_.size())
 	{
+		std::shared_ptr<DonutAVPacket> pkt = pkt_list_.front();
 		pkt.reset();
 		pkt_list_.pop();
 	}
@@ -178,6 +185,8 @@ void DonutAVPacketQueue::packetQueueStart()
 int DonutAVPacketQueue::packetQueueGet(std::shared_ptr<DonutAVPacket>& pkt, int block, int* serial)
 {
 	int ret = 0;
+	DN_CORE_WARN("DonutAVPacketQueue::packetQueueGet lock");
+
 	std::unique_lock<std::mutex> lock(mtx_);
 	if (abort_request_)
 	{
@@ -188,9 +197,14 @@ int DonutAVPacketQueue::packetQueueGet(std::shared_ptr<DonutAVPacket>& pkt, int 
 	while (pkt_list_.empty())
 	{
 		if (block)
+		{
+			DN_CORE_WARN("DonutAVPacketQueue::packetQueueGet cond wait");
 			cond_.wait(lock);
+		}
 		else
+		{
 			return 0;
+		}
 	}
 
 	std::shared_ptr<DonutAVPacket> pkt1 = pkt_list_.front();

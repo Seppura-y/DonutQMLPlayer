@@ -389,6 +389,6 @@ Window
     {
         //qmlAVManager.onVideoViewInitialized(glScene)
 
-        //glScene.setQMLAvManager(qmlAVManager)
+        glScene.setQMLAvManager(qmlAVManager)
     }
 }

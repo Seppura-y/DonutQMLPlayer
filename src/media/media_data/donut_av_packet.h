@@ -30,7 +30,7 @@ public:
 		serial_ = ser;
 	}
 
-	int getSerial()
+	int& getSerial()
 	{
 		return serial_;
 	}

@@ -6,6 +6,7 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
+#include "log.h"
 #include "donut_qml_av_manager.h"
 
 //解析字符串中的opengl版本号
@@ -94,6 +95,7 @@ bool checkVersion(int minMajor, int minMinor)
 
 int main(int argc, char **argv)
 {
+    Donut::Log::init();
     qputenv("QSG_RHI_BACKEND", QByteArray("opengl"));
     QGuiApplication app(argc, argv);
 

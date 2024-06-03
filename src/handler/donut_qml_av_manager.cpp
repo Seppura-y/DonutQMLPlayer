@@ -45,6 +45,7 @@ namespace Donut
 	{
 		if (demux_handler_)
 		{
+			demux_handler_->stop();
 			delete demux_handler_;
 			demux_handler_ = nullptr;
 		}
@@ -53,6 +54,7 @@ namespace Donut
 		{
 			if (a_decode_handler_)
 			{
+				a_decode_handler_->stop();
 				delete a_decode_handler_;
 				a_decode_handler_ = nullptr;
 			}
@@ -73,6 +75,7 @@ namespace Donut
 		{
 			if (v_decode_handler_)
 			{
+				v_decode_handler_->stop();
 				delete v_decode_handler_;
 				v_decode_handler_ = nullptr;
 			}
@@ -243,7 +246,7 @@ namespace Donut
 		video_view_ = view;
 	}
 
-	void DonutQMLAVManager::onOpenMediaFile(QString path)
+	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		if (path.toStdString() != current_url_)
 		{
@@ -252,14 +255,36 @@ namespace Donut
 
 		initManager();
 
-		if (demux_handler_)
-		{
-			if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
-			{
 
-				demux_handler_->start();
+		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
+		{
+
+			if (demux_handler_->hasVideo())
+			{
+				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
 			}
-			
+
+			if (demux_handler_->hasAudio())
+			{
+				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
+			}
+
+			demux_handler_->start();
+			v_decode_handler_->start();
+
+			return 0;
 		}
+		else
+		{
+			return -1;
+		}
+		
+		
+	}
+	int DonutQMLAVManager::onMediaPlayStart()
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+
+		return 0;
 	}
 }
