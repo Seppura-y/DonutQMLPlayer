@@ -54,10 +54,13 @@ namespace Donut
         auto pkt = static_cast<AVPacket*>(data);
         if (packet_queue_)
         {
-            std::shared_ptr<DonutAVPacket> d_pkt = std::make_shared<DonutAVPacket>(pkt, true);
-            packet_queue_->packetQueuePut(d_pkt);
+            std::lock_guard<std::mutex> lock(mtx_);
+            {
+                std::shared_ptr<DonutAVPacket> d_pkt = std::make_shared<DonutAVPacket>(pkt, true);
+                packet_queue_->packetQueuePut(d_pkt);
+            }
         }
-        //av_packet_unref(pkt);
+        av_packet_unref(pkt);
     }
 
     AVFrame* Donut::DonutAVDecodeHandler::getDecodedFrame()
@@ -79,13 +82,19 @@ namespace Donut
     {
         while (!is_exit_)
         {
-            std::shared_ptr<DonutAVPacket> pkt = std::make_shared<DonutAVPacket>();
-            if (packet_queue_->packetQueueHasEnoughPackets())
+            int serial = -1;
             {
-                packet_queue_->packetQueueGet(pkt, 0, &pkt->getSerial());
+                std::lock_guard<std::mutex> lock(mtx_);
+                if (packet_queue_->packetQueueHasEnoughPackets())
+                {
+                    auto pkt = packet_queue_->packetQueueGet(0, &serial);
+                    if (pkt)
+                    {
+                        int a = pkt->getPts();
+                    }
+                }
             }
             std::this_thread::sleep_for(std::chrono::microseconds(1));
-
         }
     }
 }

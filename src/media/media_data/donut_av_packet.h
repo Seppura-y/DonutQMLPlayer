@@ -64,7 +64,7 @@ public:
 	void packetQueueDestroy();
 	void packetQueueAbort();
 	void packetQueueStart();
-	int packetQueueGet(std::shared_ptr<DonutAVPacket>& pkt, int block, int* serial);
+	std::shared_ptr<DonutAVPacket> packetQueueGet(int block, int* serial);
 
 	void packetQueueSetStreamIndex(int index);
 	int packetQueueGetStreamIndex(int index);

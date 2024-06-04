@@ -14,11 +14,12 @@ namespace Donut {
 DonutAVPacket::DonutAVPacket()
 	: packet_(av_packet_alloc())
 {
-	packet_->flags = AV_PKT_FLAG_KEY;
+
 }
 
 DonutAVPacket::~DonutAVPacket()
 {
+	av_packet_unref(packet_);
 	av_packet_free(&packet_);
 	packet_ = nullptr;
 }
@@ -105,28 +106,21 @@ DonutAVPacketQueue::~DonutAVPacketQueue()
 int DonutAVPacketQueue::packetQueuePut(std::shared_ptr<DonutAVPacket>& pkt)
 {
 	int ret = 0;
-	//std::shared_ptr<DonutAVPacket> pkt1 = std::make_shared<DonutAVPacket>();
-	//pkt1 = pkt;
 	pkt->setSerial(serial_);
 
+	std::unique_lock<std::mutex> lock(mtx_);
+	if (abort_request_)
 	{
-		DN_CORE_WARN("DonutAVPacketQueue::packetQueuePut lock");
-
-		std::unique_lock<std::mutex> lock(mtx_);
-		if (abort_request_)
-		{
-			return -1;
-		}
-
-		int before = pkt.use_count();
-		pkt_list_.push(pkt);
-		int after = pkt.use_count();
-		nb_packets_++;
-		size_ += pkt->getSize();
-		duration_ += pkt->getDuration();
-
-		cond_.notify_one();
+		return -1;
 	}
+
+	pkt_list_.push(pkt);
+
+	nb_packets_++;
+	size_ += pkt->getSize();
+	duration_ += pkt->getDuration();
+
+	cond_.notify_one();
 
 	return ret;
 }
@@ -182,16 +176,12 @@ void DonutAVPacketQueue::packetQueueStart()
 	serial_++;
 }
 
-int DonutAVPacketQueue::packetQueueGet(std::shared_ptr<DonutAVPacket>& pkt, int block, int* serial)
+std::shared_ptr<DonutAVPacket> DonutAVPacketQueue::packetQueueGet(int block, int* serial)
 {
-	int ret = 0;
-	DN_CORE_WARN("DonutAVPacketQueue::packetQueueGet lock");
-
 	std::unique_lock<std::mutex> lock(mtx_);
 	if (abort_request_)
 	{
-		ret = -1;
-		return ret;
+		return nullptr;
 	}
 
 	while (pkt_list_.empty())
@@ -203,32 +193,30 @@ int DonutAVPacketQueue::packetQueueGet(std::shared_ptr<DonutAVPacket>& pkt, int 
 		}
 		else
 		{
-			return 0;
+			return nullptr;
 		}
 	}
 
-	std::shared_ptr<DonutAVPacket> pkt1 = pkt_list_.front();
-	if (pkt1)
+	auto ret_pkt = (pkt_list_.front());
+	if (ret_pkt)
 	{
 		pkt_list_.pop();
 		nb_packets_--;
-		size_ -= pkt1->getSize();
-		duration_ -= pkt1->getDuration();
-		pkt = pkt1;
+		size_ -= ret_pkt->getSize();
+		duration_ -= ret_pkt->getDuration();
+		//pkt = pkt1;
 		if (serial)
 		{
-			*serial = pkt1->getSerial();
+			*serial = ret_pkt->getSerial();
 		}
-
-		ret = 1;
 	}
 	else
 	{
 		//cond_.wait(lock);
-		ret = 0;
+		return nullptr;
 	}
 	
-	return ret;
+	return ret_pkt;
 }
 
 void DonutAVPacketQueue::packetQueueSetStreamIndex(int index)
