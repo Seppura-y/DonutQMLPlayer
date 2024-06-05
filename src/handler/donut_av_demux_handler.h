@@ -22,6 +22,14 @@ namespace Donut
 		bool hasVideo() { return has_video_; }
 		bool hasAudio() { return has_audio_; }
 
+		int getVideoIndex() { return video_index_; }
+		int getAudioIndex() { return audio_index_; }
+
+		AVStream* getVideoStream(int index);
+		AVStream* getAudioStream(int index);
+
+		AVStream** getVideoStreams() { return demuxer_.getVideoStreams(); }
+		AVStream** getAudioStreams() { return demuxer_.getAudioStreams(); }
 		// h264 sps pps
 		int copyCodecExtraData(uint8_t* buffer, int& size);
 
@@ -43,6 +51,9 @@ namespace Donut
 
 		int64_t total_duration_ = -1;
 		int frame_rate_ = -1;
+
+		AVStream** video_streams_ = nullptr;
+		AVStream** audio_streams_ = nullptr;
 	};
 
 }

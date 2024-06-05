@@ -102,8 +102,8 @@ namespace Donut
 		v_decode_handler_ = new DonutAVDecodeHandler();
 
 		v_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		//v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
-		//v_clock_ = std::make_shared<DonutAVClock>();
+		v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
+		v_clock_ = std::make_shared<DonutAVClock>();
 
 		//a_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
 		//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
@@ -112,15 +112,15 @@ namespace Donut
 		//demux_handler_->addNode(a_decode_handler_);
 		demux_handler_->addNode(v_decode_handler_);
 
-		//if (video_view_)
-		//{
-		//	//v_decode_handler_->addNode(video_view_);
+		if (video_view_)
+		{
+			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
-		//	v_decode_handler_->setFrameQueue(v_frame_queue_);
+			v_decode_handler_->setFrameQueue(v_frame_queue_);
 
-		//	a_decode_handler_->setPacketQueue(a_packet_queue_);
-		//	a_decode_handler_->setFrameQueue(a_frame_queue_);
-		//}
+			//a_decode_handler_->setPacketQueue(a_packet_queue_);
+			//a_decode_handler_->setFrameQueue(a_frame_queue_);
+		}
 		//else
 		//{
 		//	return -1;
@@ -261,6 +261,7 @@ namespace Donut
 
 			if (demux_handler_->hasVideo())
 			{
+				v_decode_handler_->setStreamIndex(demux_handler_->getVideoIndex());
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
 			}
 

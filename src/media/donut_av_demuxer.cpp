@@ -38,6 +38,24 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
 
     av_dump_format(fmt_ctx, 0, url, 0);
 
+    for (auto i = 0; i < fmt_ctx->nb_streams; i++)
+    {
+        if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+        {
+            video_streams_[vs_count_] = fmt_ctx->streams[i];
+            vs_count_++;
+        }
+        else if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
+        {
+            audio_streams_[as_count_] = fmt_ctx->streams[i];
+            as_count_++;
+        }
+        else if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE)
+        {
+
+        }
+    }
+
     av_dict_free(&opt);
 
     return fmt_ctx;
@@ -116,6 +134,18 @@ int64_t DonutAVDemuxer::getTotalDuration()
         return -1;
     }
     return fmt_ctx_->duration;
+}
+
+AVStream* DonutAVDemuxer::getVideoStream(int index)
+{
+    int i = av_find_best_stream(fmt_ctx_, AVMEDIA_TYPE_VIDEO, index, -1, NULL, 0);
+    AVStream* stream = fmt_ctx_->streams[i];
+    return nullptr;
+}
+
+AVStream* DonutAVDemuxer::getAudioStream(int index)
+{
+    return nullptr;
 }
 
 //DonutAVRational DonutAVDemuxer::getFrameRate()

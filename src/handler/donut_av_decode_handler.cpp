@@ -41,6 +41,11 @@ namespace Donut
             return -1;
         }
 
+        if (packet_queue_)
+        {
+            packet_queue_->packetQueueSetStreamIndex(stream_index_);
+        }
+
         return 0;
     }
 
@@ -88,9 +93,12 @@ namespace Donut
                 if (packet_queue_->packetQueueHasEnoughPackets())
                 {
                     auto pkt = packet_queue_->packetQueueGet(0, &serial);
-                    if (pkt)
+                    decoder_.sendPacket(pkt);
+
+                    auto decoded_frame = std::make_shared<DonutAVFrame>();
+                    if (decoder_.recvFrame(decoded_frame))
                     {
-                        int a = pkt->getPts();
+
                     }
                 }
             }

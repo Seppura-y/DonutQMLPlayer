@@ -43,6 +43,9 @@ namespace Donut
 
 		this->total_duration_ = demuxer_.getTotalDuration();
 
+		video_streams_ = demuxer_.getVideoStreams();
+		audio_streams_ = demuxer_.getAudioStreams();
+
 		return 0;
 	}
 
@@ -54,6 +57,16 @@ namespace Donut
 	std::shared_ptr<DonutAVParamWarpper> Donut::DonutAVDemuxHandler::copyAudioParameters()
 	{
 		return demuxer_.copyAudioParameters();
+	}
+
+	AVStream* DonutAVDemuxHandler::getVideoStream(int index)
+	{
+		return nullptr;
+	}
+
+	AVStream* DonutAVDemuxHandler::getAudioStream(int index)
+	{
+		return nullptr;
 	}
 
 	int Donut::DonutAVDemuxHandler::copyCodecExtraData(uint8_t* buffer, int& size)

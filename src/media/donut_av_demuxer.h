@@ -23,6 +23,18 @@ namespace Donut
 
 		int64_t getTotalDuration();
 		//DonutAVRational getFrameRate();
+		
+		AVStream* getVideoStream(int index);
+		AVStream* getAudioStream(int index);
+
+		AVStream** getVideoStreams() { return video_streams_; }
+		AVStream** getAudioStreams() { return audio_streams_; }
+	private:
+		int vs_count_ = 0;
+		int as_count_ = 0;
+
+		AVStream* video_streams_[8]{ nullptr };
+		AVStream* audio_streams_[8]{ nullptr };
 	};
 }
 

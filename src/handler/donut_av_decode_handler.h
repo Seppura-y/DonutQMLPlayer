@@ -21,6 +21,8 @@ namespace Donut
 		int openDecoder(std::shared_ptr<DonutAVStream> param);
 		void updateHandler(void* data) override;
 
+		void setStreamIndex(int index) { this->stream_index_ = index; }
+
 		template<typename T>
 		void handle(std::shared_ptr<T> data);
 		//virtual void handle(std::shared_ptr<DonutAVPacketQueue>& pkt_queue, std::shared_ptr<DonutAVFrameQueue>& frame_queue) override {}
