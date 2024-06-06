@@ -31,6 +31,8 @@ public:
 	std::shared_ptr<DonutAVParamWarpper> copyVideoParameters();
 	std::shared_ptr<DonutAVParamWarpper> copyAudioParameters();
 
+	AVCodecParameters* copyRawVideoParameters();
+
 	bool hasVideo() { return video_index_ >= 0; };
 	bool hasAudio() { return audio_index_ >= 0; };
 

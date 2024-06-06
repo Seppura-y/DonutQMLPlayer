@@ -28,9 +28,9 @@ public:
 	DonutAVFrame& operator=(const DonutAVFrame& other);
 	DonutAVFrame& operator=(const DonutAVFrame&& other);
 
-	int getWidth() { return width_; }
-	int getHeight() { return height_; }
-	int getFormat() { return format_; }
+	int getWidth();
+	int getHeight();
+	int getFormat();
 
 	int getSerial() { return serial_; }
 	AVFrame* getFrame() { return frame_; }

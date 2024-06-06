@@ -4,6 +4,8 @@
 #include "i_donut_av_base_handler.h"
 #include "donut_av_demuxer.h"
 #include "donut_av_datas.h"
+
+#include <functional>
 namespace Donut
 {
 	class DonutAVDemuxHandler : public IDonutAVBaseHandler
@@ -18,6 +20,8 @@ namespace Donut
 
 		std::shared_ptr<DonutAVParamWarpper> copyVideoParameters();
 		std::shared_ptr<DonutAVParamWarpper> copyAudioParameters();
+
+		AVCodecParameters* copyRawVideoParameters();
 
 		bool hasVideo() { return has_video_; }
 		bool hasAudio() { return has_audio_; }
@@ -37,6 +41,10 @@ namespace Donut
 		int64_t getTotalDuration() { return total_duration_; };
 
 		int getVideoFramerate();
+
+		using eof_callback = std::function<void(void)>;
+
+		void setEofCallback(eof_callback cb) { eof_cb_ = cb; }
 	protected:
 		virtual void threadLoop() override;
 	private:
@@ -54,6 +62,8 @@ namespace Donut
 
 		AVStream** video_streams_ = nullptr;
 		AVStream** audio_streams_ = nullptr;
+
+		eof_callback eof_cb_;
 	};
 
 }

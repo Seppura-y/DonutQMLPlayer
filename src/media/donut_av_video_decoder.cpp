@@ -19,7 +19,8 @@ static void PrintError(int err)
 {
 	char buffer[1024] = { 0 };
 	av_strerror(err, buffer, sizeof(buffer));
-	std::cout << buffer << std::endl;
+	DN_CORE_ERROR(buffer);
+	//std::cout << buffer << std::endl;
 }
 
 #define PRINT_ERR_P(err) if(err != 0) {PrintError(err);return nullptr;}
@@ -51,7 +52,7 @@ namespace Donut
 		//AVDictionary* dict = nullptr;
 		//av_dict_set(&dict, "tune", "zerolatency", 0);
 		//av_dict_set(&dict, "preset", "ultrafast", 0);
-		ret = avcodec_open2(codec_ctx_, NULL, &options_);
+		ret = avcodec_open2(codec_ctx_, nullptr, &options_);
 		PRINT_ERR_I(ret);
 		//GET_ERR_STR(ret, str1);
 		//DN_CORE_WARN(str1);

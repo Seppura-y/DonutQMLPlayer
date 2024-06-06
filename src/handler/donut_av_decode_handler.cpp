@@ -68,6 +68,14 @@ namespace Donut
         av_packet_unref(pkt);
     }
 
+    void DonutAVDecodeHandler::setStream(AVStream* stream)
+    {
+        if (packet_queue_)
+        {
+            packet_queue_->packetQueueSetStream(stream);
+        }
+    }
+
     AVFrame* Donut::DonutAVDecodeHandler::getDecodedFrame()
     {
         return nullptr;
@@ -89,16 +97,21 @@ namespace Donut
         {
             int serial = -1;
             {
-                std::lock_guard<std::mutex> lock(mtx_);
                 if (packet_queue_->packetQueueHasEnoughPackets())
                 {
                     auto pkt = packet_queue_->packetQueueGet(0, &serial);
+                    if (pkt->getStreamIndex() != stream_index_)
+                    {
+                        pkt.reset();
+                        continue;
+                    }
+
                     decoder_.sendPacket(pkt);
 
-                    auto decoded_frame = std::make_shared<DonutAVFrame>();
-                    if (decoder_.recvFrame(decoded_frame))
+                    AVFrame* decoded_frame = av_frame_alloc();
+                    if (decoder_.recvFrame(decoded_frame) == 0)
                     {
-
+                        notify(decoded_frame);
                     }
                 }
             }

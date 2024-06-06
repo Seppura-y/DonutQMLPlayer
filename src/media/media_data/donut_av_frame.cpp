@@ -59,6 +59,36 @@ namespace Donut
 		return *this;
 	}
 
+	int DonutAVFrame::getWidth()
+	{
+		width_ = 0;
+		if (frame_)
+		{
+			width_ = frame_->width;
+		}
+		return width_;
+	}
+
+	int DonutAVFrame::getHeight()
+	{
+		height_ = 0;
+		if (frame_)
+		{
+			height_ = frame_->height;
+		}
+		return height_;
+	}
+
+	int DonutAVFrame::getFormat()
+	{
+		format_ = -1;
+		if (format_)
+		{
+			format_ = frame_->format;
+		}
+		return format_;
+	}
+
 
 
 

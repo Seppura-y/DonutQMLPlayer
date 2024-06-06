@@ -59,14 +59,19 @@ namespace Donut
 		return demuxer_.copyAudioParameters();
 	}
 
+	AVCodecParameters* DonutAVDemuxHandler::copyRawVideoParameters()
+	{
+		return demuxer_.copyRawVideoParameters();
+	}
+
 	AVStream* DonutAVDemuxHandler::getVideoStream(int index)
 	{
-		return nullptr;
+		return video_streams_[index];
 	}
 
 	AVStream* DonutAVDemuxHandler::getAudioStream(int index)
 	{
-		return nullptr;
+		return audio_streams_[index];
 	}
 
 	int Donut::DonutAVDemuxHandler::copyCodecExtraData(uint8_t* buffer, int& size)
@@ -95,8 +100,13 @@ namespace Donut
 				continue;
 			}
 
-			if (demuxer_.readPacket(demux_pkt) != 0)
+			if (int ret = demuxer_.readPacket(demux_pkt) != 0)
 			{
+				if (ret == AVERROR(EOF))
+				{
+					eof_cb_();
+				}
+
 				if (!demuxer_.isNetworkConnected())
 				{
 					openAVSource(url_.c_str(), timeout_threshold_);

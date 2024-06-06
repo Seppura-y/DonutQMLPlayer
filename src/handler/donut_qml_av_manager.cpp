@@ -1,6 +1,7 @@
 #include "donut_qml_av_manager.h"
 
 #include <QTime>
+#include "log.h"
 
 namespace Donut
 {
@@ -16,12 +17,16 @@ namespace Donut
 
 		s_instance_ = this;
 
+
+		QObject::connect(this, &DonutQMLAVManager::sigMediaEOF, this, &DonutQMLAVManager::onMediaEOF);
 		//initManager();
 	}
 
 
 	DonutQMLAVManager::~DonutQMLAVManager()
 	{
+		// 终止各个线程，防止在点击右上角关闭按钮后导致程序崩溃
+		resetManager();
 	}
 
 	DonutQMLAVManager* DonutQMLAVManager::getInstance()
@@ -255,6 +260,10 @@ namespace Donut
 
 		initManager();
 
+		demux_handler_->setEofCallback([this]() {
+			qDebug() << "eof";
+			this->sigMediaEOF();
+			});
 
 		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
 		{
@@ -262,6 +271,7 @@ namespace Donut
 			if (demux_handler_->hasVideo())
 			{
 				v_decode_handler_->setStreamIndex(demux_handler_->getVideoIndex());
+				v_decode_handler_->setStream(demux_handler_->getVideoStream(0));
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
 			}
 
@@ -279,13 +289,16 @@ namespace Donut
 		{
 			return -1;
 		}
-		
-		
 	}
+
 	int DonutQMLAVManager::onMediaPlayStart()
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
 
 		return 0;
+	}
+	void DonutQMLAVManager::onMediaEOF()
+	{
+		qDebug() << "DonutQMLAVManager::onMediaEOF()";
 	}
 }

@@ -22,6 +22,7 @@ namespace Donut
 		void updateHandler(void* data) override;
 
 		void setStreamIndex(int index) { this->stream_index_ = index; }
+		void setStream(AVStream* stream);
 
 		template<typename T>
 		void handle(std::shared_ptr<T> data);

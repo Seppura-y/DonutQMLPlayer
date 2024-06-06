@@ -233,9 +233,11 @@ int DonutAVPacketQueue::packetQueueGetStreamIndex(int index)
 
 bool DonutAVPacketQueue::packetQueueHasEnoughPackets()
 {
-	return stream_index_ < 0 || 
-		abort_request_ || 
-		nb_packets_ > MIN_FRAMES && (!duration_ || av_q2d(stream_->time_base) * duration_ > 1.0);
+	std::lock_guard<std::mutex> lock(mtx_);
+	bool is_enough = stream_index_ < 0 ||
+		abort_request_ ||
+		nb_packets_ > MIN_FRAMES && (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
+	return is_enough;
 }
 
 }

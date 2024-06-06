@@ -8,6 +8,11 @@
 
 #include <QDebug>
 
+extern"C"
+{
+    #include <libavcodec/avcodec.h>
+}
+
 namespace Donut
 {
     DonutSceneRenderer* DonutScene::s_renderer_ = nullptr;
@@ -127,6 +132,12 @@ namespace Donut
 
     void DonutScene::updateHandler(void* data)
     {
+        if (data)
+        {
+            auto frame = static_cast<AVFrame*>(data);
+            av_frame_unref(frame);
+            av_frame_free(&frame);
+        }
     }
 
     void DonutScene::threadLoop()

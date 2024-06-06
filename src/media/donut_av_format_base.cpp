@@ -180,6 +180,18 @@ std::shared_ptr<DonutAVParamWarpper> DonutAVFormatBase::copyAudioParameters()
 	return param;
 }
 
+AVCodecParameters* DonutAVFormatBase::copyRawVideoParameters()
+{
+	std::lock_guard<std::mutex> lock(mtx_);
+	if (!hasVideo() || !fmt_ctx_)
+	{
+		return nullptr;
+	}
+	AVCodecParameters* param = avcodec_parameters_alloc();
+	avcodec_parameters_copy(param, fmt_ctx_->streams[video_index_]->codecpar);
+	return param;
+}
+
 DonutAVRational DonutAVFormatBase::getVideoFramerate()
 {
 	if (hasVideo())

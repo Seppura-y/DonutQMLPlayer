@@ -80,6 +80,8 @@ namespace Donut
 
 		int onOpenMediaFile(QString path);
 		int onMediaPlayStart();
+
+		void onMediaEOF();
 		//********************* QML *********************
 
 	signals:
