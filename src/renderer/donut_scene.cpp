@@ -226,7 +226,7 @@ namespace Donut
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
             
-            connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
+            connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForSpriteRender, Qt::DirectConnection);
             connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
         
         }

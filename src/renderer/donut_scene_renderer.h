@@ -28,6 +28,15 @@ struct RectangleVertex
 	//int entity_id_;
 };
 
+struct YuvVertex
+{
+	glm::vec4 position_;
+
+	glm::vec2 tex_coordinate_;
+
+	float texture_index_[3];
+};
+
 struct FlatColorVertex
 {
 	glm::vec4 position_;
@@ -88,8 +97,11 @@ public:
 	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& texture, glm::vec4 tintcolor);
 	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 tintcolor);
 
+	void drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture);
+
 public slots:
 	void init();
+	void initForSpriteRender();
 	void initForVideoRender();
 
 	void initForRectRender();
