@@ -25,6 +25,12 @@
 
 #define OPENGL_COMMAND(x) Donut::DonutRenderCommand::getRendererApi()->x
 
+enum class TextureFormat
+{
+	TEXTURE_FORMAT_YUV420 = 0,
+	TEXTURE_FORMAT_RGBA
+};
+
 namespace Donut
 {
 	template<typename T>

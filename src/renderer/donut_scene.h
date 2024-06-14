@@ -97,9 +97,15 @@ namespace Donut
 
 		std::shared_ptr<Donut::OpenGLTexture2D> test_texture_;
 
+		std::shared_ptr<Donut::OpenGLTexture2D> y_texture_;
+		std::shared_ptr<Donut::OpenGLTexture2D> u_texture_;
+		std::shared_ptr<Donut::OpenGLTexture2D> v_texture_;
+
 		float zoom_level_ = 0.2f;
 
 		DonutQMLAVManager* av_manager_ = nullptr;
+
+		AVFrame* decoded_frame_ = nullptr;
 	};
 }
 

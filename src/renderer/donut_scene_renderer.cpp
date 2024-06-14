@@ -140,8 +140,8 @@ void DonutSceneRenderer::initForSpriteRender()
         batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
 
         batch_data_.rect_shader_->setInt("u_TextureY", 1);
-        batch_data_.rect_shader_->setInt("u_TextureU", 1);
-        batch_data_.rect_shader_->setInt("u_TextureV", 1);
+        batch_data_.rect_shader_->setInt("u_TextureU", 2);
+        batch_data_.rect_shader_->setInt("u_TextureV", 3);
 
         batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
@@ -459,7 +459,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 
 void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture)
 {
-
+    DonutSceneRenderer::drawTexturedRectangle(position, size, u_texture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
 //void DonutSceneRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t count)

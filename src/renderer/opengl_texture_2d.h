@@ -1,6 +1,8 @@
 #ifndef OPENGL_TEXTURE_2D_H
 #define OPENGL_TEXTURE_2D_H
 
+#include "renderer_global.h"
+
 #include <stdint.h>
 #include <string>
 
@@ -31,6 +33,8 @@ namespace Donut
 		OpenGLTexture2D(const TextureSpecification& spec);
 		OpenGLTexture2D(const std::string& path);
 		OpenGLTexture2D(uint32_t width, uint32_t height);
+		OpenGLTexture2D(uint32_t width, uint32_t height, TextureFormat format);
+
 		virtual ~OpenGLTexture2D();
 
 		virtual const TextureSpecification& getSpecification() const { return texture_spec_; }

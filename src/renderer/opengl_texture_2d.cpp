@@ -15,6 +15,7 @@ namespace Donut
 			{
 			case ImageFormat::RGB8: return GL_RGB;
 			case ImageFormat::RGBA8: return GL_RGBA;
+			case ImageFormat::R8: return GL_RED;
 			}
 
 			//DN_CORE_ASSERT(false, "donutImageFormatToGLDataFormat : unknown format");
@@ -27,6 +28,7 @@ namespace Donut
 			{
 			case ImageFormat::RGB8: return GL_RGB8;
 			case ImageFormat::RGBA8: return GL_RGBA8;
+			case ImageFormat::R8: return GL_RED;
 			}
 
 			//DN_CORE_ASSERT(false, "donutImageFormatToGLDataFormat : unknown format");
@@ -121,6 +123,33 @@ namespace Donut
 		OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
 	}
 
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, TextureFormat format)
+	{
+		if (format == TextureFormat::TEXTURE_FORMAT_YUV420)
+		{
+			width_ = width;
+			height_ = height;
+			channels_ = 1;
+
+
+			internal_format_ = GL_RED;
+			data_format_ = GL_RED;
+
+			OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));
+			OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
+		}
+		//else
+		//{
+		//	OpenGLTexture2D(width, height);
+		//}
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		OPENGL_EXTRA_FUNCTIONS(glDeleteTextures(1, &object_id_));
@@ -128,9 +157,23 @@ namespace Donut
 
 	void OpenGLTexture2D::setData(void* data, uint32_t size)
 	{
-		uint32_t bytes_per_pixel = data_format_ == GL_RGBA ? 4 : 3;
+		//uint32_t bytes_per_pixel = data_format_ == GL_RGBA ? 4 : 3;
+		uint32_t bytes_per_pixel = 0;
+		switch (data_format_)
+		{
+		case GL_RGBA:
+			bytes_per_pixel = 4;
+			break;
+		case GL_RGB:
+			bytes_per_pixel = 3;
+			break;
+		case GL_RED:
+			bytes_per_pixel = 1;
+			break;
+		}
 		DN_CORE_ASSERT(size == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
 		OPENGL_EXTRA_FUNCTIONS(glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data));
+		is_loaded_ = true;
 	}
 
 	uint32_t OpenGLTexture2D::getObjectId() const

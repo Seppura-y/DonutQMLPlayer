@@ -30,9 +30,9 @@ DonutAVPacket::DonutAVPacket(AVPacket* packet, bool force_copy)
 	av_packet_ref(packet_, packet);
 	if (packet_->buf && force_copy)
 	{
-		const auto offset = packet_->data - packet_->buf->data;
-		av_buffer_make_writable(&packet_->buf);
-		packet_->data = packet_->buf->data + offset;
+		//const auto offset = packet_->data - packet_->buf->data;
+		//av_buffer_make_writable(&packet_->buf);
+		//packet_->data = packet_->buf->data + offset;
 	}
 }
 
