@@ -65,6 +65,14 @@ struct BatchRenderData
 	FlatColorVertex* flat_vertex_buffer_base_ = nullptr;
 	FlatColorVertex* flat_vertex_buffer_ptr_ = nullptr;
 
+	std::shared_ptr <Donut::OpenGLShader> yuv_shader_;
+	//std::shared_ptr <Donut::OpenGLVertexArray> yuv_vao_;
+	//std::shared_ptr <Donut::OpenGLVertexBuffer> yuv_vbo_;
+	//std::shared_ptr <Donut::OpenGLIndexBuffer> yuv_ebo_;
+	//std::shared_ptr <Donut::OpenGLUniformBuffer> yuv_ubo_;
+	YuvVertex* yuv_vertex_buffer_base_ = nullptr;
+	YuvVertex* yuv_vertex_buffer_ptr_ = nullptr;
+
 	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
 	uint32_t texture_index_ = 1;
 
@@ -101,8 +109,8 @@ public:
 
 public slots:
 	void init();
+	void initForYuvRender();
 	void initForSpriteRender();
-	void initForVideoRender();
 
 	void initForRectRender();
 	void paint();

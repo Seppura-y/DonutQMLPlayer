@@ -76,7 +76,7 @@ void DonutSceneRenderer::init()
 
 
 
-void DonutSceneRenderer::initForSpriteRender()
+void DonutSceneRenderer::initForYuvRender()
 {
     Donut::DonutRenderCommand::init();
     if (!batch_data_.rect_shader_)
@@ -103,7 +103,7 @@ void DonutSceneRenderer::initForSpriteRender()
 
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
 
-        batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
+        batch_data_.yuv_vertex_buffer_base_ = new YuvVertex[batch_data_.max_vertices_];
 
         uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
         uint32_t offset = 0;
@@ -152,7 +152,7 @@ void DonutSceneRenderer::initForSpriteRender()
     }
 }
 
-void DonutSceneRenderer::initForVideoRender()
+void DonutSceneRenderer::initForSpriteRender()
 {
     Donut::DonutRenderCommand::init();
     if (!batch_data_.rect_shader_)
@@ -459,7 +459,22 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 
 void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture)
 {
-    DonutSceneRenderer::drawTexturedRectangle(position, size, u_texture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    constexpr size_t rect_vertex_count = 4;
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+    const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+    for (size_t i = 0; i < rect_vertex_count; i++)
+    {
+        batch_data_.yuv_vertex_buffer_ptr_->position_ = (transform * batch_data_.rect_vertex_positions_[i]);
+        batch_data_.yuv_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+        batch_data_.yuv_vertex_buffer_ptr_++;
+    }
+
+    DonutSceneRenderer::drawRectangle(position, size, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    //DonutSceneRenderer::drawTexturedRectangle(position, size, u_texture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
 //void DonutSceneRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t count)
@@ -534,6 +549,7 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera)
     batch_data_.rect_indices_count_ = 0;
     batch_data_.rect_vertex_buffer_ptr_ = batch_data_.rect_vertex_buffer_base_;
     batch_data_.flat_vertex_buffer_ptr_ = batch_data_.flat_vertex_buffer_base_;
+    batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
     batch_data_.texture_index_ = 1;
 }
 
@@ -548,6 +564,7 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera, const glm::mat4& trans
     batch_data_.rect_indices_count_ = 0;
     batch_data_.rect_vertex_buffer_ptr_ = batch_data_.rect_vertex_buffer_base_;
     batch_data_.flat_vertex_buffer_ptr_ = batch_data_.flat_vertex_buffer_base_;
+    batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
     batch_data_.texture_index_ = 1;
 }
 
