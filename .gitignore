@@ -8,10 +8,19 @@ build-*
 *.user
 
 build
+# 忽略 bin 文件夹中的所有内容
 bin/*
-!bin/assets/
+
+# 但不忽略 bin/assets 文件夹
+!bin/assets
+
+# 取消忽略 bin/assets 文件夹中的所有内容
 bin/assets/*
+
+# 但不忽略 bin/assets/shaders 文件夹
 !bin/assets/shaders
+
+# 取消忽略 bin/assets/shaders 文件夹中的所有内容
 !bin/assets/shaders/*
 
 lib
