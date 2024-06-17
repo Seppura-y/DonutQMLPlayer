@@ -153,8 +153,9 @@ namespace Donut
             }
 
             frame_updated_ = true;
-            av_frame_unref(decoded_frame_);
         }
+
+        av_frame_unref(decoded_frame_);
 
         s_renderer_->beginScene(scene_camera_);
 
@@ -174,12 +175,13 @@ namespace Donut
 
     void DonutScene::updateHandler(void* data)
     {
+        std::unique_lock<std::mutex> lock(mtx_);
+        av_frame_unref(decoded_frame_);
         if (data)
         {
             auto frame = static_cast<AVFrame*>(data);
 
             {
-                std::unique_lock<std::mutex> lock(mtx_);
 
                 if (!decoded_frame_)
                 {
@@ -192,7 +194,6 @@ namespace Donut
             }
 
             av_frame_unref(frame);
-            av_frame_free(&frame);
         }
     }
 

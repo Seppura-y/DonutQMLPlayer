@@ -93,6 +93,7 @@ namespace Donut
 
     void Donut::DonutAVDecodeHandler::threadLoop()
     {
+        AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
             int serial = -1;
@@ -108,11 +109,13 @@ namespace Donut
 
                     decoder_.sendPacket(pkt);
 
-                    AVFrame* decoded_frame = av_frame_alloc();
+                    
                     if (decoder_.recvFrame(decoded_frame) == 0)
                     {
                         notify(decoded_frame);
                     }
+                    //av_frame_unref(decoded_frame);
+                    //av_frame_free(&decoded_frame);
                 }
             }
             std::this_thread::sleep_for(std::chrono::microseconds(100));
