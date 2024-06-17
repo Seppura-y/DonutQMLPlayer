@@ -30,10 +30,6 @@ void main(void)
 #type fragment
 #version 450 core
 
-//layout(location = 0) uniform sampler2D u_TextureY;
-//layout(location = 1) uniform sampler2D u_TextureU;
-//layout(location = 2) uniform sampler2D u_TextureV;
-
 in vec2 o_TexCoord;
 
 flat in int y_index;
@@ -48,20 +44,18 @@ void main(void)
 {
     vec3 yuv;
     vec3 rgb;
-    yuv.x = texture(u_textures[y_index], o_TexCoord).r;
-    yuv.z = texture(u_textures[v_index], o_TexCoord).r - 0.5;
-    yuv.y = texture(u_textures[u_index], o_TexCoord).r - 0.5;
     
-    //yuv.y = 1.0;
-    //yuv.z = 1.0;
-    rgb = mat3( 1,1,1, 0,-0.39465,2.03211,1.13983,-0.58060,0) * yuv;
-    //fragColor = vec4(rgb, 1);
-
-    //if(y_index == 1 && u_index == 2 && v_index == 3)
-    //    fragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    //else
-    //    fragColor = vec4(0.1f * y_index, 0.1f * u_index, 0.1f * v_index, 1.0f);
-
-    //fragColor = texture(u_textures[0], o_TexCoord);
-    //fragColor = vec4(1.0f , 1.0f, 1.0f, 1.0f);
+    yuv.x = texture(u_textures[y_index], o_TexCoord).r;
+    yuv.y = texture(u_textures[u_index], o_TexCoord).r - 0.5;
+    yuv.z = texture(u_textures[v_index], o_TexCoord).r - 0.5;
+    
+    // 使用标准的 YUV 到 RGB 转换矩阵
+    rgb = mat3(
+        1.0,  1.0, 1.0,
+        0.0, -0.344, 1.772,
+        1.402, -0.714, 0.0
+    ) * yuv;
+    
+    fragColor = vec4(rgb, 1.0);
 }
+

@@ -34,6 +34,7 @@ namespace Donut
 		OpenGLTexture2D(const std::string& path);
 		OpenGLTexture2D(uint32_t width, uint32_t height);
 		OpenGLTexture2D(uint32_t width, uint32_t height, TextureFormat format);
+		OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t size, TextureFormat format);
 
 		virtual ~OpenGLTexture2D();
 

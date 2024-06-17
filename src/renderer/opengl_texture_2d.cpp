@@ -150,6 +150,29 @@ namespace Donut
 		//}
 	}
 
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t size, TextureFormat format)
+	{
+		if (format == TextureFormat::TEXTURE_FORMAT_YUV420)
+		{
+			width_ = width;
+			height_ = height;
+			channels_ = 1;
+
+
+			internal_format_ = GL_RED;
+			data_format_ = GL_RED;
+
+			OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));
+			OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
+		}
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		OPENGL_EXTRA_FUNCTIONS(glDeleteTextures(1, &object_id_));

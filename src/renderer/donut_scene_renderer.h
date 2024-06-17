@@ -73,7 +73,7 @@ struct BatchRenderData
 	YuvVertex* yuv_vertex_buffer_ptr_ = nullptr;
 
 	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
-	uint32_t texture_index_ = 4;
+	uint32_t texture_index_ = 1;
 
 	uint32_t y_texture_index_ = 1;
 	uint32_t u_texture_index_ = 2;
@@ -107,7 +107,6 @@ public:
 	void drawFlatRectangle(glm::vec3 position, glm::vec2 size);
 
 	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& texture, glm::vec4 tintcolor);
-	void drawTexturedRectangle(glm::vec3 position, glm::vec2 size, glm::vec4 tintcolor);
 
 	void drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture);
 

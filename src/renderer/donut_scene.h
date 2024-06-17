@@ -106,6 +106,7 @@ namespace Donut
 		DonutQMLAVManager* av_manager_ = nullptr;
 
 		AVFrame* decoded_frame_ = nullptr;
+		bool frame_updated_ = true;
 	};
 }
 

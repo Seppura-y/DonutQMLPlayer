@@ -99,13 +99,13 @@ namespace Donut
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
 
-            // glDrawArrays ²âÊÔ ---- initForRectRender
+            // glDrawArrays ???? ---- initForRectRender
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForRectRender, Qt::DirectConnection);
 
-            // glDrawElements »æÖÆ ---- initForVideoRender
+            // glDrawElements ???? ---- initForVideoRender
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
-            
+
             //connect(window(), &QQuickWindow::afterSynchronizing, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::afterRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
 
@@ -121,6 +121,7 @@ namespace Donut
         }
     }
 
+
     void DonutScene::onUpdate()
     {
         //window()->beginExternalCommands();
@@ -128,10 +129,10 @@ namespace Donut
 
         //s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
         //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
-        if(y_texture_ && u_texture_ && v_texture_)
-        s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
+        if (y_texture_ && u_texture_ && v_texture_)
+            s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
         //s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
-        
+
         //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
         //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
         //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
@@ -142,6 +143,97 @@ namespace Donut
         //window()->endExternalCommands();
     }
 
+    //void DonutScene::onUpdate()
+    //{
+    //    s_renderer_->beginScene(scene_camera_);
+    //    if (!frame_updated_)
+    //    {
+    //        if (decoded_frame_ && decoded_frame_->buf[0]->data)
+    //        {
+    //            if (decoded_frame_->format == AV_PIX_FMT_YUV420P ||
+    //                decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
+    //            {
+    //                if (!y_texture_)
+    //                {
+    //                    y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420);
+    //                }
+
+    //                if (!u_texture_)
+    //                {
+    //                    u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+    //                }
+
+    //                if (!v_texture_)
+    //                {
+    //                    v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+    //                }
+    //            }
+
+    //            //unsigned char* y_data = new unsigned char[decoded_frame_->width * decoded_frame_->height];
+    //            //unsigned char* u_data = new unsigned char[decoded_frame_->width * decoded_frame_->height / 4];
+    //            //unsigned char* v_data = new unsigned char[decoded_frame_->width * decoded_frame_->height / 4];
+
+
+
+    //            //for (int i = 0; i < decoded_frame_->height; i++) // Y
+    //            //    memcpy(y_data + decoded_frame_->width * i, decoded_frame_->data[0] + decoded_frame_->linesize[0] * i, decoded_frame_->width);
+    //            //for (int i = 0; i < decoded_frame_->height / 2; i++) // U
+    //            //    memcpy(u_data + decoded_frame_->width / 2 * i, decoded_frame_->data[1] + decoded_frame_->linesize[1] * i, decoded_frame_->width);
+    //            //for (int i = 0; i < decoded_frame_->height / 2; i++) // V
+    //            //    memcpy(v_data + decoded_frame_->width / 2 * i, decoded_frame_->data[2] + decoded_frame_->linesize[2] * i, decoded_frame_->width);
+
+
+    //            //y_texture_->bind();
+    //            //y_texture_->setData(y_data, decoded_frame_->width * decoded_frame_->height);
+
+    //            //u_texture_->bind();
+    //            //u_texture_->setData(u_data, decoded_frame_->width * decoded_frame_->height / 4);
+
+    //            //v_texture_->bind();
+    //            //v_texture_->setData(v_data, decoded_frame_->width * decoded_frame_->height / 4);
+
+    //            //y_texture_->bind();
+    //            //y_texture_->setData(decoded_frame_->data[0], decoded_frame_->width * decoded_frame_->height);
+
+    //            //u_texture_->bind();
+    //            //u_texture_->setData(decoded_frame_->data[1], decoded_frame_->width * decoded_frame_->height / 4);
+
+    //            //v_texture_->bind();
+    //            //v_texture_->setData(decoded_frame_->data[2], decoded_frame_->width * decoded_frame_->height / 4);
+
+    //            y_texture_->setData(decoded_frame_->buf[0]->data, decoded_frame_->buf[0]->size);
+    //            u_texture_->setData(decoded_frame_->buf[1]->data, decoded_frame_->buf[1]->size);
+    //            v_texture_->setData(decoded_frame_->buf[2]->data, decoded_frame_->buf[2]->size);
+
+
+    //            //delete[] y_data;
+    //            //delete[] u_data;
+    //            //delete[] v_data;
+    //            av_frame_unref(decoded_frame_);
+    //        }
+
+    //        if (y_texture_ && u_texture_ && v_texture_)
+    //            s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
+
+    //        av_frame_unref(decoded_frame_);
+    //        frame_updated_ = true;
+    //    }
+
+    //    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ 0.5f, 0.5f });
+    //    //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
+    //    s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+
+    //    //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
+    //    //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
+    //    //s_renderer_->drawRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.5f, 1.5f }, glm::vec4{ 0.3f, 0.5f, 0.8f, 0.5f });
+    //    //test_texture_->bind();
+    //    //s_renderer_->drawTexturedRectangle(glm::vec3{ 0.6f, 0.6f, 0.3f }, glm::vec2{ 1.f, 1.f }, glm::vec4{ 1.f, 1.f,1.f, 1.f });
+    //    s_renderer_->endScene();
+    //    //s_renderer_->paint();
+    //    //window()->endExternalCommands();
+
+    //}
+
     void DonutScene::updateHandler(void* data)
     {
         if (data)
@@ -151,47 +243,8 @@ namespace Donut
             av_frame_unref(frame);
             av_frame_free(&frame);
 
-            if (decoded_frame_)
-            {
-                if (decoded_frame_->format == AV_PIX_FMT_YUV420P ||
-                    decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
-                {
-                    if (!y_texture_)
-                    {
-                        y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-
-                    if (!u_texture_)
-                    {
-                        u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-
-                    if (!v_texture_)
-                    {
-                        v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-                }
-
-                //unsigned char* datas[3] = { 0 };
-                //datas[0] = new unsigned char[decoded_frame_->width * decoded_frame_->height];
-                //datas[1] = new unsigned char[decoded_frame_->width * decoded_frame_->height / 4];
-                //datas[2] = new unsigned char[decoded_frame_->width * decoded_frame_->height / 4];
-
-                //for (int i = 0; i < decoded_frame_->height; i++) //Y 
-                //    memcpy(datas[0] + decoded_frame_->width * i, decoded_frame_->data[0] + decoded_frame_->linesize[0] * i, decoded_frame_->width);
-                //for (int i = 0; i < decoded_frame_->height / 2; i++) //U
-                //    memcpy(datas[1] + decoded_frame_->width / 2 * i, decoded_frame_->data[1] + decoded_frame_->linesize[1] * i, decoded_frame_->width);
-                //for (int i = 0; i < decoded_frame_->height / 2; i++) //V
-                //    memcpy(datas[2] + decoded_frame_->width / 2 * i, decoded_frame_->data[2] + decoded_frame_->linesize[2] * i, decoded_frame_->width);
-
-                y_texture_->setData(decoded_frame_->data[0], decoded_frame_->width * decoded_frame_->height);
-                u_texture_->setData(decoded_frame_->data[1], decoded_frame_->width * decoded_frame_->height / 4);
-                v_texture_->setData(decoded_frame_->data[2], decoded_frame_->width * decoded_frame_->height / 4);
-
-                av_frame_unref(decoded_frame_);
-
-                //delete[] datas;
-            }
+            frame_updated_ = false;
+            av_frame_unref(decoded_frame_);
         }
     }
 
