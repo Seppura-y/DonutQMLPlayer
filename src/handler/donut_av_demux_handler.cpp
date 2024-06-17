@@ -99,7 +99,7 @@ namespace Donut
 				std::this_thread::sleep_for(std::chrono::microseconds(1));
 				continue;
 			}
-
+			std::this_thread::sleep_for(std::chrono::microseconds(100));
 			if (int ret = demuxer_.readPacket(demux_pkt) != 0)
 			{
 				if (ret == AVERROR(EOF))

@@ -76,24 +76,23 @@ void DonutSceneRenderer::init()
 
 
 
-void DonutSceneRenderer::initForYuvRender()
+void DonutSceneRenderer::initAll()
 {
-    Donut::DonutRenderCommand::init();
-    if (!batch_data_.rect_shader_)
+    if (!is_initialized_)
     {
+        Donut::DonutRenderCommand::init();
         QSGRendererInterface* rif = window_->rendererInterface();
         Q_ASSERT(rif->graphicsApi() == QSGRendererInterface::OpenGL
             || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
 
 
+        batch_data_.yuv_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_v.glsl");
+        batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/texture.glsl");
 
-        batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_v.glsl");
-        batch_data_.rect_shader_->bind();
-
+        //Sprite Init//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         batch_data_.rect_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
-        batch_data_.rect_vao_->bind();
-
         batch_data_.rect_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(batch_data_.max_vertices_ * sizeof(RectangleVertex));
+    
         batch_data_.rect_vbo_->setLayout({
             { Donut::ShaderDataType::Float4, "a_Position" },
             { Donut::ShaderDataType::Float4, "a_Color" },
@@ -103,21 +102,21 @@ void DonutSceneRenderer::initForYuvRender()
 
         batch_data_.rect_vao_->addVertexBuffer(batch_data_.rect_vbo_);
 
-        batch_data_.yuv_vertex_buffer_base_ = new YuvVertex[batch_data_.max_vertices_];
+        batch_data_.rect_vertex_buffer_base_ = new RectangleVertex[batch_data_.max_vertices_];
 
         uint32_t* rectangle_indices = new uint32_t[batch_data_.max_indices_];
-        uint32_t offset = 0;
+        uint32_t rectangle_indices_offset = 0;
         for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
         {
-            rectangle_indices[i + 0] = offset + 0;
-            rectangle_indices[i + 1] = offset + 1;
-            rectangle_indices[i + 2] = offset + 2;
+            rectangle_indices[i + 0] = rectangle_indices_offset + 0;
+            rectangle_indices[i + 1] = rectangle_indices_offset + 1;
+            rectangle_indices[i + 2] = rectangle_indices_offset + 2;
+                                   
+            rectangle_indices[i + 3] = rectangle_indices_offset + 2;
+            rectangle_indices[i + 4] = rectangle_indices_offset + 3;
+            rectangle_indices[i + 5] = rectangle_indices_offset + 0;
 
-            rectangle_indices[i + 3] = offset + 2;
-            rectangle_indices[i + 4] = offset + 3;
-            rectangle_indices[i + 5] = offset + 0;
-
-            offset += 4;
+            rectangle_indices_offset += 4;
         }
 
         // 这里用Qt的OpenGL接口，无法在创建EBO时同时传递数据，要另外调用setData，原因未知
@@ -125,10 +124,133 @@ void DonutSceneRenderer::initForYuvRender()
         batch_data_.rect_ebo_->setData(rectangle_indices, batch_data_.max_indices_);
         batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
         delete[] rectangle_indices;
+        //Sprite Init//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //Yuv Init//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        batch_data_.yuv_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
+
+        batch_data_.yuv_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(batch_data_.max_vertices_ * sizeof(YuvVertex));
+        batch_data_.yuv_vbo_->setLayout({
+            { Donut::ShaderDataType::Float4, "a_Position" },
+            { Donut::ShaderDataType::Float2, "a_TexCoord" },
+            { Donut::ShaderDataType::Float3, "a_TextureIndices" }
+            });
+
+        batch_data_.yuv_vao_->addVertexBuffer(batch_data_.yuv_vbo_);
+
+        batch_data_.yuv_vertex_buffer_base_ = new YuvVertex[batch_data_.max_vertices_];
+
+        uint32_t* yuv_indices = new uint32_t[batch_data_.max_indices_];
+        uint32_t yuv_indices_offset = 0;
+        for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
+        {
+            yuv_indices[i + 0] = yuv_indices_offset + 0;
+            yuv_indices[i + 1] = yuv_indices_offset + 1;
+            yuv_indices[i + 2] = yuv_indices_offset + 2;
+                                 
+            yuv_indices[i + 3] = yuv_indices_offset + 2;
+            yuv_indices[i + 4] = yuv_indices_offset + 3;
+            yuv_indices[i + 5] = yuv_indices_offset + 0;
+
+            yuv_indices_offset += 4;
+        }
+
+        // 这里用Qt的OpenGL接口，无法在创建EBO时同时传递数据，要另外调用setData，原因未知
+        batch_data_.yuv_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(yuv_indices, batch_data_.max_indices_));
+        batch_data_.yuv_ebo_->setData(yuv_indices, batch_data_.max_indices_);
+        batch_data_.yuv_vao_->setIndexBuffer(batch_data_.yuv_ebo_);
+        delete[] yuv_indices;
+        //Yuv Init//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
         batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
         uint32_t white_texture_data = 0xffffffff;
         batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+
+        //int samplers[batch_data_.max_texture_slots_];
+        //for (uint32_t i = 0; i < batch_data_.max_texture_slots_; i++)
+        //{
+        //    samplers[i] = i;
+        //}
+
+        //batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
+        //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+        //batch_data_.rect_shader_->setInt("u_tex", 1);
+        batch_data_.texture_slots_[0] = batch_data_.white_texture_;
+
+        //batch_data_.yuv_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
+        //batch_data_.yuv_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+
+        //batch_data_.yuv_shader_->setInt("u_TextureY", 1);
+        //batch_data_.yuv_shader_->setInt("u_TextureU", 2);
+        //batch_data_.yuv_shader_->setInt("u_TextureV", 3);
+
+        batch_data_.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+        batch_data_.rect_vertex_positions_[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
+        batch_data_.rect_vertex_positions_[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
+        batch_data_.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+        batch_data_.camera_ubo_ = std::make_shared<Donut::OpenGLUniformBuffer>(sizeof(glm::mat4), 0);
+
+        is_initialized_ = true;
+    }
+
+}
+
+void DonutSceneRenderer::initForYuvRender()
+{
+    Donut::DonutRenderCommand::init();
+    //if (!batch_data_.yuv_shader_)
+    //{
+        QSGRendererInterface* rif = window_->rendererInterface();
+        Q_ASSERT(rif->graphicsApi() == QSGRendererInterface::OpenGL
+            || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
+
+        batch_data_.yuv_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_v.glsl");
+
+        batch_data_.yuv_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
+
+        batch_data_.yuv_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(batch_data_.max_vertices_ * sizeof(YuvVertex));
+        batch_data_.yuv_vbo_->setLayout({
+            { Donut::ShaderDataType::Float4, "a_Position" },
+            { Donut::ShaderDataType::Float2, "a_TexCoord" },
+        });
+
+        batch_data_.yuv_vao_->addVertexBuffer(batch_data_.yuv_vbo_);
+
+        batch_data_.yuv_vertex_buffer_base_ = new YuvVertex[batch_data_.max_vertices_];
+
+        uint32_t* yuv_indices = new uint32_t[batch_data_.max_indices_];
+        uint32_t offset = 0;
+        for (uint32_t i = 0; i < batch_data_.max_indices_; i += 6)
+        {
+            yuv_indices[i + 0] = offset + 0;
+            yuv_indices[i + 1] = offset + 1;
+            yuv_indices[i + 2] = offset + 2;
+            
+            yuv_indices[i + 3] = offset + 2;
+            yuv_indices[i + 4] = offset + 3;
+            yuv_indices[i + 5] = offset + 0;
+
+            offset += 4;
+        }
+
+        // 这里用Qt的OpenGL接口，无法在创建EBO时同时传递数据，要另外调用setData，原因未知
+        batch_data_.yuv_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(yuv_indices, batch_data_.max_indices_));
+        batch_data_.yuv_ebo_->setData(yuv_indices, batch_data_.max_indices_);
+        batch_data_.yuv_vao_->setIndexBuffer(batch_data_.yuv_ebo_);
+        delete[] yuv_indices;
+
+        if (!batch_data_.white_texture_)
+        {
+            batch_data_.white_texture_ = std::make_shared<Donut::OpenGLTexture2D>(1, 1);
+            uint32_t white_texture_data = 0xffffffff;
+            batch_data_.white_texture_->setData(&white_texture_data, sizeof(uint32_t));
+        }
+
 
         int samplers[batch_data_.max_texture_slots_];
         for (uint32_t i = 0; i < batch_data_.max_texture_slots_; i++)
@@ -136,12 +258,12 @@ void DonutSceneRenderer::initForYuvRender()
             samplers[i] = i;
         }
 
-        batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
-        batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+        //batch_data_.yuv_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
+        //batch_data_.yuv_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
 
-        batch_data_.rect_shader_->setInt("u_TextureY", 1);
-        batch_data_.rect_shader_->setInt("u_TextureU", 2);
-        batch_data_.rect_shader_->setInt("u_TextureV", 3);
+        //batch_data_.yuv_shader_->setInt("u_TextureY", 1);
+        //batch_data_.yuv_shader_->setInt("u_TextureU", 2);
+        //batch_data_.yuv_shader_->setInt("u_TextureV", 3);
 
         batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
@@ -149,7 +271,9 @@ void DonutSceneRenderer::initForYuvRender()
         batch_data_.rect_vertex_positions_[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
-    }
+
+        batch_data_.camera_ubo_ = std::make_shared<Donut::OpenGLUniformBuffer>(sizeof(glm::mat4), 0);
+    //}
 }
 
 void DonutSceneRenderer::initForSpriteRender()
@@ -164,10 +288,10 @@ void DonutSceneRenderer::initForSpriteRender()
 
 
         batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/texture.glsl");
-        batch_data_.rect_shader_->bind();
+        //batch_data_.rect_shader_->bind();
 
         batch_data_.rect_vao_ = std::make_shared<Donut::OpenGLVertexArray>();
-        batch_data_.rect_vao_->bind();
+        //batch_data_.rect_vao_->bind();
 
         batch_data_.rect_vbo_ = std::make_shared<Donut::OpenGLVertexBuffer>(batch_data_.max_vertices_ * sizeof(RectangleVertex));
         batch_data_.rect_vbo_->setLayout({
@@ -212,15 +336,17 @@ void DonutSceneRenderer::initForSpriteRender()
             samplers[i] = i;
         }
 
-        batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
-        batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
-        batch_data_.rect_shader_->setInt("u_tex", 1);
+        //batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", glm::mat4(1.0f));
+        //batch_data_.rect_shader_->setIntArray("u_textures", samplers, batch_data_.max_texture_slots_);
+        //batch_data_.rect_shader_->setInt("u_tex", 1);
         batch_data_.texture_slots_[0] = batch_data_.white_texture_;
 
         batch_data_.rect_vertex_positions_[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
         batch_data_.rect_vertex_positions_[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+        batch_data_.camera_ubo_ = std::make_shared<Donut::OpenGLUniformBuffer>(sizeof(glm::mat4), 0);
     }
 }
 
@@ -361,7 +487,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
     const glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
     const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
 
-    for (uint32_t i = 1; i < batch_data_.texture_index_; i++)
+    for (uint32_t i = 4; i < batch_data_.texture_index_; i++)
     {
         // 获取raw指针，然后解引用，以调用operator==(const Texture& other)
         if (*batch_data_.texture_slots_[i].get() == *texture.get())
@@ -418,7 +544,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
     const glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
     const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
     batch_data_.white_texture_->bind();
-    for (uint32_t i = 1; i < batch_data_.texture_index_; i++)
+    for (uint32_t i = 4; i < batch_data_.texture_index_; i++)
     {
         // 获取raw指针，然后解引用，以调用operator==(const Texture& other)
         if (*batch_data_.texture_slots_[i].get() == *batch_data_.white_texture_.get())
@@ -459,22 +585,54 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 
 void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture)
 {
-    constexpr size_t rect_vertex_count = 4;
-
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
+    const size_t rect_vertex_count = 4;
     const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
 
-    for (size_t i = 0; i < rect_vertex_count; i++)
+    if (batch_data_.yuv_indices_count_ >= batch_data_.max_indices_)
     {
-        batch_data_.yuv_vertex_buffer_ptr_->position_ = (transform * batch_data_.rect_vertex_positions_[i]);
-        batch_data_.yuv_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
-        batch_data_.yuv_vertex_buffer_ptr_++;
+        flushAndReset();
     }
 
-    DonutSceneRenderer::drawRectangle(position, size, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    //DonutSceneRenderer::drawTexturedRectangle(position, size, u_texture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    if (!batch_data_.texture_slots_[batch_data_.y_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.y_texture_index_] = y_texture;
+    }
+
+    if (!batch_data_.texture_slots_[batch_data_.u_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.u_texture_index_] = u_texture;
+    }
+
+    if (!batch_data_.texture_slots_[batch_data_.v_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.v_texture_index_] = v_texture;
+    }
+
+    auto scale_matrix = glm::scale(glm::mat4(1.0f), (y_texture->getRatio() > 1 ? glm::vec3{ size.x * y_texture->getRatio(), size.y, 1.0f }
+    : glm::vec3{ size.x, size.y / y_texture->getRatio(), 1.0f }));
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * scale_matrix;
+
+    glm::vec3 indices = glm::vec3(
+        batch_data_.y_texture_index_,
+        batch_data_.u_texture_index_,
+        batch_data_.v_texture_index_
+    );
+
+    //batch_data_.yuv_vertex_buffer_ptr_->texture_indices_[0] = (float)batch_data_.y_texture_index_;
+    //batch_data_.yuv_vertex_buffer_ptr_->texture_indices_[1] = (float)batch_data_.u_texture_index_;
+    //batch_data_.yuv_vertex_buffer_ptr_->texture_indices_[2] = (float)batch_data_.v_texture_index_;
+    
+    for (size_t i = 0; i < rect_vertex_count; i++)
+    {
+        batch_data_.yuv_vertex_buffer_ptr_->position_ = transform * batch_data_.rect_vertex_positions_[i];
+        batch_data_.yuv_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+        batch_data_.yuv_vertex_buffer_ptr_->texture_indices_ = indices;
+        batch_data_.yuv_vertex_buffer_ptr_++;
+    }
+    batch_data_.yuv_indices_count_ += 6;
 }
 
 //void DonutSceneRenderer::drawIndices(const Donut::Ref<Donut::OpenGLVertexArray>& va, uint32_t count)
@@ -513,6 +671,23 @@ void DonutSceneRenderer::flush()
         OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.rect_vao_, batch_data_.rect_indices_count_));
     }
 
+    if (batch_data_.yuv_indices_count_)
+    {
+        batch_data_.yuv_vao_.get()->bind();
+        batch_data_.yuv_ebo_->bind();
+        
+
+        // bind textures
+        for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
+        {
+            auto tex = batch_data_.texture_slots_[i];
+            batch_data_.texture_slots_[i]->bind(i);
+        }
+        batch_data_.yuv_shader_->bind();
+
+        OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.yuv_vao_, batch_data_.yuv_indices_count_));
+    }
+
 
     // 以下测试flat rect 绘制
     //batch_data_.rect_vao_->bind();
@@ -531,7 +706,11 @@ void DonutSceneRenderer::flushAndReset()
     endScene();
     batch_data_.rect_indices_count_ = 0;
     batch_data_.rect_vertex_buffer_ptr_ = batch_data_.rect_vertex_buffer_base_;
-    batch_data_.texture_index_ = 1;
+
+    batch_data_.yuv_indices_count_ = 0;
+    batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
+
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::beginScene()
@@ -543,14 +722,19 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera)
     //window_->beginExternalCommands();
 
     glm::mat4 view_projection = camera.getProjection();
-    batch_data_.rect_shader_->bind();
-    batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+    //batch_data_.rect_shader_->bind();
+    //batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+    batch_data_.camera_ubo_->setData(&view_projection, sizeof(glm::mat4));
 
     batch_data_.rect_indices_count_ = 0;
     batch_data_.rect_vertex_buffer_ptr_ = batch_data_.rect_vertex_buffer_base_;
+
     batch_data_.flat_vertex_buffer_ptr_ = batch_data_.flat_vertex_buffer_base_;
+
+    batch_data_.yuv_indices_count_ = 0;
     batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
-    batch_data_.texture_index_ = 1;
+
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::beginScene(Donut::Camera camera, const glm::mat4& transform)
@@ -558,20 +742,31 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera, const glm::mat4& trans
     //window_->beginExternalCommands();
 
     glm::mat4 view_projection = camera.getProjection() * glm::inverse(transform);
-    batch_data_.rect_shader_->bind();
-    batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", view_projection);
+    batch_data_.camera_ubo_->setData(&batch_data_.view_projection_, sizeof(glm::mat4));
+
+    //batch_data_.rect_shader_->bind();
+    //batch_data_.rect_shader_->setMat4("u_viewProjectionMatrix", view_projection);
 
     batch_data_.rect_indices_count_ = 0;
     batch_data_.rect_vertex_buffer_ptr_ = batch_data_.rect_vertex_buffer_base_;
+
     batch_data_.flat_vertex_buffer_ptr_ = batch_data_.flat_vertex_buffer_base_;
+
+    batch_data_.yuv_indices_count_ = 0;
     batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
-    batch_data_.texture_index_ = 1;
+
+
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::endScene()
 {
     uint32_t data_size = (uint8_t*)batch_data_.rect_vertex_buffer_ptr_ - (uint8_t*)batch_data_.rect_vertex_buffer_base_;
     batch_data_.rect_vbo_->setData(batch_data_.rect_vertex_buffer_base_, data_size);
+
+    data_size = (uint8_t*)batch_data_.yuv_vertex_buffer_ptr_ - (uint8_t*)batch_data_.yuv_vertex_buffer_base_;
+    batch_data_.yuv_vbo_->setData(batch_data_.yuv_vertex_buffer_base_, data_size);
+
     flush();
 }
 

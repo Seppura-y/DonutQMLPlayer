@@ -31,10 +31,8 @@ struct RectangleVertex
 struct YuvVertex
 {
 	glm::vec4 position_;
-
 	glm::vec2 tex_coordinate_;
-
-	float texture_index_[3];
+	glm::vec3 texture_indices_;
 };
 
 struct FlatColorVertex
@@ -66,19 +64,25 @@ struct BatchRenderData
 	FlatColorVertex* flat_vertex_buffer_ptr_ = nullptr;
 
 	std::shared_ptr <Donut::OpenGLShader> yuv_shader_;
-	//std::shared_ptr <Donut::OpenGLVertexArray> yuv_vao_;
-	//std::shared_ptr <Donut::OpenGLVertexBuffer> yuv_vbo_;
-	//std::shared_ptr <Donut::OpenGLIndexBuffer> yuv_ebo_;
-	//std::shared_ptr <Donut::OpenGLUniformBuffer> yuv_ubo_;
+	std::shared_ptr <Donut::OpenGLVertexArray> yuv_vao_;
+	std::shared_ptr <Donut::OpenGLVertexBuffer> yuv_vbo_;
+	std::shared_ptr <Donut::OpenGLIndexBuffer> yuv_ebo_;
+	std::shared_ptr <Donut::OpenGLUniformBuffer> yuv_ubo_;
+	uint32_t yuv_indices_count_ = 0;
 	YuvVertex* yuv_vertex_buffer_base_ = nullptr;
 	YuvVertex* yuv_vertex_buffer_ptr_ = nullptr;
 
 	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
-	uint32_t texture_index_ = 1;
+	uint32_t texture_index_ = 4;
+
+	uint32_t y_texture_index_ = 1;
+	uint32_t u_texture_index_ = 2;
+	uint32_t v_texture_index_ = 3;
 
 	glm::vec4 rect_vertex_positions_[4];
 
 	glm::mat4 view_projection_;
+
 	std::shared_ptr<Donut::OpenGLUniformBuffer> camera_ubo_;
 };
 
@@ -107,8 +111,12 @@ public:
 
 	void drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture);
 
+signals:
+	void sigInitialized(bool);
 public slots:
 	void init();
+
+	void initAll();
 	void initForYuvRender();
 	void initForSpriteRender();
 
@@ -149,6 +157,7 @@ private:
 	int height_;
 	float aspect_ratio_;
 	
+	bool is_initialized_ = false;
 };
 
 #endif

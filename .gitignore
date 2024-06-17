@@ -8,7 +8,12 @@ build-*
 *.user
 
 build
-bin
+bin/*
+!bin/assets/
+bin/assets/*
+!bin/assets/shaders
+!bin/assets/shaders/*
+
 lib
 include
 
