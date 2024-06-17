@@ -146,9 +146,7 @@ namespace Donut
                 }
 
                 y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
-
                 u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
-
                 v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
             }
 
