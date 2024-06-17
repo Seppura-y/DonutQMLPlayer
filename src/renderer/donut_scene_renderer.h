@@ -110,6 +110,16 @@ public:
 
 	void drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture);
 
+
+	void updateYuvTextures(
+		int width, int height,
+		std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, void* y_data, uint32_t y_size,
+		std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, void* u_data, uint32_t u_size,
+		std::shared_ptr<Donut::OpenGLTexture2D>& v_texture, void* v_data, uint32_t v_size
+	);
+
+	void updateSpriteTexture(const std::string& path, std::shared_ptr<Donut::OpenGLTexture2D>& texture);
+
 signals:
 	void sigInitialized(bool);
 public slots:

@@ -136,13 +136,17 @@ namespace Donut
 			data_format_ = GL_RED;
 
 			OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));
-			OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+			//OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+			OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
 
 			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
 			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT));
 			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+			//OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
+			OPENGL_EXTRA_FUNCTIONS(glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, 0));
 		}
 		//else
 		//{
@@ -195,6 +199,7 @@ namespace Donut
 			break;
 		}
 		DN_CORE_ASSERT(size == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
+		OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
 		OPENGL_EXTRA_FUNCTIONS(glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data));
 		is_loaded_ = true;
 	}

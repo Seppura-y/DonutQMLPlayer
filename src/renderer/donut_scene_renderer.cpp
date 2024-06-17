@@ -533,7 +533,9 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture)
 {
     const size_t rect_vertex_count = 4;
-    const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+    //const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+    const glm::vec2 texture_coords[] = { { 0.0f, 1.0f },{ 1.0f, 1.0f },{ 1.0f, 0.0f },{ 0.0f, 0.0f } };
 
     if (batch_data_.yuv_indices_count_ >= batch_data_.max_indices_)
     {
@@ -541,25 +543,20 @@ void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::sh
     }
 
     // Update texture slots only if they are empty
-    //if (!batch_data_.texture_slots_[batch_data_.y_texture_index_])
-    //{
-    //    batch_data_.texture_slots_[batch_data_.y_texture_index_] = y_texture;
-    //}
+    if (!batch_data_.texture_slots_[batch_data_.y_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.y_texture_index_] = y_texture;
+    }
 
-    //if (!batch_data_.texture_slots_[batch_data_.u_texture_index_])
-    //{
-    //    batch_data_.texture_slots_[batch_data_.u_texture_index_] = u_texture;
-    //}
+    if (!batch_data_.texture_slots_[batch_data_.u_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.u_texture_index_] = u_texture;
+    }
 
-    //if (!batch_data_.texture_slots_[batch_data_.v_texture_index_])
-    //{
-    //    batch_data_.texture_slots_[batch_data_.v_texture_index_] = v_texture;
-    //}
-
-
-    batch_data_.texture_slots_[batch_data_.y_texture_index_] = y_texture;
-    batch_data_.texture_slots_[batch_data_.u_texture_index_] = u_texture;
-    batch_data_.texture_slots_[batch_data_.v_texture_index_] = v_texture;
+    if (!batch_data_.texture_slots_[batch_data_.v_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.v_texture_index_] = v_texture;
+    }
 
     auto ratio = y_texture->getRatio();
     // Scale matrix based on texture ratio
@@ -583,6 +580,42 @@ void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::sh
     }
 
     batch_data_.yuv_indices_count_ += 6;
+}
+
+void DonutSceneRenderer::updateYuvTextures(int width, int height, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, void* y_data, uint32_t y_size, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, void* u_data, uint32_t u_size, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture, void* v_data, uint32_t v_size)
+{
+    //window_->beginExternalCommands();
+
+    if (!y_texture)
+    {
+        y_texture = std::make_shared<Donut::OpenGLTexture2D>(width, height, TextureFormat::TEXTURE_FORMAT_YUV420);
+    }
+
+    if (!u_texture)
+    {
+        u_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+    }
+
+    if (!v_texture)
+    {
+        v_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+    }
+
+    y_texture->bind(1);
+    y_texture->setData(y_data, y_size);
+
+    u_texture->bind(2);
+    u_texture->setData(u_data, u_size);
+
+    v_texture->bind(3);
+    v_texture->setData(v_data, v_size);
+
+    //window_->endExternalCommands();
+}
+
+void DonutSceneRenderer::updateSpriteTexture(const std::string& path, std::shared_ptr<Donut::OpenGLTexture2D>& texture)
+{
+    texture = std::make_shared<Donut::OpenGLTexture2D>(path);
 }
 
 
@@ -629,11 +662,15 @@ void DonutSceneRenderer::flush()
         
 
         // bind textures
-        for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
-        {
-            auto tex = batch_data_.texture_slots_[i];
-            batch_data_.texture_slots_[i]->bind(i);
-        }
+        //for (uint32_t i = 0; i < batch_data_.texture_index_; i++)
+        //{
+        //    auto tex = batch_data_.texture_slots_[i];
+        //    batch_data_.texture_slots_[i]->bind(i);
+        //}
+
+        batch_data_.texture_slots_[1]->bind(1);
+        batch_data_.texture_slots_[2]->bind(2);
+        batch_data_.texture_slots_[3]->bind(3);
         batch_data_.yuv_shader_->bind();
 
         OPENGL_EXTRA_FUNCTIONS(drawIndices(batch_data_.yuv_vao_, batch_data_.yuv_indices_count_));

@@ -49,7 +49,6 @@ void main(void)
     yuv.y = texture(u_textures[u_index], o_TexCoord).r - 0.5;
     yuv.z = texture(u_textures[v_index], o_TexCoord).r - 0.5;
     
-    // 使用标准的 YUV 到 RGB 转换矩阵
     rgb = mat3(
         1.0,  1.0, 1.0,
         0.0, -0.344, 1.772,
