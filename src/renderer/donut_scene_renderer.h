@@ -73,7 +73,7 @@ struct BatchRenderData
 	YuvVertex* yuv_vertex_buffer_ptr_ = nullptr;
 
 	std::array<std::shared_ptr<Donut::OpenGLTexture2D>, max_texture_slots_> texture_slots_;
-	uint32_t texture_index_ = 1;
+	uint32_t texture_index_ = 4;
 
 	uint32_t y_texture_index_ = 1;
 	uint32_t u_texture_index_ = 2;

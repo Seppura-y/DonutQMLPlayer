@@ -661,7 +661,7 @@ void DonutSceneRenderer::flushAndReset()
     batch_data_.yuv_indices_count_ = 0;
     batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
 
-    batch_data_.texture_index_ = 1;
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::beginScene()
@@ -685,7 +685,7 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera)
     batch_data_.yuv_indices_count_ = 0;
     batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
 
-    batch_data_.texture_index_ = 1;
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::beginScene(Donut::Camera camera, const glm::mat4& transform)
@@ -707,7 +707,7 @@ void DonutSceneRenderer::beginScene(Donut::Camera camera, const glm::mat4& trans
     batch_data_.yuv_vertex_buffer_ptr_ = batch_data_.yuv_vertex_buffer_base_;
 
 
-    batch_data_.texture_index_ = 1;
+    batch_data_.texture_index_ = 4;
 }
 
 void DonutSceneRenderer::endScene()

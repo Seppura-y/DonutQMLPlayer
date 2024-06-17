@@ -99,10 +99,10 @@ namespace Donut
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::init, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, s_renderer_, &DonutSceneRenderer::paint, Qt::DirectConnection);
 
-            // glDrawArrays ���� ---- initForRectRender
+            // glDrawArrays 测试 ---- initForRectRender
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForRectRender, Qt::DirectConnection);
 
-            // glDrawElements ���� ---- initForVideoRender
+            // glDrawElements 绘制 ---- initForVideoRender
             //connect(window(), &QQuickWindow::beforeRendering, s_renderer_, &DonutSceneRenderer::initForVideoRender, Qt::DirectConnection);
             //connect(window(), &QQuickWindow::beforeRenderPassRecording, this, &DonutScene::onUpdate, Qt::DirectConnection);
 
@@ -130,7 +130,7 @@ namespace Donut
         //s_renderer_->drawFlatRectangle(glm::vec3{ 0.5f, 0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f });
         if (y_texture_ && u_texture_ && v_texture_)
             s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
-        //s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+        s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
 
         //s_renderer_->drawRectangle(glm::vec3{ 0.0f, 0.0f, 0.5f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.8f, 0.5f, 0.3f, 1.0f });
         //s_renderer_->drawRectangle(glm::vec3{ -1.0f, -1.0f, 0.2f }, glm::vec2{ 1.0f, 1.0f }, glm::vec4{ 0.5f, 0.8f, 0.3f, 1.0f });
@@ -216,7 +216,7 @@ namespace Donut
         {
             // right handed
             // get closer, then, we should decrease the z level of the camera
-            // QML�����������ؼ���zֵΪ100����������zoomlevelС��0.12���Ϳ�ʼ�Ḳ��GUI��������ʱ����Ϊ��С0.15
+            // QML中设置其他控件的z值为100，但是这里zoomlevel小于0.12，就开始会覆盖GUI，所以暂时限制为最小0.15
             if (delta.y() > 0 && zoom_level_ > 0.15f)
             {
                 zoom_level_ -= 0.01f;
