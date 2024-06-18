@@ -43,6 +43,7 @@ namespace Donut
 		AVCodecContext* codec_ctx_ = nullptr;
 		AVDictionary* options_ = nullptr;
 
+		bool is_audio_ = false;
 	private:
 
 	};

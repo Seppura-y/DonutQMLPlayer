@@ -79,6 +79,16 @@ void DonutAVCodecBase::setCodecContext(AVCodecContext* codec_ctx)
 		avcodec_free_context(&codec_ctx_);
 	}
 	codec_ctx_ = codec_ctx;
+
+	if (codec_ctx_->codec_type == AVMEDIA_TYPE_AUDIO)
+	{
+		is_audio_ = true;
+	}
+	else
+	{
+		is_audio_ = false;
+	}
+
 }
 
 //int DonutAVCodecBase::openContext(bool is_decode)

@@ -57,9 +57,10 @@ namespace Donut
     void Donut::DonutAVDecodeHandler::updateHandler(void* data)
     {
         auto pkt = static_cast<AVPacket*>(data);
+        std::lock_guard<std::mutex> lock(mtx_);
         if (packet_queue_)
         {
-            std::lock_guard<std::mutex> lock(mtx_);
+            if(packet_queue_->packetQueueGetStreamIndex(0) == pkt->stream_index)
             {
                 std::shared_ptr<DonutAVPacket> d_pkt = std::make_shared<DonutAVPacket>(pkt, true);
                 packet_queue_->packetQueuePut(d_pkt);
