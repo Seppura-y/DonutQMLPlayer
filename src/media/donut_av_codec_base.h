@@ -27,6 +27,7 @@ namespace Donut
 		virtual int openContext() = 0;
 		virtual int flushCodec() = 0;
 
+		void setStreamIndex(int idx) { this->stream_index_ = idx; }
 
 		int setOption(const char* key, const char* value);
 		int setOption(const char* key, const int value);
@@ -44,6 +45,7 @@ namespace Donut
 		AVDictionary* options_ = nullptr;
 
 		bool is_audio_ = false;
+		int stream_index_ = -1;
 	private:
 
 	};

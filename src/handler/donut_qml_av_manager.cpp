@@ -114,8 +114,9 @@ namespace Donut
 		a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
 		a_clock_ = std::make_shared<DonutAVClock>();
 
-		demux_handler_->addNode(a_decode_handler_);
+		// video decoder 要放在audio decoder上面，否则avcodec_send_packet时会警告 invalid arguement
 		demux_handler_->addNode(v_decode_handler_);
+		demux_handler_->addNode(a_decode_handler_);
 
 		if (video_view_)
 		{
@@ -270,6 +271,7 @@ namespace Donut
 
 			if (demux_handler_->hasVideo())
 			{
+				auto index = demux_handler_->getVideoIndex();
 				v_decode_handler_->setStreamIndex(demux_handler_->getVideoIndex());
 				v_decode_handler_->setStream(demux_handler_->getVideoStream(0));
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
@@ -277,6 +279,7 @@ namespace Donut
 
 			if (demux_handler_->hasAudio())
 			{
+				auto index = demux_handler_->getAudioIndex();
 				a_decode_handler_->setStreamIndex(demux_handler_->getAudioIndex());
 				a_decode_handler_->setStream(demux_handler_->getAudioStream(0));
 				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
@@ -284,7 +287,7 @@ namespace Donut
 
 			demux_handler_->start();
 			v_decode_handler_->start();
-			a_decode_handler_->start();
+			//a_decode_handler_->start();
 			return 0;
 		}
 		else

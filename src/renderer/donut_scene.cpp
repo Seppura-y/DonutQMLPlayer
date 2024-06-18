@@ -180,12 +180,6 @@ namespace Donut
             auto frame = static_cast<AVFrame*>(data);
 
             {
-
-                if (!decoded_frame_)
-                {
-                    decoded_frame_ = av_frame_alloc();
-                }
-
                 av_frame_ref(decoded_frame_, frame);
                 frame_updated_ = false;
                 lock.unlock();

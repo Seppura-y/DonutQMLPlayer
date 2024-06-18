@@ -54,48 +54,63 @@ namespace Donut
 		//av_dict_set(&dict, "preset", "ultrafast", 0);
 		ret = avcodec_open2(codec_ctx_, nullptr, &options_);
 		PRINT_ERR_I(ret);
-		//GET_ERR_STR(ret, str1);
-		//DN_CORE_WARN(str1);
-
-		if (codec_ctx_
-			&& codec_ctx_->codec_type == AVMEDIA_TYPE_VIDEO
-			&& codec_ctx_->codec_id == AV_CODEC_ID_H264
-			&& codec_ctx_->extradata && codec_ctx_->extradata_size > 0)
+		if (ret != 0)
 		{
-			int data_size = codec_ctx_->extradata_size;
-			uint8_t* data = codec_ctx_->extradata;
-			uint8_t* sps = nullptr;
-			uint8_t* pps = nullptr;
+			GET_ERR_STR(ret, str);
+			DN_CORE_WARN(str);
+		}
 
-			for (int i = 0; i < data_size; i++)
+		if (codec_ctx_ && codec_ctx_->codec_type == AVMEDIA_TYPE_VIDEO)
+		{
+			if (codec_ctx_->codec_id == AV_CODEC_ID_H264
+				&& codec_ctx_->extradata
+				&& codec_ctx_->extradata_size > 0)
 			{
-				if (data[i] == 0x00 && data[i + 1] == 0x00 && data[i + 2] == 0x00 && data[i + 3] == 0x01)
-				{
-					if (sps == nullptr)
-					{
-						i += 4;
-						sps = &data[i];
-						continue;
-					}
-					if (sps && pps == nullptr)
-					{
-						i += 4;
-						pps = &data[i];
+				int data_size = codec_ctx_->extradata_size;
+				uint8_t* data = codec_ctx_->extradata;
+				uint8_t* sps = nullptr;
+				uint8_t* pps = nullptr;
 
-						sps_size_ = pps - data - 8;
-						pps_size_ = data_size - sps_size_ - 8;
-						sps_data_.append((const char*)sps, sps_size_);
-						pps_data_.append((const char*)pps, pps_size_);
-						break;
+				for (int i = 0; i < data_size; i++)
+				{
+					if (data[i] == 0x00 && data[i + 1] == 0x00 && data[i + 2] == 0x00 && data[i + 3] == 0x01)
+					{
+						if (sps == nullptr)
+						{
+							i += 4;
+							sps = &data[i];
+							continue;
+						}
+						if (sps && pps == nullptr)
+						{
+							i += 4;
+							pps = &data[i];
+
+							sps_size_ = pps - data - 8;
+							pps_size_ = data_size - sps_size_ - 8;
+							sps_data_.append((const char*)sps, sps_size_);
+							pps_data_.append((const char*)pps, pps_size_);
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		decoded_frame_ = av_frame_alloc();
-		decoded_frame_->width = codec_ctx_->width;
-		decoded_frame_->height = codec_ctx_->height;
-		decoded_frame_->format = codec_ctx_->pix_fmt;
+			decoded_frame_ = av_frame_alloc();
+			decoded_frame_->width = codec_ctx_->width;
+			decoded_frame_->height = codec_ctx_->height;
+			decoded_frame_->format = codec_ctx_->pix_fmt;
+		}
+		else if (codec_ctx_ && codec_ctx_->codec_type == AVMEDIA_TYPE_AUDIO)
+		{
+			decoded_frame_ = av_frame_alloc();
+			decoded_frame_->channels = codec_ctx_->channels;
+			decoded_frame_->format = codec_ctx_->sample_fmt;
+			
+			decoded_frame_->channel_layout = av_get_default_channel_layout(decoded_frame_->channels);
+			decoded_frame_->sample_rate = codec_ctx_->sample_rate;
+			decoded_frame_->nb_samples = codec_ctx_->frame_size;
+		}
 
 		ret = av_frame_get_buffer(decoded_frame_, 0);
 		//PRINT_ERR_I(ret);
@@ -127,8 +142,11 @@ namespace Donut
 			return -1;
 		}
 
+		auto is_null =  pkt->size == 0;
+
 		int ret = avcodec_send_packet(codec_ctx_, pkt);
 		av_packet_unref(pkt);
+
 		if (ret == AVERROR(EAGAIN) || ret == AVERROR(EOF))
 		{
 			//std::cout << "avcodec_send_packet failed : ret == AVERROR(EAGAIN) || ret == AVERROR(EOF)" << std::endl;
@@ -147,7 +165,7 @@ namespace Donut
 		{
 			//PrintError(ret);
 			GET_ERR_STR(ret, str);
-			DN_CORE_WARN(str);
+			DN_CORE_WARN(is_audio_ ? "Audio Decoder " : "Video Decoder " + str + std::string(is_null ? " pkt null" : " pkt not null idx :"));
 			return -1;
 		}
 	}
@@ -184,7 +202,7 @@ namespace Donut
 				//std::cout << "avcodec_receive_frame failed" << std::endl;
 				//PRINT_ERR_I(ret);
 				GET_ERR_STR(ret, str);
-				DN_CORE_WARN(str);
+				DN_CORE_WARN(is_audio_ ? "Audio Decoder " : "Video Decoder " + str);
 			}
 
 			if (codec_ctx_->hw_device_ctx)
@@ -204,7 +222,7 @@ namespace Donut
 				//PRINT_ERR_I(ret);
 
 				GET_ERR_STR(ret, str);
-				DN_CORE_WARN(str);
+				DN_CORE_WARN(is_audio_ ? "Audio Decoder " : "Video Decoder " + str);
 				return ret;
 			}
 		}
@@ -236,7 +254,7 @@ namespace Donut
 		{
 			//PRINT_ERR_I(ret);
 			GET_ERR_STR(ret, str);
-			DN_CORE_WARN(str);
+			DN_CORE_WARN(is_audio_ ? "Audio Decoder " : "Video Decoder " + str);
 			return ret;
 		}
 		codec_ctx_->hw_device_ctx = hw_device_ctx;
