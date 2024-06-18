@@ -1,5 +1,9 @@
 #include "donut_sdl_audio_player.h"
 
+extern"C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 namespace Donut
 {
@@ -9,6 +13,24 @@ namespace Donut
     }
 
     void DonutSDLAudioPlayer::updateHandler(void* data)
+    {
+        if (data)
+        {
+            auto frame = static_cast<AVFrame*>(data);
+
+            {
+                //std::unique_lock<std::mutex> lock(mtx_);
+                //av_frame_ref(decoded_frame_, frame);
+                push(frame);
+                //frame_updated_ = false;
+                //lock.unlock();
+            }
+
+            av_frame_unref(frame);
+        }
+    }
+
+    void DonutSDLAudioPlayer::threadLoop()
     {
 
     }

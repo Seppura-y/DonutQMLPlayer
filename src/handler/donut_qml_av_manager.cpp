@@ -126,6 +126,7 @@ namespace Donut
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			v_decode_handler_->setFrameQueue(v_frame_queue_);
 
+			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
 			a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
@@ -285,11 +286,13 @@ namespace Donut
 				a_decode_handler_->setStreamIndex(demux_handler_->getAudioIndex());
 				a_decode_handler_->setStream(demux_handler_->getAudioStream(0));
 				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
+
+				audio_player_->open(demux_handler_->copyAudioParameters()->para);
 			}
 
 			demux_handler_->start();
 			v_decode_handler_->start();
-			//a_decode_handler_->start();
+			a_decode_handler_->start();
 			return 0;
 		}
 		else

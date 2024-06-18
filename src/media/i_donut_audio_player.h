@@ -4,6 +4,7 @@
 #include "core.h"
 #include "donut_av_datas.h"
 
+#include "i_donut_av_base_handler.h"
 
 #include <vector>
 #include <list>
@@ -29,10 +30,12 @@ struct AVCodecParameters;
 
 namespace Donut {
 
-class DONUT_API IDonutAudioPlayer
+class DONUT_API IDonutAudioPlayer : public IDonutAVBaseHandler
 {
 public:
     static IDonutAudioPlayer* getInstance();
+
+    virtual void updateHandler(void* data) = 0;
 
     virtual void pause(bool is_pause) = 0;
 
@@ -62,7 +65,7 @@ protected:
         ap->callback(stream, len);
     }
 protected:
-    std::mutex mtx_;
+    //std::mutex mtx_;
     DonutAudioSpec spec_;
     std::list<DonutAudioData> audio_datas_;
     float speed_ = 1.;

@@ -2,7 +2,6 @@
 #define DONUT_SDL_AUDIO_PLAYER_H
 
 #include "i_donut_audio_player.h"
-#include "i_donut_av_base_handler.h"
 
 #include <SDL2/SDL.h>
 
@@ -12,12 +11,13 @@ struct AVCodecParameters;
 
 namespace Donut {
 
-class DonutSDLAudioPlayer : public IDonutAudioPlayer, public IDonutAVBaseHandler
+class DonutSDLAudioPlayer : public IDonutAudioPlayer
 {
 public:
     DonutSDLAudioPlayer();
 
     void updateHandler(void* data) override;
+    void threadLoop() override;
 
     void pause(bool is_pause);
 
