@@ -118,6 +118,8 @@ namespace Donut
 		demux_handler_->addNode(v_decode_handler_);
 		demux_handler_->addNode(a_decode_handler_);
 
+		audio_player_ = IDonutAudioPlayer::getInstance();
+
 		if (video_view_)
 		{
 			v_decode_handler_->addNode(video_view_);

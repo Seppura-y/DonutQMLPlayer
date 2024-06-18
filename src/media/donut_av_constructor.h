@@ -4,7 +4,7 @@
 #include "donut_qml_av_manager.h"
 #include "donut_av_demux_handler.h"
 #include "donut_av_decode_handler.h"
-#include "donut_av_audio_player.h"
+#include "i_donut_audio_player.h"
 
 #include "i_donut_video_view.h"
 

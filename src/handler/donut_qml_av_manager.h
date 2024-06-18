@@ -2,6 +2,8 @@
 #define DONUT_QML_AV_MANAGER_H
 
 #include "i_donut_video_view.h"
+#include "i_donut_audio_player.h"
+
 #include "donut_av_demux_handler.h"
 #include "donut_av_decode_handler.h"
 
@@ -127,6 +129,7 @@ namespace Donut
 		DonutPixFormat pix_fmt_ = DonutPixFormat::DONUT_PIX_FORMAT_YUV420P;
 
 		IDonutVideoView* video_view_ = nullptr;
+		IDonutAudioPlayer* audio_player_ = nullptr;
 		DonutAVDemuxHandler* demux_handler_ = nullptr;
 		DonutAVDecodeHandler* a_decode_handler_ = nullptr;
 		DonutAVDecodeHandler* v_decode_handler_ = nullptr;
