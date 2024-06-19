@@ -10,6 +10,8 @@ namespace Donut
     DonutSDLAudioPlayer::DonutSDLAudioPlayer()
     {
         SDL_Init(SDL_INIT_AUDIO);
+
+        sound_touch_ = new soundtouch::SoundTouch();
     }
 
     DonutSDLAudioPlayer::~DonutSDLAudioPlayer()

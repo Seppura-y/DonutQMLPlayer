@@ -4,7 +4,7 @@
 #include "i_donut_audio_player.h"
 
 #include <SDL2/SDL.h>
-
+#include "SoundTouch.h"
 
 struct AVFrame;
 struct AVCodecParameters;
@@ -31,6 +31,9 @@ private:
     long long cur_pts_ = 0; //当前播放位置
     long long last_ms_ = 0;  //上次的时间戳
     long long pause_begin_ = 0;//暂停开始时间戳
+
+    soundtouch::SoundTouch* sound_touch_ = nullptr;
+    soundtouch::SAMPLETYPE* sample_buffer_ = nullptr;
 };
 
 

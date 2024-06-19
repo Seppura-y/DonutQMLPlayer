@@ -10,6 +10,8 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data
     ${CMAKE_CURRENT_LIST_DIR}/src/handler
     ${CMAKE_CURRENT_LIST_DIR}/src/player
+    ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/include
+    ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/SoundTouch
 )
 
 ### QT库设置
@@ -49,6 +51,12 @@ file(GLOB ${PROJECT_NAME}_MEDIA_DATA_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/media
 file(GLOB ${PROJECT_NAME}_STBIMAGE_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.h)
 file(GLOB ${PROJECT_NAME}_STBIMAGE_SOURCES ${CMAKE_CURRENT_LIST_DIR}/include/stb_image/*.cpp)
 
+file(GLOB ${PROJECT_NAME}_SOUNDTOUCH_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/include/*.h)
+file(GLOB ${PROJECT_NAME}_SOUNDTOUCH_SOURCES 
+    ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/SoundTouch/*.h 
+    ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/SoundTouch/*.cpp
+)
+
 file(GLOB ${PROJECT_NAME}_SHADERS ${CMAKE_CURRENT_LIST_DIR}/bin/assets/shaders/*.glsl)
 
 source_group("qrc"                              FILES  ${${PROJECT_NAME}_QRC_FILES} ${${PROJECT_NAME}_QML_DIR})
@@ -58,6 +66,7 @@ source_group("src//log"                         FILES  ${${PROJECT_NAME}_LOG_HEA
 source_group("src//renderer"                    FILES  ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
 source_group("src//player"                      FILES  ${${PROJECT_NAME}_PLAYER_HEADERS} ${${PROJECT_NAME}_PLAYER_SOURCES})
 source_group("src//media"                       FILES  ${${PROJECT_NAME}_MEDIA_HEADERS} ${${PROJECT_NAME}_MEDIA_SOURCES})
+source_group("src//media//soundtouch"           FILES  ${${PROJECT_NAME}_SOUNDTOUCH_HEADERS} ${${PROJECT_NAME}_SOUNDTOUCH_SOURCES})
 source_group("src//media//media_data"           FILES  ${${PROJECT_NAME}_MEDIA_DATA_HEADERS} ${${PROJECT_NAME}_MEDIA_DATA_SOURCES})
 source_group("src//handler"                     FILES  ${${PROJECT_NAME}_HANDLER_HEADERS} ${${PROJECT_NAME}_HANDLER_SOURCES})
 source_group("src//renderer//stb_image"         FILES  ${${PROJECT_NAME}_STBIMAGE_HEADERS} ${${PROJECT_NAME}_STBIMAGE_SOURCES})
@@ -85,6 +94,9 @@ add_executable(${PROJECT_NAME}
 
     ${${PROJECT_NAME}_PLAYER_HEADERS}
     ${${PROJECT_NAME}_PLAYER_SOURCES}
+
+    ${${PROJECT_NAME}_SOUNDTOUCH_HEADERS}
+    ${${PROJECT_NAME}_SOUNDTOUCH_SOURCES}
 
     ${${PROJECT_NAME}_GLM_HEADERS}
     ${${PROJECT_NAME}_STBIMAGE_HEADERS} ${${PROJECT_NAME}_STBIMAGE_SOURCES}
