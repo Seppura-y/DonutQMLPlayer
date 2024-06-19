@@ -10,6 +10,11 @@
 #include <list>
 #include <mutex>
 
+struct AVFrame;
+struct AVCodecParameters;
+
+namespace Donut {
+
 struct DonutAudioSpec
 {
     int sample_rate = 44100;
@@ -24,11 +29,6 @@ struct DonutAudioData
     int offset = 0;
     long long pts = 0;
 };
-
-struct AVFrame;
-struct AVCodecParameters;
-
-namespace Donut {
 
 class DONUT_API IDonutAudioPlayer : public IDonutAVBaseHandler
 {

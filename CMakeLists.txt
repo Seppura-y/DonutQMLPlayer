@@ -9,6 +9,7 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/src/media
     ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data
     ${CMAKE_CURRENT_LIST_DIR}/src/handler
+    ${CMAKE_CURRENT_LIST_DIR}/src/player
 )
 
 ### QT库设置
@@ -37,6 +38,9 @@ file(GLOB ${PROJECT_NAME}_RENDERER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/rendere
 file(GLOB ${PROJECT_NAME}_HANDLER_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/handler/*.h)
 file(GLOB ${PROJECT_NAME}_HANDLER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/handler/*.cpp)
 
+file(GLOB ${PROJECT_NAME}_PLAYER_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/player/*.h)
+file(GLOB ${PROJECT_NAME}_PLAYER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/player/*.cpp)
+
 file(GLOB ${PROJECT_NAME}_MEDIA_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/media/*.h)
 file(GLOB ${PROJECT_NAME}_MEDIA_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/media/*.cpp)
 file(GLOB ${PROJECT_NAME}_MEDIA_DATA_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/media/media_data/*.h)
@@ -52,6 +56,7 @@ source_group("qrc//qml"                         FILES  ${${PROJECT_NAME}_QML_FIL
 source_group("src"                              FILES  ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 source_group("src//log"                         FILES  ${${PROJECT_NAME}_LOG_HEADERS} ${${PROJECT_NAME}_LOG_SOURCES})
 source_group("src//renderer"                    FILES  ${${PROJECT_NAME}_RENDERER_HEADERS} ${${PROJECT_NAME}_RENDERER_SOURCES})
+source_group("src//player"                      FILES  ${${PROJECT_NAME}_PLAYER_HEADERS} ${${PROJECT_NAME}_PLAYER_SOURCES})
 source_group("src//media"                       FILES  ${${PROJECT_NAME}_MEDIA_HEADERS} ${${PROJECT_NAME}_MEDIA_SOURCES})
 source_group("src//media//media_data"           FILES  ${${PROJECT_NAME}_MEDIA_DATA_HEADERS} ${${PROJECT_NAME}_MEDIA_DATA_SOURCES})
 source_group("src//handler"                     FILES  ${${PROJECT_NAME}_HANDLER_HEADERS} ${${PROJECT_NAME}_HANDLER_SOURCES})
@@ -77,6 +82,9 @@ add_executable(${PROJECT_NAME}
     
     ${${PROJECT_NAME}_HANDLER_HEADERS}
     ${${PROJECT_NAME}_HANDLER_SOURCES}
+
+    ${${PROJECT_NAME}_PLAYER_HEADERS}
+    ${${PROJECT_NAME}_PLAYER_SOURCES}
 
     ${${PROJECT_NAME}_GLM_HEADERS}
     ${${PROJECT_NAME}_STBIMAGE_HEADERS} ${${PROJECT_NAME}_STBIMAGE_SOURCES}
