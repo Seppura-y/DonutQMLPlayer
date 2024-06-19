@@ -3,6 +3,7 @@
 
 #include "i_donut_video_view.h"
 #include "i_donut_audio_player.h"
+#include "i_donut_av_base_handler.h"
 
 #include "donut_av_demux_handler.h"
 #include "donut_av_decode_handler.h"
@@ -13,7 +14,7 @@
 
 namespace Donut
 {
-	class DonutQMLAVManager : public QQuickItem, public IDonutThread
+	class DonutQMLAVManager : public QQuickItem, public IDonutAVBaseHandler
 	{
 		Q_OBJECT
 		QML_ELEMENT
@@ -25,8 +26,9 @@ namespace Donut
 		//static QObject* singletonProvider(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
-		virtual void threadLoop() {}
-		virtual void update() {}
+		//virtual void update() {}
+		virtual void threadLoop() override;
+		virtual void updateHandler(void* data) override;
 
 
 		Q_INVOKABLE virtual int resetManager();
@@ -77,6 +79,10 @@ namespace Donut
 		Q_INVOKABLE void setVideoDecoder(DonutAVDecodeHandler* decoder);
 		Q_INVOKABLE void setAudioDecoder(DonutAVDecodeHandler* decoder);
 		Q_INVOKABLE void setVideoView(IDonutVideoView* view);
+
+		Q_INVOKABLE void setPlaybackRate(float value);
+
+		Q_INVOKABLE float getPlaybackRate();
 	public slots:
 		void onVideoViewInitialized(QObject* view);
 
@@ -145,6 +151,8 @@ namespace Donut
 		std::shared_ptr<DonutAVClock> a_clock_;
 
 		std::string current_url_;
+
+		float playback_rate_ = 1.0f;
 	};
 }
 

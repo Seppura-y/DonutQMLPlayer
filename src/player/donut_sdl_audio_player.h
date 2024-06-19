@@ -15,6 +15,7 @@ class DonutSDLAudioPlayer : public IDonutAudioPlayer
 {
 public:
     DonutSDLAudioPlayer();
+    ~DonutSDLAudioPlayer();
 
     void updateHandler(void* data) override;
     void threadLoop() override;

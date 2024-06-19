@@ -12,6 +12,11 @@ namespace Donut
         SDL_Init(SDL_INIT_AUDIO);
     }
 
+    DonutSDLAudioPlayer::~DonutSDLAudioPlayer()
+    {
+        SDL_QuitSubSystem(SDL_INIT_AUDIO);
+    }
+
     void DonutSDLAudioPlayer::updateHandler(void* data)
     {
         if (data)

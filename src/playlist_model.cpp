@@ -60,6 +60,11 @@ void PlaylistModel::addLocalFiles(const QList<QUrl>& file_urls)
 		file_urls_ << url;
 	}
 	endInsertRows();
+
+	if (count == 1)
+	{
+		emit playingSingleDrop(start + count - 1);
+	}
 }
 
 void PlaylistModel::removeItem(int index)

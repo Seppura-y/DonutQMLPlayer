@@ -93,4 +93,13 @@ Item
 			onTriggered: openFileRequested()
 		}
 	}
+
+	Connections
+	{
+		target: PlaylistModel
+		onPlayingSingleDrop:
+		{
+			PlaylistModel.playItem(index);
+		}
+	}
 }

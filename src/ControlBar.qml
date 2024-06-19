@@ -27,8 +27,8 @@ Control
     signal previousButtonClicked()
     signal nextButtonClicked()
     signal stopButtonClicked()
-    signal speedUpButtonClicked()
-    signal speedDownButtonClicked()
+    signal speedUpButtonClicked(var rate)
+    signal speedDownButtonClicked(var rate)
     signal playModeButtonClicked()
     signal volumeButtonClicked(point pos)
     signal settingsButtonClicked()
@@ -264,7 +264,7 @@ Control
 
             FontButton
             {
-                id: speedUpButton
+                id: speedDownButton
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
 
@@ -273,8 +273,13 @@ Control
 
                 onButtonClicked:
                 {
-                    speedUpButtonClicked()
-                    print("speedUpButton onClicked")
+                    playbackSpeed -= 0.25;
+                    if(playbackSpeed < 0.5)
+                    {
+                        playbackSpeed = 0.5;
+                    }
+                    speedDownButtonClicked(playbackSpeed)
+                    print("speedDownButton onClicked")
                 }
             }
 
@@ -289,7 +294,7 @@ Control
 
             FontButton
             {
-                id: speedDownButton
+                id: speedUpButton
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
 
@@ -298,8 +303,13 @@ Control
 
                 onButtonClicked:
                 {
-                    speedDownButtonClicked()
-                    print("speedDownButton onClicked")
+                    playbackSpeed += 0.25;
+                    if(playbackSpeed > 2.0)
+                    {
+                        playbackSpeed = 2.0;
+                    }
+                    speedUpButtonClicked(playbackSpeed)
+                    print("speedUpButton onClicked")
                 }
             }
 

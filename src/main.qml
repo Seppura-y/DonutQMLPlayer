@@ -381,6 +381,16 @@ Window
                 volumePopup.y = pos.y - volumePopup.height - window.y
                 volumePopup.visible = true
             }
+
+            onSpeedUpButtonClicked:(rate)=>
+            {
+                qmlAVManager.setPlaybackRate(rate);
+            }
+
+            onSpeedDownButtonClicked:(rate)=>
+            {
+                qmlAVManager.setPlaybackRate(rate);
+            }
         } // ControlBar
     } // GridLayout
 

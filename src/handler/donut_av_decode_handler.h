@@ -19,6 +19,7 @@ namespace Donut
 		int openDecoder(AVCodecParameters* param);
 		int openDecoder(std::shared_ptr<DonutAVParamWarpper> param);
 		int openDecoder(std::shared_ptr<DonutAVStream> param);
+
 		void updateHandler(void* data) override;
 
 		void setStreamIndex(int index) { this->stream_index_ = index; }

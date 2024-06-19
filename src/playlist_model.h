@@ -34,6 +34,7 @@ public:
 	Q_INVOKABLE void playNextItem();
 signals:
 	void playingIndexChanged();
+	void playingSingleDrop(int index);
 private:
 
 

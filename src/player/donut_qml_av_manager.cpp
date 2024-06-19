@@ -25,6 +25,7 @@ namespace Donut
 
 	DonutQMLAVManager::~DonutQMLAVManager()
 	{
+		this->stop();
 		// 终止各个线程，防止在点击右上角关闭按钮后导致程序崩溃
 		resetManager();
 	}
@@ -45,6 +46,21 @@ namespace Donut
 	//	Q_UNUSED(scriptEngine)
 	//	return DonutQMLAVManager::getInstance();
 	//}
+
+	void DonutQMLAVManager::threadLoop()
+	{
+		while (!is_exit_)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			auto a_serial = a_packet_queue_->getSerial();
+			auto a_pkt_remaining = a_decode_handler_;
+			auto a_remaining = a_frame_queue_->frameQueueNbRemaining();
+		}
+	}
+
+	void DonutQMLAVManager::updateHandler(void* data)
+	{
+	}
 
 	int DonutQMLAVManager::resetManager()
 	{
@@ -95,6 +111,15 @@ namespace Donut
 			{
 				v_frame_queue_->frameQueueDestroy();
 				v_frame_queue_.reset();
+			}
+		}
+
+		{
+			if (audio_player_)
+			{
+				audio_player_->close();
+				audio_player_->stop();
+				audio_player_ = nullptr;
 			}
 		}
 		return 0;
@@ -255,6 +280,17 @@ namespace Donut
 		video_view_ = view;
 	}
 
+	Q_INVOKABLE void DonutQMLAVManager::setPlaybackRate(float value)
+	{
+		playback_rate_ = value;
+		DN_CORE_WARN("playback rate : " + std::to_string(value));
+	}
+
+	Q_INVOKABLE float DonutQMLAVManager::getPlaybackRate()
+	{
+		return playback_rate_;
+	}
+
 	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		if (path.toStdString() != current_url_)
@@ -293,6 +329,7 @@ namespace Donut
 			demux_handler_->start();
 			v_decode_handler_->start();
 			a_decode_handler_->start();
+			this->start();
 			return 0;
 		}
 		else
