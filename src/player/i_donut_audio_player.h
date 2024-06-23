@@ -65,10 +65,10 @@ protected:
         ap->callback(stream, len);
     }
 protected:
-    //std::mutex mtx_;
     DonutAudioSpec spec_;
     std::list<DonutAudioData> audio_datas_;
-    float speed_ = 1.;
+
+    float playback_speed_ = 1.;
     double timebase_ = 0;
     unsigned char volume_ = 128;// 0~128
 };

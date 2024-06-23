@@ -33,7 +33,9 @@ private:
     long long pause_begin_ = 0;//暂停开始时间戳
 
     soundtouch::SoundTouch* sound_touch_ = nullptr;
-    soundtouch::SAMPLETYPE* sample_buffer_ = nullptr;
+    soundtouch::SAMPLETYPE* st_sample_buffer_ = nullptr;
+
+    float pitch_ = 1.0f;
 };
 
 

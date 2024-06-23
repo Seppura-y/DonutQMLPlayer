@@ -10,8 +10,6 @@ namespace Donut
     DonutSDLAudioPlayer::DonutSDLAudioPlayer()
     {
         SDL_Init(SDL_INIT_AUDIO);
-
-        sound_touch_ = new soundtouch::SoundTouch();
     }
 
     DonutSDLAudioPlayer::~DonutSDLAudioPlayer()
@@ -78,6 +76,14 @@ namespace Donut
             std::cerr << SDL_GetError() << std::endl;
             return false;
         }
+
+        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(spec.sample_rate * 2 * 2));
+        sound_touch_ = new soundtouch::SoundTouch();
+        sound_touch_->setSampleRate(spec.sample_rate);
+        sound_touch_->setChannels(2);
+        sound_touch_->setTempo(playback_speed_);
+        sound_touch_->setPitch(pitch_);
+
         //¿ªÊ¼²¥·Å
         SDL_PauseAudio(0);
         return true;
@@ -153,7 +159,7 @@ namespace Donut
             ms = ms / (double)1000 / (double)timebase_;
         }
 
-        return cur_pts_ + speed_ * ms;
+        return cur_pts_ + playback_speed_ * ms;
     }
 
 }

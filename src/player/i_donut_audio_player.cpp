@@ -103,7 +103,7 @@ bool IDonutAudioPlayer::open(AVCodecParameters* para)
 void IDonutAudioPlayer::clear()
 {
     close();
-    setSpeed(speed_);
+    setSpeed(playback_speed_);
 }
 
 void IDonutAudioPlayer::push(const unsigned char* data, int size, long long pts)
@@ -117,7 +117,7 @@ void IDonutAudioPlayer::push(const unsigned char* data, int size, long long pts)
 
 void IDonutAudioPlayer::setSpeed(float s)
 {
-    speed_ = s;
+    playback_speed_ = s;
     auto spec = spec_;
     auto old_sample_rate = spec.sample_rate;
     spec.sample_rate *= s;
