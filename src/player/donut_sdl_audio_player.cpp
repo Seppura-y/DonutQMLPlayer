@@ -23,6 +23,17 @@ namespace Donut
         {
             auto frame = static_cast<AVFrame*>(data);
 
+            //if (!is_resampler_init_)
+            //{
+            //    AudioSpec input_spec;
+            //    input_spec.channels = frame->channels;
+            //    input_spec.format = frame->format;
+            //    input_spec.samples = frame->nb_samples;
+            //    input_spec.sample_rate = frame->sample_rate;
+
+            //    resampler_.initResampler()
+            //}
+
             {
                 //std::unique_lock<std::mutex> lock(mtx_);
                 //av_frame_ref(decoded_frame_, frame);
@@ -57,9 +68,10 @@ namespace Donut
 
     }
 
-    bool DonutSDLAudioPlayer::open(DonutAudioSpec& spec)
+    bool DonutSDLAudioPlayer::open(AudioSpec& spec)
     {
-        this->spec_ = spec;
+        this->input_spec_ = spec;
+
         //退出上一次音频
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
@@ -76,6 +88,12 @@ namespace Donut
             std::cerr << SDL_GetError() << std::endl;
             return false;
         }
+
+        AudioSpec output_spec;
+        output_spec.channels = 2;
+        output_spec.format = AV_SAMPLE_FMT_FLT;
+        // 输出参数暂时按照输入设置
+        resampler_.initResampler(this->input_spec_, this->input_spec_);
 
         st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(spec.sample_rate * 2 * 2));
         sound_touch_ = new soundtouch::SoundTouch();
@@ -107,7 +125,7 @@ namespace Donut
 
         if (audio_datas_.empty())return;
 
-        auto buf = audio_datas_.front();
+        DonutAudioData buf = audio_datas_.front();
         // 1 buf 大于stream缓冲  offset记录位置
         // 2 buf 小于stream 缓冲  拼接
         int mixed_size = 0;     //已经处理的字节数
@@ -160,6 +178,11 @@ namespace Donut
         }
 
         return cur_pts_ + playback_speed_ * ms;
+    }
+
+    int DonutSDLAudioPlayer::getSoundTouchData(void** pcm_buffer)
+    {
+        return 0;
     }
 
 }

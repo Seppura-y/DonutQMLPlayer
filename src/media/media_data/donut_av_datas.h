@@ -110,6 +110,14 @@ namespace Donut
 		Log_Fatal
 	};
 
+	struct AudioSpec
+	{
+		int sample_rate = 44100;
+		unsigned short format = AUDIO_S16SYS;
+		unsigned char channels = 2;
+		unsigned short samples = 1024;
+	};
+
 
 	int64_t GetCurrentTimeMsec();
 	void SleepForMsec(int ms);

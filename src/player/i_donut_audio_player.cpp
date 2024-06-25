@@ -73,13 +73,12 @@ bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
 
 bool IDonutAudioPlayer::open(AVCodecParameters* para)
 {
-    DonutAudioSpec spec;
+    AudioSpec spec;
 
     //spec.channels = para->channels;
     spec.channels = para->ch_layout.nb_channels;
     spec.sample_rate = para->sample_rate;
 
-    AVSampleFormat;
     switch (para->format)
     {
         case AV_SAMPLE_FMT_S16:         ///< signed 16 bits
@@ -118,11 +117,11 @@ void IDonutAudioPlayer::push(const unsigned char* data, int size, long long pts)
 void IDonutAudioPlayer::setSpeed(float s)
 {
     playback_speed_ = s;
-    auto spec = spec_;
+    auto spec = input_spec_;
     auto old_sample_rate = spec.sample_rate;
     spec.sample_rate *= s;
     open(spec);
-    spec_.sample_rate = old_sample_rate;
+    input_spec_.sample_rate = old_sample_rate;
 }
 
 IDonutAudioPlayer* IDonutAudioPlayer::getInstance()

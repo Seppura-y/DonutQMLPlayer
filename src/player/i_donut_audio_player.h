@@ -14,15 +14,6 @@ struct AVFrame;
 struct AVCodecParameters;
 
 namespace Donut {
-
-struct DonutAudioSpec
-{
-    int sample_rate = 44100;
-    unsigned short format = AUDIO_S16SYS;
-    unsigned char channels = 2;
-    unsigned short samples = 1024;
-};
-
 struct DonutAudioData
 {
     std::vector<unsigned char> data;
@@ -43,7 +34,7 @@ public:
     virtual bool open(AVCodecParameters* para);
     virtual bool open(DonutAVParamWarpper& para);
 
-    virtual bool open(DonutAudioSpec& spec) = 0;
+    virtual bool open(AudioSpec& spec) = 0;
     virtual void close() = 0;
     virtual void clear();
 
@@ -65,7 +56,8 @@ protected:
         ap->callback(stream, len);
     }
 protected:
-    DonutAudioSpec spec_;
+    AudioSpec input_spec_;
+    AudioSpec output_spec_;
     std::list<DonutAudioData> audio_datas_;
 
     float playback_speed_ = 1.;
