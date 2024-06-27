@@ -28,6 +28,8 @@ namespace Donut
 		uint8_t* buffer_ = nullptr;
 
 		AVRational timebase_{ 0,0 };
+
+		std::mutex mtx_;
 	};
 }
 #endif

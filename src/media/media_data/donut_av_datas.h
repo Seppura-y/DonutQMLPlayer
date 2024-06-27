@@ -4,6 +4,7 @@
 extern"C"
 {
 #include <libavutil/avutil.h>
+#include <libswresample/swresample.h>
 }
 
 #include <list>
@@ -113,8 +114,10 @@ namespace Donut
 	struct AudioSpec
 	{
 		int sample_rate = 44100;
-		unsigned short format = AUDIO_S16SYS;
+		int av_fmt = AV_SAMPLE_FMT_S16;
+		unsigned short sdl_fmt = AUDIO_S16SYS;
 		unsigned char channels = 2;
+		unsigned char sample_size = 2;
 		unsigned short samples = 1024;
 	};
 

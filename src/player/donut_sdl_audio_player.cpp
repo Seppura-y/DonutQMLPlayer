@@ -19,25 +19,77 @@ namespace Donut
 
     void DonutSDLAudioPlayer::updateHandler(void* data)
     {
+        int num = 0;
+        
         if (data)
         {
             auto frame = static_cast<AVFrame*>(data);
 
-            //if (!is_resampler_init_)
-            //{
-            //    AudioSpec input_spec;
-            //    input_spec.channels = frame->channels;
-            //    input_spec.format = frame->format;
-            //    input_spec.samples = frame->nb_samples;
-            //    input_spec.sample_rate = frame->sample_rate;
+            if (!is_resampler_init_)
+            {
+                AudioSpec input_spec;
+                input_spec.channels = frame->channels;
+                input_spec.av_fmt = frame->format;
+                //input_spec.samples = frame->nb_samples;
+                input_spec.sample_rate = frame->sample_rate;
 
-            //    resampler_.initResampler()
-            //}
+                AudioSpec output_spec;
+                output_spec.channels = 2;
+                output_spec.av_fmt = AV_SAMPLE_FMT_S16;
+                //output_spec.samples = frame->nb_samples;
+                output_spec.sample_rate = frame->sample_rate;
+
+                std::lock_guard<std::mutex> lock(mtx_);
+                resampler_.initResampler(input_spec, output_spec);
+            }
+
+
+            //int nb_resampled = 0;
+
+            if (is_finished_)
+            {
+                is_finished_ = false;
+
+                nb_resampled_ = resampler_.resampleAudio(frame, (void**)&resampled_buffer_);
+                int s = sizeof(resampled_buffer_);
+                cur_pts_ = frame->pts * av_q2d(tb_);
+                if (cur_pts_ < clock_)
+                {
+                    cur_pts_ = clock_;
+                }
+                clock_ = cur_pts_;
+
+                if (nb_resampled_ > 0)
+                {
+                    for (int i = 0; i < nb_resampled_ / 2; i++)
+                    {
+                        st_sample_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
+                    }
+
+                    sound_touch_->putSamples(st_sample_buffer_, nb_resampled_);
+
+                    num = sound_touch_->receiveSamples(st_sample_buffer_, nb_resampled_ / 4);
+                }
+                else
+                {
+                    sound_touch_->flush();
+                }
+            }
+
+            if (num == 0)
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                is_finished_ = true;
+            }
+
+            {
+                push((uint8_t*)st_sample_buffer_, num * 4, 1);
+            }
 
             {
                 //std::unique_lock<std::mutex> lock(mtx_);
                 //av_frame_ref(decoded_frame_, frame);
-                push(frame);
+                //push(frame);
                 //frame_updated_ = false;
                 //lock.unlock();
             }
@@ -70,6 +122,7 @@ namespace Donut
 
     bool DonutSDLAudioPlayer::open(AudioSpec& spec)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         this->input_spec_ = spec;
 
         //退出上一次音频
@@ -77,7 +130,7 @@ namespace Donut
 
         SDL_AudioSpec sdl_spec;
         sdl_spec.freq = spec.sample_rate;
-        sdl_spec.format = spec.format;
+        sdl_spec.format = spec.sdl_fmt;
         sdl_spec.channels = spec.channels;
         sdl_spec.samples = spec.samples;
         sdl_spec.silence = 0;
@@ -91,14 +144,25 @@ namespace Donut
 
         AudioSpec output_spec;
         output_spec.channels = 2;
-        output_spec.format = AV_SAMPLE_FMT_FLT;
+        output_spec.av_fmt = AV_SAMPLE_FMT_S16;
+        output_spec.sample_rate = spec.sample_rate;
+        output_spec.sample_size = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
         // 输出参数暂时按照输入设置
-        resampler_.initResampler(this->input_spec_, this->input_spec_);
+        int ret = resampler_.initResampler(this->input_spec_, output_spec);
+        if (ret != 0)
+        {
+            is_resampler_init_ = false;
+            return false;
+        }
 
-        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(spec.sample_rate * 2 * 2));
+        is_resampler_init_ = true;
+
+        resampled_buffer_ = (uint8_t*)av_malloc(output_spec.sample_rate * output_spec.channels * output_spec.sample_size);    // sample rate * channels * sizeof(short)
+        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(output_spec.sample_rate * output_spec.channels * 2));
+
         sound_touch_ = new soundtouch::SoundTouch();
-        sound_touch_->setSampleRate(spec.sample_rate);
-        sound_touch_->setChannels(2);
+        sound_touch_->setSampleRate(output_spec.sample_rate);
+        sound_touch_->setChannels(output_spec.channels);
         sound_touch_->setTempo(playback_speed_);
         sound_touch_->setPitch(pitch_);
 
@@ -119,6 +183,10 @@ namespace Donut
 
     void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
     {
+        if (!stream)
+        {
+            int a = len;
+        }
         SDL_memset(stream, 0, len);
 
         std::unique_lock<std::mutex> lock(mtx_);
@@ -182,6 +250,10 @@ namespace Donut
 
     int DonutSDLAudioPlayer::getSoundTouchData(void** pcm_buffer)
     {
+        while (!is_exit_)
+        {
+
+        }
         return 0;
     }
 

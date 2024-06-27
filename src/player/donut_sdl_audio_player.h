@@ -37,12 +37,12 @@ private:
     long long pause_begin_ = 0;//暂停开始时间戳
 
     soundtouch::SoundTouch* sound_touch_ = nullptr;
-    // 经soundtouch处理后的音频数据
+    // 经soundtouch处理后的音频数据 sample rate * channels * sizeof(short)
     soundtouch::SAMPLETYPE* st_sample_buffer_ = nullptr;
+    // ffmpeg接口重采样后的音频数据 sample rate * channels * sizeof(short)
+    uint8_t* resampled_buffer_ = nullptr;
 
     int nb_resampled_ = 0;
-    // ffmpeg接口重采样后的音频数据
-    uint8_t* resampled_buffer_ = nullptr;
 
     float pitch_ = 1.0f;
 

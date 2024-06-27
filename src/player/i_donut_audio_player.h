@@ -63,6 +63,13 @@ protected:
     float playback_speed_ = 1.;
     double timebase_ = 0;
     unsigned char volume_ = 128;// 0~128
+
+    AVRational tb_{ 0 };
+    double cur_pts_ = 0;
+    double clock_ = 0;
+    double last_pts_ = 0;
+
+    bool is_finished_ = false;
 };
 
 

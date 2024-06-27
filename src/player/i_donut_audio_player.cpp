@@ -74,24 +74,26 @@ bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
 bool IDonutAudioPlayer::open(AVCodecParameters* para)
 {
     AudioSpec spec;
-
+    
     //spec.channels = para->channels;
     spec.channels = para->ch_layout.nb_channels;
+    spec.av_fmt = para->format;
     spec.sample_rate = para->sample_rate;
+    spec.sample_size = av_get_bytes_per_sample((AVSampleFormat)para->format);
 
     switch (para->format)
     {
         case AV_SAMPLE_FMT_S16:         ///< signed 16 bits
         case AV_SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
-            spec.format = AUDIO_S16;
+            spec.sdl_fmt = AUDIO_S16;
             break;
         case AV_SAMPLE_FMT_S32:         ///< signed 32 bits
         case AV_SAMPLE_FMT_S32P:        ///< signed 32 bits, planar
-            spec.format = AUDIO_S32;
+            spec.sdl_fmt = AUDIO_S32;
             break;
         case AV_SAMPLE_FMT_FLT:         ///< float
         case AV_SAMPLE_FMT_FLTP:        ///< float, planar
-            spec.format = AUDIO_F32;
+            spec.sdl_fmt = AUDIO_F32;
             break;
         default:
             break;
