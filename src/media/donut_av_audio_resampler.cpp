@@ -51,7 +51,16 @@ namespace Donut
             return ret;
         }
 
-        buffer_ = (uint8_t*)av_malloc(in.sample_rate * in.channels * in.sample_size);
+
+
+        int output_sample_count = av_rescale_rnd(swr_get_delay(swr_ctx_, in.sample_rate) + in.samples, out.sample_rate, in.sample_rate, AV_ROUND_UP);
+        int buffer_size = av_samples_alloc(&buffer_, nullptr, 2, output_sample_count, AV_SAMPLE_FMT_S16, 0);
+        if (buffer_size < 0)
+        {
+            return -1;
+        }
+
+        //buffer_ = (uint8_t*)av_malloc(in.sample_rate * in.channels * in.sample_size);
 
         return 0;
     }
@@ -70,16 +79,32 @@ namespace Donut
             input_frame->nb_samples
         );
 
-        *pcm = buffer_;
+        if (nb_resampled < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            int out_size = av_samples_get_buffer_size(nullptr, 2, nb_resampled, AV_SAMPLE_FMT_S16, 1);
+            //for (int i = 0; i < out_size; i++)
+            //{
+            //    printf("%02x ", buffer_[i]);
+            //    if ((i + 1) % 16 == 0) printf("\n");
+            //}
 
-        //int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
-        //int swr_data_size = nb_resampled * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
-        int out_channels = input_spec_.channels;
-        int swr_data_size = nb_resampled * out_channels * av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
+            *pcm = buffer_;
 
-        //double now_time = input_frame->pts * av_q2d(timebase_);
-        //if(now_time < )
-        return nb_resampled;
+            //int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+            //int swr_data_size = nb_resampled * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+            int out_channels = input_spec_.channels;
+            int swr_data_size = nb_resampled * out_channels * av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
+
+            //double now_time = input_frame->pts * av_q2d(timebase_);
+            //if(now_time < )
+            return out_size;
+        }
+
+        return -1;
     }
 
 }

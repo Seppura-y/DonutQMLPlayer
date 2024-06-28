@@ -61,19 +61,19 @@ namespace Donut
 
                 if (nb_resampled_ > 0)
                 {
-                    for (int i = 0; i < nb_resampled_ / 2; i++)
+                    for (int i = 0; i < nb_resampled_ / 2 + 1; i++)
                     {
                         st_sample_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
                     }
 
                     sound_touch_->putSamples(st_sample_buffer_, nb_resampled_);
 
-                    num = sound_touch_->receiveSamples(st_sample_buffer_, nb_resampled_ / 4);
+                    num = sound_touch_->receiveSamples(st_resample_buffer_, nb_resampled_);
                 }
-                else
-                {
-                    sound_touch_->flush();
-                }
+                //else
+                //{
+                //    sound_touch_->flush();
+                //}
             }
 
             if (num == 0)
@@ -81,9 +81,9 @@ namespace Donut
                 std::lock_guard<std::mutex> lock(mtx_);
                 is_finished_ = true;
             }
-
+            else
             {
-                push((uint8_t*)st_sample_buffer_, num * 4, 1);
+                push((uint8_t*)st_resample_buffer_, num, 1);
             }
 
             {
@@ -123,7 +123,7 @@ namespace Donut
     bool DonutSDLAudioPlayer::open(AudioSpec& spec)
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        this->input_spec_ = spec;
+        //this->input_spec_ = spec;
 
         //退出上一次音频
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
@@ -148,7 +148,7 @@ namespace Donut
         output_spec.sample_rate = spec.sample_rate;
         output_spec.sample_size = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
         // 输出参数暂时按照输入设置
-        int ret = resampler_.initResampler(this->input_spec_, output_spec);
+        int ret = resampler_.initResampler(this->input_spec_, this->output_spec_);
         if (ret != 0)
         {
             is_resampler_init_ = false;
@@ -157,14 +157,15 @@ namespace Donut
 
         is_resampler_init_ = true;
 
-        resampled_buffer_ = (uint8_t*)av_malloc(output_spec.sample_rate * output_spec.channels * output_spec.sample_size);    // sample rate * channels * sizeof(short)
-        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(output_spec.sample_rate * output_spec.channels * 2));
+        resampled_buffer_ = (uint8_t*)av_malloc(output_spec_.sample_rate * output_spec_.channels * output_spec_.sample_size);    // sample rate * channels * sizeof(short)
+        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(output_spec_.sample_rate * output_spec_.channels * 2));
+        st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(output_spec_.sample_rate * output_spec_.channels * 2));
 
         sound_touch_ = new soundtouch::SoundTouch();
-        sound_touch_->setSampleRate(output_spec.sample_rate);
-        sound_touch_->setChannels(output_spec.channels);
+        sound_touch_->setSampleRate(output_spec_.sample_rate);
+        sound_touch_->setChannels(output_spec_.channels);
         sound_touch_->setTempo(playback_speed_);
-        sound_touch_->setPitch(pitch_);
+        //sound_touch_->setPitch(pitch_);
 
         //开始播放
         SDL_PauseAudio(0);
@@ -204,7 +205,11 @@ namespace Donut
 
         while (mixed_size < len)
         {
-            if (audio_datas_.empty())break;
+            if (audio_datas_.empty())
+            {
+                int a = 133;
+                break;
+            }
 
             buf = audio_datas_.front();
 
