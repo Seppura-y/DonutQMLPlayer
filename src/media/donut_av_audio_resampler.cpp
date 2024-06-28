@@ -22,16 +22,19 @@ namespace Donut
 
     int DonutAVAudioResampler::initResampler(AudioSpec in, AudioSpec out)
     {
+        input_spec_ = in;
+        output_spec_ = out;
+
         int ret = 0;
         int ch_layout = av_get_default_channel_layout(out.channels);
         swr_ctx_ = swr_alloc_set_opts(
             nullptr,                                        // SwrContext
             ch_layout,                                      // out_ch_layout        AV_CH_LAYOUT_STEREO
-            (AVSampleFormat)out.av_fmt,                     // out_sample_fmt
-            out.sample_rate,                                // out_sample_rate
-            av_get_default_channel_layout(out.channels),    // in_ch_layout
-            (AVSampleFormat)in.av_fmt,                      // in_sample_fmt
-            in.sample_rate,                                 // in_sample_rate
+            (AVSampleFormat)output_spec_.av_fmt,                     // out_sample_fmt
+            output_spec_.sample_rate,                                // out_sample_rate
+            av_get_default_channel_layout(output_spec_.channels),    // in_ch_layout
+            (AVSampleFormat)input_spec_.av_fmt,                      // in_sample_fmt
+            input_spec_.sample_rate,                                 // in_sample_rate
             0,
             nullptr
         );
@@ -53,8 +56,23 @@ namespace Donut
 
 
 
-        int output_sample_count = av_rescale_rnd(swr_get_delay(swr_ctx_, in.sample_rate) + in.samples, out.sample_rate, in.sample_rate, AV_ROUND_UP);
-        int buffer_size = av_samples_alloc(&buffer_, nullptr, 2, output_sample_count, AV_SAMPLE_FMT_S16, 0);
+        int output_sample_count = av_rescale_rnd(
+            swr_get_delay(swr_ctx_, input_spec_.sample_rate) + input_spec_.samples,
+            out.sample_rate,
+            input_spec_.sample_rate,
+            AV_ROUND_UP
+        );
+
+        int buffer_size = av_samples_alloc(
+            &buffer_,
+            nullptr,
+            2,
+            output_sample_count,
+            (AVSampleFormat)output_spec_.av_fmt,
+            0
+        );
+
+
         if (buffer_size < 0)
         {
             return -1;
@@ -79,13 +97,13 @@ namespace Donut
             input_frame->nb_samples
         );
 
-        if (nb_resampled < 0)
+        if (nb_resampled <= 0)
         {
             return -1;
         }
         else
         {
-            int out_size = av_samples_get_buffer_size(nullptr, 2, nb_resampled, AV_SAMPLE_FMT_S16, 1);
+            int out_size = av_samples_get_buffer_size(nullptr, 2, nb_resampled, (AVSampleFormat)output_spec_.av_fmt, 1);
             //for (int i = 0; i < out_size; i++)
             //{
             //    printf("%02x ", buffer_[i]);
