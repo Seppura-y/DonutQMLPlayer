@@ -363,15 +363,14 @@ namespace Donut
 
         DonutAudioData buf = resampled_datas_.front();
 
-        // 1 buf 大于stream缓冲  offset记录位置
-        // 2 buf 小于stream 缓冲  拼接
-        int mixed_size = 0;     //已经处理的字节数
-        int need_size = len;    //需要处理的字节数
+
+        int mixed_size = 0;
+        int need_size = len;
 
         int buffer_offset = 0;
 
-        cur_pts_ = buf.pts;     //当前播放的pts
-        last_ms_ = GetCurrentTimeMsec();     //计时开始播放
+        //cur_pts_ = buf.pts;     //当前播放的pts
+        //last_ms_ = GetCurrentTimeMsec();     //计时开始播放
 
         while (mixed_size < len)
         {
@@ -392,11 +391,9 @@ namespace Donut
 
             sound_touch_->putSamples(st_sample_buffer_, nb_resampled_);
 
-            std::this_thread::sleep_for(std::chrono::microseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(40));
 
-            int num = sound_touch_->receiveSamples(st_resample_buffer_, nb_resampled_);
-            int unp = sound_touch_->numUnprocessedSamples();
-            int pnum = num - unp;
+            int num = sound_touch_->receiveSamples(st_resample_buffer_, nb_resampled_ / 4);
             if (num == 0)
             {
                 continue;
@@ -404,7 +401,6 @@ namespace Donut
             else
             {
                 int size = need_size;
-                //pushAudio((uint8_t*)st_resample_buffer_, num, 1);
                 if (num > need_size)
                 {
                     size = need_size;
@@ -412,14 +408,14 @@ namespace Donut
 
                 SDL_MixAudio(
                     stream + mixed_size,
-                    (uint8_t*)st_resample_buffer_ + buffer_offset,
+                    (uint8_t*)resampled_buffer_ + buffer_offset,
                     size,
                     volume_
                 );
 
-                need_size -= size;
-                mixed_size += size;
-                buffer_offset += size;
+                need_size -= raw_data_size;
+                mixed_size += raw_data_size;
+                buffer_offset += raw_data_size;
             }
 
 
