@@ -40,7 +40,8 @@ public:
 
     virtual long long getCurrentPts() = 0;
 
-    void push(const unsigned char* data, int size, long long pts);
+    void pushResampled(const unsigned char* data, int size, long long pts);
+    void pushAudio(const unsigned char* data, int size, long long pts);
 
     virtual void setSpeed(float s);
 
@@ -59,6 +60,8 @@ protected:
     AudioSpec input_spec_;
     AudioSpec output_spec_;
     std::list<DonutAudioData> audio_datas_;
+    std::list<DonutAudioData> resampled_datas_;
+    std::list<DonutAudioData> processsed_datas_;
 
     float playback_speed_ = 1.;
     double timebase_ = 0;

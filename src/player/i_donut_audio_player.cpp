@@ -30,7 +30,7 @@ void IDonutAudioPlayer::push(AVFrame* frame)
     unsigned char* data = nullptr;
     if (channels == 1)
     {
-        push(frame->data[0], frame->nb_samples * sample_size, frame->pts);
+        pushResampled(frame->data[0], frame->nb_samples * sample_size, frame->pts);
         return;
     }
 
@@ -52,13 +52,13 @@ void IDonutAudioPlayer::push(AVFrame* frame)
                 memcpy(data + i * sample_size * channels + sample_size,
                     R + i * sample_size, sample_size);
             }
-            push(data, frame->linesize[0], frame->pts);
+            pushResampled(data, frame->linesize[0], frame->pts);
             return;
         }
         default:
             break;
     }
-    push(frame->data[0], frame->linesize[0], frame->pts);
+    pushResampled(frame->data[0], frame->linesize[0], frame->pts);
 }
 
 bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
@@ -113,7 +113,16 @@ void IDonutAudioPlayer::clear()
     setSpeed(playback_speed_);
 }
 
-void IDonutAudioPlayer::push(const unsigned char* data, int size, long long pts)
+void IDonutAudioPlayer::pushResampled(const unsigned char* data, int size, long long pts)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+
+    resampled_datas_.push_back(DonutAudioData());
+    resampled_datas_.back().pts = pts;
+    resampled_datas_.back().data.assign(data, data + size);
+}
+
+void IDonutAudioPlayer::pushAudio(const unsigned char* data, int size, long long pts)
 {
     std::unique_lock<std::mutex> lock(mtx_);
 
