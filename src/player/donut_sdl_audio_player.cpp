@@ -21,6 +21,7 @@ namespace Donut
     void DonutSDLAudioPlayer::updateHandler(void* data)
     {
         int num = 0;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         if (data)
         {
@@ -391,7 +392,7 @@ namespace Donut
 
             sound_touch_->putSamples(st_sample_buffer_, nb_resampled_);
 
-            std::this_thread::sleep_for(std::chrono::microseconds(40));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             int num = sound_touch_->receiveSamples(st_resample_buffer_, nb_resampled_ / 4);
             if (num == 0)

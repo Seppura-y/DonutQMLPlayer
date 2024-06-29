@@ -123,7 +123,7 @@ namespace Donut
                     //av_frame_free(&decoded_frame);
                 }
             }
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            //std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
     }
 }
