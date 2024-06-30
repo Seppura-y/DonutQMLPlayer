@@ -126,6 +126,7 @@ namespace Donut
 
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekNext()
 	{
+		auto a = frame_queue_[(rindex_ + rindex_shown_ + 1) % max_size_];
 		return frame_queue_[(rindex_ + rindex_shown_ + 1) % max_size_];
 	}
 
@@ -176,6 +177,7 @@ namespace Donut
 		}
 		std::unique_lock<std::mutex> lock(mtx_);
 		size_++;
+		this->frame_queue_.push_back(frame);
 		cond_.notify_one();
 	}
 

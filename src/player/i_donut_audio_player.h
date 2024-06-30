@@ -18,7 +18,8 @@ struct DonutAudioData
 {
     std::vector<unsigned char> data;
     int offset = 0;
-    long long pts = 0;
+    double pts = 0;
+    double duration = 0;
 };
 
 class DONUT_API IDonutAudioPlayer : public IDonutAVBaseHandler
@@ -40,6 +41,7 @@ public:
 
     virtual long long getCurrentPts() = 0;
 
+    void pushResampled(const unsigned char* data, int size, double pts, double duration);
     void pushResampled(const unsigned char* data, int size, long long pts);
     void pushAudio(const unsigned char* data, int size, long long pts);
 

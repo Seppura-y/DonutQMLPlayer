@@ -53,13 +53,55 @@ namespace Donut
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			auto a_serial = a_packet_queue_->getSerial();
-			auto a_pkt_remaining = a_decode_handler_;
-			auto a_remaining = a_frame_queue_->frameQueueNbRemaining();
+
+			int a_remaining = a_frame_queue_->frameQueueNbRemaining();
+			if (a_remaining)
+			{
+				auto f = a_frame_queue_->frameQueuePeekNext().get()->getFrame();
+				notify((void*)(a_frame_queue_->frameQueuePeek().get()->getFrame()));
+				//a_frame_queue_->frameQueueNext();
+			}
+
 		}
 	}
 
 	void DonutQMLAVManager::updateHandler(void* data)
 	{
+		int num = 0;
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		
+		if (data)
+		{
+			auto frame = static_cast<AVFrame*>(data);
+			
+			if (frame->width > 0 && frame->height > 0)
+			{
+				// this is a video frame
+			}
+			else if (frame->channels > 0 && frame->sample_rate > 0)
+			{
+				// this is an audio frame
+				auto dn_frame = std::make_shared<DonutAVFrame>(frame);
+				a_frame_queue_->frameQueuePush(dn_frame);
+			}
+
+			//int resampled = resampler_.resampleAudio(frame, (void**)&resampled_buffer_);
+
+
+			////double clock = nb_resampled_ / output_spec_.sample_rate* output_spec_.channels* av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
+			//double clock = frame->pts + (double)frame->nb_samples / frame->sample_rate;
+			//double duration = frame->duration;
+
+			//nb_storage_ += resampled * output_spec_.channels * av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
+
+			////std::this_thread::sleep_for(std::chrono::milliseconds((int)duration));
+			//if (resampled > 0)
+			//{
+			//	pushResampled(resampled_buffer_, resampled, duration);
+			//}
+
+			//av_frame_unref(frame);
+		}
 	}
 
 	int DonutQMLAVManager::resetManager()
@@ -151,7 +193,7 @@ namespace Donut
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			v_decode_handler_->setFrameQueue(v_frame_queue_);
 
-			a_decode_handler_->addNode(audio_player_);
+			a_decode_handler_->addNode(this);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
 			a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
@@ -310,21 +352,23 @@ namespace Donut
 
 			if (demux_handler_->hasVideo())
 			{
-				auto index = demux_handler_->getVideoIndex();
-				v_decode_handler_->setStreamIndex(demux_handler_->getVideoIndex());
+				video_index_ = demux_handler_->getVideoIndex();
+				v_decode_handler_->setStreamIndex(video_index_);
 				v_decode_handler_->setStream(demux_handler_->getVideoStream(0));
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
 			}
 
 			if (demux_handler_->hasAudio())
 			{
-				auto index = demux_handler_->getAudioIndex();
-				a_decode_handler_->setStreamIndex(demux_handler_->getAudioIndex());
+				audio_index_ = demux_handler_->getAudioIndex();
+				a_decode_handler_->setStreamIndex(audio_index_);
 				a_decode_handler_->setStream(demux_handler_->getAudioStream(0));
 				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
 
 				audio_player_->open(demux_handler_->copyAudioParameters()->para);
 			}
+
+			this->addNode(audio_player_);
 
 			demux_handler_->start();
 			v_decode_handler_->start();

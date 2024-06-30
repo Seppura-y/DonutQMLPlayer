@@ -113,6 +113,16 @@ void IDonutAudioPlayer::clear()
     setSpeed(playback_speed_);
 }
 
+void IDonutAudioPlayer::pushResampled(const unsigned char* data, int size, double pts, double duration)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+
+    resampled_datas_.push_back(DonutAudioData());
+    resampled_datas_.back().pts = pts;
+    resampled_datas_.back().duration = duration;
+    resampled_datas_.back().data.assign(data, data + size);
+}
+
 void IDonutAudioPlayer::pushResampled(const unsigned char* data, int size, long long pts)
 {
     std::unique_lock<std::mutex> lock(mtx_);

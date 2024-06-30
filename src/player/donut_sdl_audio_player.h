@@ -59,7 +59,8 @@ private:
 
     bool is_resampler_init_ = false;
 
-
+    int nb_per_second_ = 0;
+    int nb_storage_ = 0;
 };
 
 

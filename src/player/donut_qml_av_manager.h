@@ -153,6 +153,9 @@ namespace Donut
 		std::string current_url_;
 
 		float playback_rate_ = 1.0f;
+
+		int video_index_ = -1;
+		int audio_index_ = -1;
 	};
 }
 
