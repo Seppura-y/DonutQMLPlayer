@@ -134,20 +134,21 @@ namespace Donut
 
 		DonutPixFormat pix_fmt_ = DonutPixFormat::DONUT_PIX_FORMAT_YUV420P;
 
+		DonutAVDemuxHandler* demux_handler_ = nullptr;
 		IDonutVideoView* video_view_ = nullptr;
 		IDonutAudioPlayer* audio_player_ = nullptr;
-		DonutAVDemuxHandler* demux_handler_ = nullptr;
+
 		DonutAVDecodeHandler* a_decode_handler_ = nullptr;
 		DonutAVDecodeHandler* v_decode_handler_ = nullptr;
 
 		static DonutQMLAVManager* s_instance_;
 
 		std::shared_ptr<DonutAVPacketQueue> v_packet_queue_;
-		std::shared_ptr<DonutAVFrameQueue>	v_frame_queue_;
+		//std::shared_ptr<DonutAVFrameQueue>	v_frame_queue_;
 		std::shared_ptr<DonutAVClock> v_clock_;
 
 		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
-		std::shared_ptr<DonutAVFrameQueue>	a_frame_queue_;
+		//std::shared_ptr<DonutAVFrameQueue>	a_frame_queue_;
 		std::shared_ptr<DonutAVClock> a_clock_;
 
 		std::string current_url_;

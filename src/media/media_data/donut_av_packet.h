@@ -19,7 +19,7 @@ public:
 	DonutAVPacket();
 	~DonutAVPacket();
 
-	DonutAVPacket(AVPacket* packet, bool force_copy);
+	DonutAVPacket(AVPacket* packet, bool force_copy = true);
 	DonutAVPacket(const DonutAVPacket& other);
 	DonutAVPacket(DonutAVPacket&& other);
 	

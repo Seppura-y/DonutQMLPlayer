@@ -3,6 +3,12 @@
 #include <QTime>
 #include "log.h"
 
+extern"C"
+{
+#include <libavformat/avformat.h>
+//#include <>
+}
+
 namespace Donut
 {
 	DonutQMLAVManager* DonutQMLAVManager::s_instance_ = nullptr;
@@ -54,13 +60,13 @@ namespace Donut
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			auto a_serial = a_packet_queue_->getSerial();
 
-			int a_remaining = a_frame_queue_->frameQueueNbRemaining();
-			if (a_remaining)
-			{
-				auto f = a_frame_queue_->frameQueuePeekNext().get()->getFrame();
-				notify((void*)(a_frame_queue_->frameQueuePeek().get()->getFrame()));
-				//a_frame_queue_->frameQueueNext();
-			}
+			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
+			//if (a_remaining)
+			//{
+			//	auto f = a_frame_queue_->frameQueuePeek().get()->getFrame();
+			//	notify((void*)(a_frame_queue_->frameQueuePeek().get()->getFrame()));
+			//	a_frame_queue_->frameQueueNext();
+			//}
 
 		}
 	}
@@ -72,35 +78,18 @@ namespace Donut
 		
 		if (data)
 		{
-			auto frame = static_cast<AVFrame*>(data);
-			
-			if (frame->width > 0 && frame->height > 0)
+			AVPacket* pkt = static_cast<AVPacket*>(data);
+
+			if (pkt->stream_index == video_index_)
 			{
-				// this is a video frame
+				auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
+				v_packet_queue_->packetQueuePut(dn_pkt);
 			}
-			else if (frame->channels > 0 && frame->sample_rate > 0)
+			else if (pkt->stream_index == audio_index_)
 			{
-				// this is an audio frame
-				auto dn_frame = std::make_shared<DonutAVFrame>(frame);
-				a_frame_queue_->frameQueuePush(dn_frame);
+				auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
+				a_packet_queue_->packetQueuePut(dn_pkt);
 			}
-
-			//int resampled = resampler_.resampleAudio(frame, (void**)&resampled_buffer_);
-
-
-			////double clock = nb_resampled_ / output_spec_.sample_rate* output_spec_.channels* av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
-			//double clock = frame->pts + (double)frame->nb_samples / frame->sample_rate;
-			//double duration = frame->duration;
-
-			//nb_storage_ += resampled * output_spec_.channels * av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
-
-			////std::this_thread::sleep_for(std::chrono::milliseconds((int)duration));
-			//if (resampled > 0)
-			//{
-			//	pushResampled(resampled_buffer_, resampled, duration);
-			//}
-
-			//av_frame_unref(frame);
 		}
 	}
 
@@ -128,11 +117,11 @@ namespace Donut
 				a_packet_queue_.reset();
 			}
 
-			if (a_frame_queue_)
-			{
-				a_frame_queue_->frameQueueDestroy();
-				a_frame_queue_.reset();
-			}
+			//if (a_frame_queue_)
+			//{
+			//	a_frame_queue_->frameQueueDestroy();
+			//	a_frame_queue_.reset();
+			//}
 		}
 
 		{
@@ -149,11 +138,11 @@ namespace Donut
 				v_packet_queue_.reset();
 			}
 
-			if (v_frame_queue_)
-			{
-				v_frame_queue_->frameQueueDestroy();
-				v_frame_queue_.reset();
-			}
+			//if (v_frame_queue_)
+			//{
+			//	v_frame_queue_->frameQueueDestroy();
+			//	v_frame_queue_.reset();
+			//}
 		}
 
 		{
@@ -174,16 +163,18 @@ namespace Donut
 		v_decode_handler_ = new DonutAVDecodeHandler();
 
 		v_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
+		//v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
 		v_clock_ = std::make_shared<DonutAVClock>();
 
 		a_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
+		//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
 		a_clock_ = std::make_shared<DonutAVClock>();
 
 		// video decoder 要放在audio decoder上面，否则avcodec_send_packet时会警告 invalid arguement
-		demux_handler_->addNode(v_decode_handler_);
-		demux_handler_->addNode(a_decode_handler_);
+		//demux_handler_->addNode(v_decode_handler_);
+		//demux_handler_->addNode(a_decode_handler_);
+
+		demux_handler_->addNode(this);
 
 		audio_player_ = IDonutAudioPlayer::getInstance();
 
@@ -191,16 +182,17 @@ namespace Donut
 		{
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
-			v_decode_handler_->setFrameQueue(v_frame_queue_);
+			//v_decode_handler_->setFrameQueue(v_frame_queue_);
 
+		}
+
+		if (audio_player_)
+		{
 			a_decode_handler_->addNode(this);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
-			a_decode_handler_->setFrameQueue(a_frame_queue_);
+			//a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
-		//else
-		//{
-		//	return -1;
-		//}
+
 		return 0;
 	}
 

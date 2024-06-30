@@ -121,17 +121,22 @@ namespace Donut
 
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeek()
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
+		auto a = frame_queue_[(rindex_ + rindex_shown_) % max_size_];
 		return frame_queue_[(rindex_ + rindex_shown_) % max_size_];
 	}
 
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekNext()
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
+
 		auto a = frame_queue_[(rindex_ + rindex_shown_ + 1) % max_size_];
 		return frame_queue_[(rindex_ + rindex_shown_ + 1) % max_size_];
 	}
 
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekLast()
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
 		return frame_queue_[rindex_];
 	}
 
@@ -202,6 +207,7 @@ namespace Donut
 
 	int DonutAVFrameQueue::frameQueueNbRemaining()
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
 		return size_ - rindex_shown_;
 	}
 
@@ -221,6 +227,7 @@ namespace Donut
 	void DonutAVFrameQueue::frameQueueDestroy()
 	{
 		int i;
+		std::unique_lock<std::mutex> lock(mtx_);
 		for (i = 0; i < max_size_; i++)
 		{
 			auto frame = frame_queue_[i];

@@ -5,6 +5,7 @@
 #include "donut_av_datas.h"
 
 #include "i_donut_av_base_handler.h"
+#include "donut_av_decoder.h"
 
 #include <vector>
 #include <list>
@@ -75,6 +76,8 @@ protected:
     double last_pts_ = 0;
 
     bool is_finished_ = false;
+
+    DonutAVDecoder decoder_;
 };
 
 
