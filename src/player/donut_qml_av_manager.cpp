@@ -90,6 +90,8 @@ namespace Donut
 				auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
 				a_packet_queue_->packetQueuePut(dn_pkt);
 			}
+
+			av_packet_unref(pkt);
 		}
 	}
 
@@ -178,8 +180,11 @@ namespace Donut
 
 		audio_player_ = IDonutAudioPlayer::getInstance();
 
+		demux_handler_->setVideoQueue(v_packet_queue_);
+		demux_handler_->setAudioQueue(a_packet_queue_);
 		if (video_view_)
 		{
+			
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			//v_decode_handler_->setFrameQueue(v_frame_queue_);
@@ -188,7 +193,7 @@ namespace Donut
 
 		if (audio_player_)
 		{
-			a_decode_handler_->addNode(this);
+			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
 			//a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}

@@ -61,15 +61,15 @@ namespace Donut
         std::lock_guard<std::mutex> lock(mtx_);
         if (packet_queue_)
         {
-            auto pkt = static_cast<AVPacket*>(data);
+            //auto pkt = static_cast<AVPacket*>(data);
 
-            if(packet_queue_->packetQueueGetStreamIndex(0) == pkt->stream_index
-                && stream_index_ == pkt->stream_index)
-            {
-                std::shared_ptr<DonutAVPacket> d_pkt = std::make_shared<DonutAVPacket>(pkt, true);
-                packet_queue_->packetQueuePut(d_pkt);
-                av_packet_unref(pkt);
-            }
+            //if(packet_queue_->packetQueueGetStreamIndex(0) == pkt->stream_index
+            //    && stream_index_ == pkt->stream_index)
+            //{
+            //    std::shared_ptr<DonutAVPacket> d_pkt = std::make_shared<DonutAVPacket>(pkt, true);
+            //    packet_queue_->packetQueuePut(d_pkt);
+            //    av_packet_unref(pkt);
+            //}
         }
     }
 

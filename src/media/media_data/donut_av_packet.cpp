@@ -19,6 +19,14 @@ DonutAVPacket::DonutAVPacket()
 
 DonutAVPacket::~DonutAVPacket()
 {
+	if (packet_->stream_index == 0)
+	{
+		int a = 1;
+	}
+	else if (packet_->stream_index == 1)
+	{
+		int a = 1;
+	}
 	av_packet_unref(packet_);
 	av_packet_free(&packet_);
 	packet_ = nullptr;
@@ -50,7 +58,7 @@ DonutAVPacket::DonutAVPacket(DonutAVPacket&& other)
 
 DonutAVPacket& DonutAVPacket::operator=(const DonutAVPacket& other)
 {
-	av_packet_ref(this->packet_, other.packet_);
+	av_packet_move_ref(this->packet_, other.packet_);
 	return *this;
 }
 
@@ -233,8 +241,12 @@ int DonutAVPacketQueue::packetQueueGetStreamIndex(int index)
 
 bool DonutAVPacketQueue::packetQueueHasEnoughPackets()
 {
-	std::lock_guard<std::mutex> lock(mtx_);
-	bool is_enough = stream_index_ < 0 ||
+	//auto a = av_q2d(stream_->time_base) * duration_;
+	//auto b = stream_index_ < 0;
+	//auto c = abort_request_;
+	//auto d = nb_packets_ > MIN_FRAMES;
+	//auto e = (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
+	bool is_enough = stream_index_ == -1 ||
 		abort_request_ ||
 		nb_packets_ > MIN_FRAMES && (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
 	return is_enough;

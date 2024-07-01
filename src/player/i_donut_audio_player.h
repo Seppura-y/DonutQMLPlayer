@@ -17,6 +17,10 @@ struct AVCodecParameters;
 namespace Donut {
 struct DonutAudioData
 {
+    ~DonutAudioData()
+    {
+        data.clear();
+    }
     std::vector<unsigned char> data;
     int offset = 0;
     double pts = 0;

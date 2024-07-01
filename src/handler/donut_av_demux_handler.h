@@ -45,6 +45,10 @@ namespace Donut
 		using eof_callback = std::function<void(void)>;
 
 		void setEofCallback(eof_callback cb) { eof_cb_ = cb; }
+
+
+		void setAudioQueue(std::shared_ptr<DonutAVPacketQueue>& audio_queue);
+		void setVideoQueue(std::shared_ptr<DonutAVPacketQueue>& video_queue);
 	protected:
 		virtual void threadLoop() override;
 	private:
@@ -64,6 +68,9 @@ namespace Donut
 		AVStream** audio_streams_ = nullptr;
 
 		eof_callback eof_cb_;
+
+		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
+		std::shared_ptr<DonutAVPacketQueue> v_packet_queue_;
 	};
 
 }

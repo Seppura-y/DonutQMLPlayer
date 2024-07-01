@@ -80,7 +80,7 @@ private:
 	int abort_request_;
 	int serial_;
 
-	int stream_index_;
+	int stream_index_ = -1;
 	AVStream* stream_;
 
 

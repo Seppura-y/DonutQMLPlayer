@@ -89,6 +89,18 @@ namespace Donut
 		return 0;
 	}
 
+	void DonutAVDemuxHandler::setAudioQueue(std::shared_ptr<DonutAVPacketQueue>& audio_queue)
+	{
+		std::unique_lock<std::mutex> lock(mtx_);
+		this->a_packet_queue_ = audio_queue;
+	}
+
+	void DonutAVDemuxHandler::setVideoQueue(std::shared_ptr<DonutAVPacketQueue>& video_queue)
+	{
+		std::unique_lock<std::mutex> lock(mtx_);
+		this->v_packet_queue_ = video_queue;
+	}
+
 	void Donut::DonutAVDemuxHandler::threadLoop()
 	{
 		AVPacket* demux_pkt = av_packet_alloc();
@@ -96,10 +108,20 @@ namespace Donut
 		{
 			if (is_pause_)
 			{
-				std::this_thread::sleep_for(std::chrono::microseconds(1));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				continue;
 			}
-			//std::this_thread::sleep_for(std::chrono::microseconds(100));
+
+			if (
+				(hasVideo() && v_packet_queue_ && v_packet_queue_->packetQueueHasEnoughPackets())
+				&&
+				(hasAudio() && a_packet_queue_ && a_packet_queue_->packetQueueHasEnoughPackets())
+				)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				continue;
+			}
+
 			if (int ret = demuxer_.readPacket(demux_pkt) != 0)
 			{
 				if (ret == AVERROR(EOF))
@@ -113,11 +135,10 @@ namespace Donut
 				}
 
 				av_packet_unref(demux_pkt);
-				std::this_thread::sleep_for(std::chrono::microseconds(1));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				continue;
 			}
 
-			//std::this_thread::sleep_for(std::chrono::microseconds(1));
 			
 			if (handler_nodes_.size() != 0)
 				notify(demux_pkt);
