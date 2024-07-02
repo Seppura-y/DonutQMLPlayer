@@ -157,6 +157,9 @@ namespace Donut
 
 		int video_index_ = -1;
 		int audio_index_ = -1;
+
+		std::shared_ptr<DonutAVClock> audio_clock_;
+		std::shared_ptr<DonutAVClock> video_clock_;
 	};
 }
 

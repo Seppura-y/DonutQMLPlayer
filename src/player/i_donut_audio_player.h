@@ -55,6 +55,10 @@ public:
     void setVolume(int v){ volume_ = v; }
     void setTimebase(double b) { timebase_ = b; }
 
+    void setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock);
+
+    void updateAuidoPts(double pts, int64_t pos, int serial);
+
 protected:
     IDonutAudioPlayer();
     virtual void callback(unsigned char* stream, int len) = 0;
@@ -82,6 +86,9 @@ protected:
     bool is_finished_ = false;
 
     DonutAVDecoder decoder_;
+
+    std::shared_ptr<DonutAVClock> audio_clock_;
+    std::shared_ptr<DonutAVClock> video_clock_;
 };
 
 

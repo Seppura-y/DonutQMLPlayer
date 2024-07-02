@@ -176,6 +176,9 @@ namespace Donut
 		//demux_handler_->addNode(v_decode_handler_);
 		//demux_handler_->addNode(a_decode_handler_);
 
+		audio_clock_ = std::make_shared<DonutAVClock>();
+		video_clock_ = std::make_shared<DonutAVClock>();
+
 		demux_handler_->addNode(this);
 
 		audio_player_ = IDonutAudioPlayer::getInstance();
@@ -184,7 +187,7 @@ namespace Donut
 		demux_handler_->setAudioQueue(a_packet_queue_);
 		if (video_view_)
 		{
-			
+			video_view_->setClocks(audio_clock_, video_clock_);
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			//v_decode_handler_->setFrameQueue(v_frame_queue_);
@@ -193,6 +196,7 @@ namespace Donut
 
 		if (audio_player_)
 		{
+			audio_player_->setClocks(audio_clock_, video_clock_);
 			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
 			//a_decode_handler_->setFrameQueue(a_frame_queue_);

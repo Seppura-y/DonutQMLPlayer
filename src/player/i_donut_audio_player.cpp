@@ -8,6 +8,7 @@
 extern "C"
 {
 #include <libavformat/avformat.h>
+#include <libavutil/time.h>
 }
 
 namespace Donut
@@ -155,6 +156,22 @@ IDonutAudioPlayer* IDonutAudioPlayer::getInstance()
 {
     static DonutSDLAudioPlayer cx;
     return &cx;
+}
+
+void IDonutAudioPlayer::setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock)
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    audio_clock_ = a_clock;
+    video_clock_ = v_clock;
+}
+
+void IDonutAudioPlayer::updateAuidoPts(double pts, int64_t pos, int serial)
+{
+    double time = av_gettime_relative() / 1000000.0;
+    audio_clock_->pts_ = pts;
+    audio_clock_->last_updated_ = time;
+    audio_clock_->pts_drift_ = audio_clock_->pts_ - time;
+    audio_clock_->serial_ = serial;
 }
 
 IDonutAudioPlayer::IDonutAudioPlayer()
