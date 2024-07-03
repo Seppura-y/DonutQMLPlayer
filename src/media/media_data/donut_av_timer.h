@@ -23,6 +23,9 @@ public:
     int serial_;           /* clock is based on a packet with this serial */
     int paused_;
     int* queue_serial_;    /* pointer to the current packet queue serial, used for obsolete clock detection */
+
+public:
+    void setClockAt(double pts, int serial, double time);
 };
 
 class DONUT_API DonutAVRational

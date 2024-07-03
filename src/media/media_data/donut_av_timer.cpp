@@ -14,4 +14,12 @@ namespace Donut
         return (long long)tmp.count();
     }
 
+    void DonutAVClock::setClockAt(double pts, int serial, double time)
+    {
+        this->pts_ = pts;
+        this->last_updated_ = time;
+        this->pts_drift_ = this->pts_ - time;
+        this->serial_ = serial;
+    }
+
 }

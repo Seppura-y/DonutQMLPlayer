@@ -76,7 +76,7 @@ bool IDonutAudioPlayer::open(AVCodecParameters* para)
 {
     //spec.channels = para->channels;
     input_spec_.channels = para->ch_layout.nb_channels;
-    input_spec_.av_fmt = para->format;
+    input_spec_.av_fmt = (AVSampleFormat)para->format;
     input_spec_.sample_rate = para->sample_rate;
     input_spec_.sample_size = av_get_bytes_per_sample((AVSampleFormat)para->format);
 
@@ -98,14 +98,14 @@ bool IDonutAudioPlayer::open(AVCodecParameters* para)
             break;
     }
 
-    output_spec_.channels = para->ch_layout.nb_channels;
-    output_spec_.av_fmt = AV_SAMPLE_FMT_S16;
-    output_spec_.sample_rate = para->sample_rate;
-    output_spec_.sample_size = av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
-    output_spec_.sdl_fmt = AUDIO_S16;
+    resample_spec_.channels = para->ch_layout.nb_channels;
+    resample_spec_.av_fmt = AV_SAMPLE_FMT_S16;
+    resample_spec_.sample_rate = para->sample_rate;
+    resample_spec_.sample_size = av_get_bytes_per_sample((AVSampleFormat)resample_spec_.av_fmt);
+    resample_spec_.sdl_fmt = AUDIO_S16;
 
     //input_spec_.sdl_fmt = AUDIO_S16;
-    return open(output_spec_);
+    return open(resample_spec_);
 }
 
 void IDonutAudioPlayer::clear()

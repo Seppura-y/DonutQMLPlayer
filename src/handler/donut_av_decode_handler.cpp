@@ -96,6 +96,13 @@ namespace Donut
         this->packet_queue_ = packet_queue;
     }
 
+    void DonutAVDecodeHandler::setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock)
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        audio_clock_ = a_clock;
+        video_clock_ = v_clock;
+    }
+
     void Donut::DonutAVDecodeHandler::threadLoop()
     {
         AVFrame* decoded_frame = av_frame_alloc();
@@ -117,6 +124,16 @@ namespace Donut
                     
                     if (decoder_.recvFrame(decoded_frame) == 0)
                     {
+                        //if (!isnan((double)decoded_frame->pts))
+                        //{
+
+                        //    if (decoded_frame->channels > 0 && decoded_frame->sample_rate > 0)
+                        //    {
+                        //        double pts = decoded_frame->pts + (double)decoded_frame->nb_samples / decoded_frame->sample_rate;
+                        //        audio_clock_->pts_ = pts;
+                        //    }
+
+                        //}
                         notify(decoded_frame);
                     }
                     //av_frame_unref(decoded_frame);

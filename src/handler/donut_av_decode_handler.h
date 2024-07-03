@@ -33,6 +33,8 @@ namespace Donut
 
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue> frame_queue);
 		void setPacketQueue(std::shared_ptr<DonutAVPacketQueue> packet_queue);
+
+		void setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock);
 	protected:
 		void threadLoop() override;
 	private:
@@ -48,6 +50,9 @@ namespace Donut
 		std::shared_ptr<DonutAVPacketQueue> packet_queue_;
 
 		int stream_index_ = -1;
+
+		std::shared_ptr<DonutAVClock> audio_clock_;
+		std::shared_ptr<DonutAVClock> video_clock_;
 	};
 
 	template<typename T>

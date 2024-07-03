@@ -69,7 +69,7 @@ protected:
     }
 protected:
     AudioSpec input_spec_;
-    AudioSpec output_spec_;
+    AudioSpec resample_spec_;
     std::list<DonutAudioData> audio_datas_;
     std::list<DonutAudioData> resampled_datas_;
     std::list<DonutAudioData> processsed_datas_;

@@ -41,7 +41,7 @@ private:
     soundtouch::SoundTouch* sound_touch_ = nullptr;
 
     // 经soundtouch处理后的音频数据 sample rate * channels * sizeof(short)
-    soundtouch::SAMPLETYPE* st_sample_buffer_ = nullptr;
+    soundtouch::SAMPLETYPE* st_source_buffer_ = nullptr;
     soundtouch::SAMPLETYPE* st_resample_buffer_ = nullptr;
 
     // ffmpeg接口重采样后的音频数据 sample rate * channels * sizeof(short)

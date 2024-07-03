@@ -1,5 +1,8 @@
 #include "donut_sdl_audio_player.h"
 
+
+#include "log.h"
+
 extern"C"
 {
     #include <libavcodec/avcodec.h>
@@ -33,7 +36,7 @@ namespace Donut
             double clock = frame->pts + (double)frame->nb_samples / frame->sample_rate;
             double duration = frame->duration;
 
-            nb_storage_ += resampled * output_spec_.channels * av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
+            nb_storage_ += resampled * resample_spec_.channels * av_get_bytes_per_sample((AVSampleFormat)resample_spec_.av_fmt);
 
             //std::this_thread::sleep_for(std::chrono::milliseconds((int)duration));
             if (resampled > 0)
@@ -313,29 +316,132 @@ namespace Donut
         //退出上一次音频
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
-        SDL_AudioSpec sdl_spec;
-        sdl_spec.freq = spec.sample_rate;
-        sdl_spec.format = spec.sdl_fmt;
-        sdl_spec.channels = spec.channels;
-        sdl_spec.samples = spec.samples;
-        sdl_spec.silence = 0;
-        sdl_spec.userdata = this;
-        sdl_spec.callback = audioCallback;
-        if (SDL_OpenAudio(&sdl_spec, nullptr) < 0)
+        SDL_Init(SDL_INIT_AUDIO);
+
+        SDL_AudioSpec wanted_spec;
+
+        SDL_AudioSpec actual_spec;
+
+        const char* env;
+        static const int next_nb_channels[] = { 0, 0, 1, 6, 2, 6, 4, 6 };
+        static const int next_sample_rates[] = { 0, 44100, 48000, 96000, 192000 };
+        int next_sample_rate_idx = FF_ARRAY_ELEMS(next_sample_rates) - 1;
+
+        // 4.8.A.1 获取环境变量中的声道数和升到布局等信息
+        env = SDL_getenv("SDL_AUDIO_CHANNELS");
+        if (env)
         {
-            std::cerr << SDL_GetError() << std::endl;
+            spec.channels = atoi(env);
+            spec.ch_layout = av_get_default_channel_layout(spec.channels);
+        }
+
+        if (!spec.ch_layout || spec.channels != av_get_channel_layout_nb_channels(spec.ch_layout))
+        {
+            spec.ch_layout = av_get_default_channel_layout(spec.channels);
+            spec.ch_layout &= ~AV_CH_LAYOUT_STEREO_DOWNMIX;
+        }
+
+        // 根据channel_layout获取nb_channels，当传入参数wanted_nb_channels不匹配时，此处会作修正
+        int wanted_nb_channels = av_get_channel_layout_nb_channels(spec.ch_layout);
+        int64_t wanted_channel_layout = spec.ch_layout;
+
+        spec.channels = av_get_channel_layout_nb_channels(spec.ch_layout);
+        wanted_spec.channels = spec.channels;
+        wanted_spec.freq = spec.sample_rate;
+
+        if (spec.sample_rate <= 0 || spec.channels <= 0)
+        {
+            DN_CORE_ERROR("Invalid sample rate or channel count!");
             return false;
         }
 
-        AudioSpec output_spec;
-        output_spec.channels = spec.channels;
-        output_spec.av_fmt = spec.av_fmt;
-        output_spec.sample_rate = spec.sample_rate;
-        output_spec.sample_size = av_get_bytes_per_sample((AVSampleFormat)output_spec.av_fmt);
+        while (next_sample_rate_idx && next_sample_rates[next_sample_rate_idx] >= wanted_spec.freq)
+        {
+            next_sample_rate_idx--;
+        }
 
-        // 输出参数暂时按照输入设置
-        //output_spec_ = output_spec;
-        int ret = resampler_.initResampler(this->input_spec_, this->output_spec_);
+        wanted_spec.format = spec.sdl_fmt; // 目前传入时已填入AUDIO_S16SYS
+        wanted_spec.silence = 0;
+
+        wanted_spec.samples = FFMAX(SDL_AUDIO_MIN_BUFFER_SIZE, 2 << av_log2(wanted_spec.freq / SDL_AUDIO_MAX_CALLBACKS_PER_SEC));
+        wanted_spec.userdata = this;
+        wanted_spec.callback = audioCallback;
+
+        SDL_AudioDeviceID audio_dev;
+
+        while (!(audio_dev = SDL_OpenAudioDevice(
+            NULL,
+            0,
+            &wanted_spec,
+            &actual_spec,
+            SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE))
+        )
+        {
+            av_log(NULL, AV_LOG_WARNING, "SDL_OpenAudio (%d channels, %d Hz): %s\n",
+                wanted_spec.channels, wanted_spec.freq, SDL_GetError());
+
+            wanted_spec.channels = next_nb_channels[FFMIN(7, wanted_spec.channels)];
+
+            if (!wanted_spec.channels)
+            {
+                wanted_spec.freq = next_sample_rates[next_sample_rate_idx--];
+                wanted_spec.channels = wanted_nb_channels;
+                if (!wanted_spec.freq)
+                {
+                    av_log(NULL, AV_LOG_ERROR,
+                        "No more combinations to try, audio open failed\n");
+                    return -1;
+                }
+            }
+            wanted_channel_layout = av_get_default_channel_layout(wanted_spec.channels);
+        }
+
+        if (actual_spec.format != AUDIO_S16SYS)
+        {
+            DN_CORE_ERROR("SDL advised audio format %d is not supported!");
+            return false;
+        }
+
+        if (actual_spec.channels != wanted_spec.channels)
+        {
+            wanted_channel_layout = av_get_default_channel_layout(actual_spec.channels);
+            if (!wanted_channel_layout)
+            {
+                DN_CORE_ERROR("SDL advised channel count %d is not supported!", actual_spec.channels);
+                return false;
+            }
+        }
+
+        //if (SDL_OpenAudio(&wanted_spec, nullptr) < 0)
+        //{
+        //    std::cerr << SDL_GetError() << std::endl;
+        //    return false;
+        //}
+
+        AudioSpec resample_spec;
+        resample_spec.channels = actual_spec.channels;
+        resample_spec.ch_layout = wanted_channel_layout;
+        resample_spec.av_fmt = AV_SAMPLE_FMT_S16;
+        resample_spec.sample_rate = spec.sample_rate;
+        resample_spec.sample_size = av_get_bytes_per_sample((AVSampleFormat)resample_spec.av_fmt);
+        resample_spec.frame_size = av_samples_get_buffer_size(
+            NULL,                           // linesize
+            resample_spec.channels,         // nb_channels
+            1,                              // nb_samples
+            resample_spec.av_fmt,           // sample_fmt
+            1                               // align
+        );
+
+        resample_spec.bytes_per_sec = av_samples_get_buffer_size(
+            NULL,                           // linesize
+            resample_spec.channels,         // nb_channels
+            resample_spec.sample_rate,      // nb_samples
+            resample_spec.av_fmt,           // sample_fmt
+            1                               // align
+        );
+
+        this->resample_spec_ = resample_spec;
+        int ret = resampler_.initResampler(this->input_spec_, this->resample_spec_);
         if (ret != 0)
         {
             is_resampler_init_ = false;
@@ -346,33 +452,96 @@ namespace Donut
 
         // sample rate * channels * sizeof(short)
         resampled_buffer_ = (uint8_t*)av_malloc(
-            output_spec_.sample_rate
-            * output_spec_.channels
-            * output_spec_.sample_size
-        );
-        
-        st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(
-            malloc(output_spec_.sample_rate * output_spec_.channels * output_spec_.sample_size)
-        );
-        
-        st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(
-            malloc(output_spec_.sample_rate * output_spec_.channels * output_spec_.sample_size)
+            resample_spec.bytes_per_sec
         );
 
+        st_source_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(resample_spec.bytes_per_sec));
+
+        st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(resample_spec.bytes_per_sec));
+
         sound_touch_ = new soundtouch::SoundTouch();
-        sound_touch_->setSampleRate(output_spec_.sample_rate);
-        sound_touch_->setChannels(output_spec_.channels);
+        sound_touch_->setSampleRate(resample_spec.sample_rate);
+        sound_touch_->setChannels(resample_spec.channels);
         //sound_touch_->setTempo(2);
         sound_touch_->setTempo(playback_speed_);
         sound_touch_->setPitch(pitch_);
 
-        //开始播放
-        SDL_PauseAudio(0);
+        // 启动回调，开始播放
+        SDL_PauseAudioDevice(audio_dev, 0);
 
-        nb_per_second_ = output_spec_.sample_rate * output_spec_.channels * output_spec_.sample_size;
+        nb_per_second_ = resample_spec.bytes_per_sec;
         is_exit_ = false;
         return true;
     }
+
+    //bool DonutSDLAudioPlayer::open(AudioSpec& spec)
+    //{
+    //    std::lock_guard<std::mutex> lock(mtx_);
+    //    //this->input_spec_ = spec;
+
+    //    //退出上一次音频
+    //    SDL_QuitSubSystem(SDL_INIT_AUDIO);
+
+    //    SDL_AudioSpec sdl_spec;
+    //    sdl_spec.freq = spec.sample_rate;
+    //    sdl_spec.format = spec.sdl_fmt;
+    //    sdl_spec.channels = spec.channels;
+    //    sdl_spec.samples = spec.samples;
+    //    sdl_spec.silence = 0;
+    //    sdl_spec.userdata = this;
+    //    sdl_spec.callback = audioCallback;
+    //    if (SDL_OpenAudio(&sdl_spec, nullptr) < 0)
+    //    {
+    //        std::cerr << SDL_GetError() << std::endl;
+    //        return false;
+    //    }
+
+    //    AudioSpec output_spec;
+    //    output_spec.channels = spec.channels;
+    //    output_spec.av_fmt = spec.av_fmt;
+    //    output_spec.sample_rate = spec.sample_rate;
+    //    output_spec.sample_size = av_get_bytes_per_sample((AVSampleFormat)output_spec.av_fmt);
+
+    //    // 输出参数暂时按照输入设置
+    //    //output_spec_ = output_spec;
+    //    int ret = resampler_.initResampler(this->input_spec_, this->resample_spec_);
+    //    if (ret != 0)
+    //    {
+    //        is_resampler_init_ = false;
+    //        return false;
+    //    }
+
+    //    is_resampler_init_ = true;
+
+    //    // sample rate * channels * sizeof(short)
+    //    resampled_buffer_ = (uint8_t*)av_malloc(
+    //        resample_spec_.sample_rate
+    //        * resample_spec_.channels
+    //        * resample_spec_.sample_size
+    //    );
+    //    
+    //    st_sample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(
+    //        malloc(resample_spec_.sample_rate * resample_spec_.channels * resample_spec_.sample_size)
+    //    );
+    //    
+    //    st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(
+    //        malloc(resample_spec_.sample_rate * resample_spec_.channels * resample_spec_.sample_size)
+    //    );
+
+    //    sound_touch_ = new soundtouch::SoundTouch();
+    //    sound_touch_->setSampleRate(resample_spec_.sample_rate);
+    //    sound_touch_->setChannels(resample_spec_.channels);
+    //    //sound_touch_->setTempo(2);
+    //    sound_touch_->setTempo(playback_speed_);
+    //    sound_touch_->setPitch(pitch_);
+
+    //    //开始播放
+    //    SDL_PauseAudio(0);
+
+    //    nb_per_second_ = resample_spec_.sample_rate * resample_spec_.channels * resample_spec_.sample_size;
+    //    is_exit_ = false;
+    //    return true;
+    //}
 
     void DonutSDLAudioPlayer::close()
     {
@@ -423,10 +592,10 @@ namespace Donut
 
             for (int i = 0; i < raw_data_size / 2; i++)
             {
-                st_sample_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
+                st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
             }
 
-            sound_touch_->putSamples(st_sample_buffer_, raw_data_size);
+            sound_touch_->putSamples(st_source_buffer_, raw_data_size);
 
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -443,12 +612,20 @@ namespace Donut
                     size = need_size;
                 }
 
-                SDL_MixAudio(
+                SDL_MixAudioFormat(
                     stream + mixed_size,
                     (uint8_t*)resampled_buffer_ + buffer_offset,
+                    AUDIO_S16SYS,
                     size,
                     volume_
                 );
+
+                //SDL_MixAudio(
+                //    stream + mixed_size,
+                //    (uint8_t*)resampled_buffer_ + buffer_offset,
+                //    size,
+                //    volume_
+                //);
 
                 need_size -= raw_data_size;
                 mixed_size += raw_data_size;
@@ -456,7 +633,6 @@ namespace Donut
             }
             
             int duration = buf.pts;
-            std::this_thread::sleep_for(std::chrono::microseconds(duration  * 100));
 
             //int size = buf.data.size() - buf.offset;//剩余未处理的数据
             //if (size > need_size)

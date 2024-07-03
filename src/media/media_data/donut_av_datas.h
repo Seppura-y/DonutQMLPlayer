@@ -20,6 +20,11 @@ struct AVPacket;
 struct AVCodecParameters;
 struct AVRational;
 
+/* Minimum SDL audio buffer size, in samples. */
+#define SDL_AUDIO_MIN_BUFFER_SIZE 512
+/* Calculate actual buffer size keeping in mind not cause too frequent audio callbacks */
+#define SDL_AUDIO_MAX_CALLBACKS_PER_SEC 30
+
 
 #define MIN_LOG_LEVEL Log_Info
 #define LOG(s,level) if(level >= Log_Info)\
@@ -114,13 +119,16 @@ namespace Donut
 	struct AudioSpec
 	{
 		int sample_rate = 44100;
-		int av_fmt = AV_SAMPLE_FMT_S16;
+		enum AVSampleFormat av_fmt = AV_SAMPLE_FMT_S16;
+		int64_t ch_layout = 0;
 		unsigned short sdl_fmt = AUDIO_S16SYS;
 		unsigned char channels = 2;
 		unsigned char sample_size = 2;
 		unsigned short samples = 1024;
-	};
 
+		int frame_size;
+		int bytes_per_sec;
+	};
 
 	int64_t GetCurrentTimeMsec();
 	void SleepForMsec(int ms);
