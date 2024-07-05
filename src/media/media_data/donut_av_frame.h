@@ -34,7 +34,7 @@ public:
 
 	int getSerial() { return serial_; }
 	AVFrame* getFrame() { return frame_; }
-private:
+public:
 	AVFrame* frame_ = nullptr;
 
 	int width_ = 0;
@@ -66,7 +66,7 @@ public:
 	std::shared_ptr<DonutAVFrame> frameQueuePeekWritable();
 	std::shared_ptr<DonutAVFrame>& frameQueuePeekReadable();
 
-	void frameQueuePush(std::shared_ptr<DonutAVFrame> frame);
+	void frameQueuePush(std::shared_ptr<DonutAVFrame>& frame);
 	void frameQueueNext();
 
 	int frameQueueNbRemaining();
@@ -74,18 +74,22 @@ public:
 	int64_t frameQueueLastPos();
 
 	void frameQueueDestroy();
+
+	int getSerial() { return pkt_queue_->getSerial(); }
 private:
 	std::mutex mtx_;
 	std::condition_variable cond_;
 	std::shared_ptr<DonutAVPacketQueue> pkt_queue_;
 	std::vector<std::shared_ptr<DonutAVFrame>> frame_queue_;
 
-	int rindex_ = -1;
-	int windex_ = -1;
-	int size_ = -1;
-	int max_size_ = -1;
+	int rindex_ = 0;
+	int windex_ = 0;
+	int size_ = 0;
+	int max_size_ = 0;
 	int keep_last_ = 0;
-	int rindex_shown_ = -1;
+	int rindex_shown_ = 0;
+
+	int stream_index_ = -1;
 };
 
 

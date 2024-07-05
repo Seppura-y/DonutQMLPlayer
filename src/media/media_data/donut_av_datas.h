@@ -126,8 +126,21 @@ namespace Donut
 		unsigned char sample_size = 2;
 		unsigned short samples = 1024;
 
-		int frame_size;
-		int bytes_per_sec;
+		int frame_size = 0;
+		int bytes_per_sec = 0;
+
+		bool operator==(AudioSpec& other)
+		{
+			return this->sample_rate == other.sample_rate &&
+				this->av_fmt == other.av_fmt &&
+				this->ch_layout == other.ch_layout &&
+				this->sdl_fmt == other.sdl_fmt &&
+				this->channels == other.channels &&
+				this->sample_size == other.sample_size &&
+				this->samples == other.samples &&
+				this->frame_size == other.frame_size &&
+				this->bytes_per_sec == other.bytes_per_sec;
+		}
 	};
 
 	int64_t GetCurrentTimeMsec();

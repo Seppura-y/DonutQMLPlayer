@@ -26,13 +26,16 @@ public:
     bool open(AudioSpec& spec);
     void close();
     void callback(unsigned char* stream, int len);
+    //void audioCb(void* userdata, unsigned char* stream, int len);
 
     long long getCurrentPts() override;
 
 
     bool isNormalPlaybackRate();
-private:
+public:
     int getSoundTouchData(void** pcm_buffer);
+
+    int audioDecodeFrame();
 private:
     long long cur_pts_ = 0;     //当前播放位置
     long long last_ms_ = 0;     //上次的时间戳
@@ -61,6 +64,9 @@ private:
 
     int nb_per_second_ = 0;
     int nb_storage_ = 0;
+
+    // SDL_OpenAudioDevice返回的SDL_AudioSpec中记录
+    int audio_hw_buf_size_ = 0;
 };
 
 

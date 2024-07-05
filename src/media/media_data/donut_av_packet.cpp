@@ -233,7 +233,7 @@ void DonutAVPacketQueue::packetQueueSetStreamIndex(int index)
 	stream_index_ = index;
 }
 
-int DonutAVPacketQueue::packetQueueGetStreamIndex(int index)
+int DonutAVPacketQueue::packetQueueGetStreamIndex()
 {
 	std::unique_lock<std::mutex> lock(mtx_);
 	return stream_index_;

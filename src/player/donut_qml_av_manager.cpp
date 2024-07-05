@@ -169,7 +169,7 @@ namespace Donut
 		v_clock_ = std::make_shared<DonutAVClock>();
 
 		a_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 3, 1);
+		//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 1);
 		a_clock_ = std::make_shared<DonutAVClock>();
 
 		// video decoder 要放在audio decoder上面，否则avcodec_send_packet时会警告 invalid arguement
@@ -196,6 +196,7 @@ namespace Donut
 
 		if (audio_player_)
 		{
+			//audio_player_->setFrameQueue(a_frame_queue_);
 			audio_player_->setClocks(audio_clock_, video_clock_);
 			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
@@ -267,6 +268,7 @@ namespace Donut
 
 	void DonutQMLAVManager::onSeekForward()
 	{
+		serial_++;
 	}
 
 	void DonutQMLAVManager::onSeekBackward()
@@ -365,6 +367,11 @@ namespace Donut
 				a_decode_handler_->setStreamIndex(audio_index_);
 				a_decode_handler_->setStream(demux_handler_->getAudioStream(0));
 				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
+
+				a_packet_queue_->packetQueueSetStreamIndex(audio_index_);
+				a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 0);
+
+				audio_player_->setFrameQueue(a_frame_queue_);
 
 				audio_player_->open(demux_handler_->copyAudioParameters()->para);
 			}

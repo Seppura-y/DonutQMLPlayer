@@ -68,7 +68,7 @@ public:
 	std::shared_ptr<DonutAVPacket> packetQueueGet(int block, int* serial);
 
 	void packetQueueSetStreamIndex(int index);
-	int packetQueueGetStreamIndex(int index);
+	int packetQueueGetStreamIndex();
 
 	bool packetQueueHasEnoughPackets();
 protected:

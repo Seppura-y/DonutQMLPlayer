@@ -2,6 +2,8 @@
 
 #include "log.h"
 
+
+
 extern"C"
 {
 #include "libavcodec/avcodec.h"
@@ -22,6 +24,10 @@ namespace Donut
 
     int DonutAVAudioResampler::initResampler(AudioSpec in, AudioSpec out)
     {
+        if (input_spec_ == in || output_spec_ == out)
+        {
+            return 0;
+        }
         input_spec_ = in;
         output_spec_ = out;
 
@@ -123,6 +129,68 @@ namespace Donut
         }
 
         return -1;
+    }
+
+    int DonutAVAudioResampler::resampleAudio(std::shared_ptr<DonutAVFrame>& frame, void** out)
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+
+        int resampled_data_size = 0;
+        const uint8_t** input_buffer = (const uint8_t**)frame->frame_->extended_data;
+        uint8_t** output_buffer = (uint8_t**)out;
+
+        int out_count = (int64_t)output_spec_.samples * output_spec_.sample_rate / input_spec_.sample_rate + 256;
+        int out_size = av_samples_get_buffer_size(
+            nullptr,
+            output_spec_.channels,
+            out_count,
+            (AVSampleFormat)output_spec_.av_fmt,
+            0);
+
+        if (out_size < 0)
+        {
+            DN_CORE_ERROR("av_samples_get_buffer_size() failed");
+            return -1;
+        }
+
+        unsigned int output_buffer_size = 0;
+        av_fast_malloc(output_buffer, &output_buffer_size, out_size);
+
+        if (!output_buffer)
+        {
+            DN_CORE_ERROR("av_fast_malloc() failed");
+            return -1;
+        }
+
+
+
+        int nb_resampled = swr_convert(
+            swr_ctx_,
+            output_buffer,
+            out_count,
+            input_buffer,
+            frame->frame_->nb_samples
+        );
+
+        if (nb_resampled < 0)
+        {
+            return -1;
+        }
+
+        if(nb_resampled == out_count)
+        {
+
+        }
+
+        out = (void**)output_buffer;
+        resampled_data_size = nb_resampled * output_spec_.channels * av_get_bytes_per_sample(output_spec_.av_fmt);
+
+        return resampled_data_size;
+    }
+
+    int DonutAVAudioResampler::resampleAudio(void** in, void** out)
+    {
+        return 0;
     }
 
 }

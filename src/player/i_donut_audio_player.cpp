@@ -174,6 +174,12 @@ void IDonutAudioPlayer::updateAuidoPts(double pts, int64_t pos, int serial)
     audio_clock_->serial_ = serial;
 }
 
+void IDonutAudioPlayer::setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue)
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    this->audio_frame_queue_ = queue;
+}
+
 IDonutAudioPlayer::IDonutAudioPlayer()
 {
     //SDL_Init(SDL_INIT_AUDIO);

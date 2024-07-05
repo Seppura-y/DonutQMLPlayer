@@ -53,6 +53,8 @@ namespace Donut
 		virtual void updateSoundVolume(int value);
 		virtual void mediaEndReached();
 		// general
+
+		int getSerial() { return serial_; };
 	public:
 		virtual void setPlaying();
 		virtual void setPause();
@@ -128,7 +130,7 @@ namespace Donut
 		int64_t total_duration_ = -1;
 
 		int64_t seek_time_ = -1;
-		int seek_serial_ = -1;
+		int serial_ = -1;
 
 		void* window_id_ = nullptr;
 
@@ -148,7 +150,7 @@ namespace Donut
 		std::shared_ptr<DonutAVClock> v_clock_;
 
 		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
-		//std::shared_ptr<DonutAVFrameQueue>	a_frame_queue_;
+		std::shared_ptr<DonutAVFrameQueue>	a_frame_queue_;
 		std::shared_ptr<DonutAVClock> a_clock_;
 
 		std::string current_url_;

@@ -107,6 +107,8 @@ namespace Donut
 		max_size_ = max;
 		keep_last_ = !!kp_last;
 
+		stream_index_ = queue->packetQueueGetStreamIndex();
+
 		for (int i = 0; i < max_size_; i++)
 		{
 			auto frame = std::make_shared<DonutAVFrame>();
@@ -169,38 +171,40 @@ namespace Donut
 			auto null_frame = std::make_shared<DonutAVFrame>();
 			return null_frame;
 		}
-
+		int idx = (rindex_ + rindex_shown_) % max_size_;
 		return frame_queue_[(rindex_ + rindex_shown_) % max_size_];
 	}
 
 	// update write index
-	void DonutAVFrameQueue::frameQueuePush(std::shared_ptr<DonutAVFrame> frame)
+	void DonutAVFrameQueue::frameQueuePush(std::shared_ptr<DonutAVFrame>& frame)
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
 		if (++windex_ == max_size_)
 		{
 			windex_ = 0;
 		}
-		std::unique_lock<std::mutex> lock(mtx_);
 		size_++;
-		this->frame_queue_.push_back(frame);
+		//this->frame_queue_.push_back(frame);
+		//frame_queue_[windex_].reset();
+		//frame_queue_[windex_] = frame;
 		cond_.notify_one();
 	}
 
 	void DonutAVFrameQueue::frameQueueNext()
 	{
+		std::unique_lock<std::mutex> lock(mtx_);
 		if (keep_last_ && !rindex_shown_)
 		{
 			rindex_shown_ = 1;
 			return;
 		}
 
-		frame_queue_[rindex_].reset();
+		av_frame_unref(frame_queue_[rindex_]->frame_);
 		if (++rindex_ == max_size_)
 		{
 			rindex_ = 0;
 		}
 
-		std::unique_lock<std::mutex> lock(mtx_);
 		size_--;
 		cond_.notify_one();
 	}

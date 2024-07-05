@@ -59,6 +59,8 @@ public:
 
     void updateAuidoPts(double pts, int64_t pos, int serial);
 
+    void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
+
 protected:
     IDonutAudioPlayer();
     virtual void callback(unsigned char* stream, int len) = 0;
@@ -89,6 +91,10 @@ protected:
 
     std::shared_ptr<DonutAVClock> audio_clock_;
     std::shared_ptr<DonutAVClock> video_clock_;
+
+    std::shared_ptr<DonutAVFrameQueue> audio_frame_queue_;
+
+    int64_t audio_callback_time_ = -1;
 };
 
 
