@@ -107,7 +107,7 @@ namespace Donut
         }
         else
         {
-            //È¥µôÔİÍ£µÄÊÂ¼ş
+            //å»æ‰æš‚åœçš„äº‹ä»¶
             if (pause_begin_ > 0)
                 last_ms_ += (GetCurrentTimeMsec() - pause_begin_);
             SDL_PauseAudio(0);
@@ -120,7 +120,7 @@ namespace Donut
         std::lock_guard<std::mutex> lock(mtx_);
         //this->input_spec_ = spec;
 
-        //ÍË³öÉÏÒ»´ÎÒôÆµ
+        //é€€å‡ºä¸Šä¸€æ¬¡éŸ³é¢‘
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
         SDL_Init(SDL_INIT_AUDIO);
@@ -134,7 +134,7 @@ namespace Donut
         static const int next_sample_rates[] = { 0, 44100, 48000, 96000, 192000 };
         int next_sample_rate_idx = FF_ARRAY_ELEMS(next_sample_rates) - 1;
 
-        // 4.8.A.1 »ñÈ¡»·¾³±äÁ¿ÖĞµÄÉùµÀÊıºÍÉıµ½²¼¾ÖµÈĞÅÏ¢
+        // 4.8.A.1 è·å–ç¯å¢ƒå˜é‡ä¸­çš„å£°é“æ•°å’Œå‡åˆ°å¸ƒå±€ç­‰ä¿¡æ¯
         env = SDL_getenv("SDL_AUDIO_CHANNELS");
         if (env)
         {
@@ -148,7 +148,7 @@ namespace Donut
             spec.ch_layout &= ~AV_CH_LAYOUT_STEREO_DOWNMIX;
         }
 
-        // ¸ù¾İchannel_layout»ñÈ¡nb_channels£¬µ±´«Èë²ÎÊıwanted_nb_channels²»Æ¥ÅäÊ±£¬´Ë´¦»á×÷ĞŞÕı
+        // æ ¹æ®channel_layoutè·å–nb_channelsï¼Œå½“ä¼ å…¥å‚æ•°wanted_nb_channelsä¸åŒ¹é…æ—¶ï¼Œæ­¤å¤„ä¼šä½œä¿®æ­£
         int wanted_nb_channels = av_get_channel_layout_nb_channels(spec.ch_layout);
         int64_t wanted_channel_layout = spec.ch_layout;
 
@@ -167,7 +167,7 @@ namespace Donut
             next_sample_rate_idx--;
         }
 
-        wanted_spec.format = spec.sdl_fmt; // Ä¿Ç°´«ÈëÊ±ÒÑÌîÈëAUDIO_S16SYS
+        wanted_spec.format = spec.sdl_fmt; // ç›®å‰ä¼ å…¥æ—¶å·²å¡«å…¥AUDIO_S16SYS
         wanted_spec.silence = 0;
 
         wanted_spec.samples = FFMAX(SDL_AUDIO_MIN_BUFFER_SIZE, 2 << av_log2(wanted_spec.freq / SDL_AUDIO_MAX_CALLBACKS_PER_SEC));
@@ -220,7 +220,7 @@ namespace Donut
             }
         }
 
-        // SDL ÄÚ²¿µÄÒôÆµ»º³åÇø´óĞ¡
+        // SDL å†…éƒ¨çš„éŸ³é¢‘ç¼“å†²åŒºå¤§å°
         audio_hw_buf_size_ = actual_spec.size;
 
         //if (SDL_OpenAudio(&wanted_spec, nullptr) < 0)
@@ -233,7 +233,7 @@ namespace Donut
         resample_spec.channels = actual_spec.channels;
         resample_spec.ch_layout = wanted_channel_layout;
         resample_spec.av_fmt = AV_SAMPLE_FMT_S16;
-        resample_spec.sample_rate = spec.sample_rate;
+        resample_spec.sample_rate = actual_spec.freq;
         resample_spec.sample_size = av_get_bytes_per_sample((AVSampleFormat)resample_spec.av_fmt);
         resample_spec.frame_size = av_samples_get_buffer_size(
             NULL,                           // linesize
@@ -277,7 +277,7 @@ namespace Donut
         sound_touch_->setTempo(playback_speed_);
         sound_touch_->setPitch(pitch_);
 
-        // Æô¶¯»Øµ÷£¬¿ªÊ¼²¥·Å
+        // å¯åŠ¨å›è°ƒï¼Œå¼€å§‹æ’­æ”¾
         SDL_PauseAudioDevice(audio_dev, 0);
 
         nb_per_second_ = resample_spec.bytes_per_sec;
@@ -290,124 +290,314 @@ namespace Donut
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
         std::unique_lock<std::mutex> lock(mtx_);
         audio_datas_.clear();
-        cur_pts_ = 0; //µ±Ç°²¥·ÅÎ»ÖÃ
-        last_ms_ = 0;  //ÉÏ´ÎµÄÊ±¼ä´Á
-        pause_begin_ = 0;//ÔİÍ£¿ªÊ¼Ê±¼ä´Á
+        cur_pts_ = 0; //å½“å‰æ’­æ”¾ä½ç½®
+        last_ms_ = 0;  //ä¸Šæ¬¡çš„æ—¶é—´æˆ³
+        pause_begin_ = 0;//æš‚åœå¼€å§‹æ—¶é—´æˆ³
     }
 
 
+    //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
+    //{
+    //    SDL_memset(stream, 0, len);
+
+    //    std::unique_lock<std::mutex> lock(mtx_);
+
+    //    if (audio_datas_.empty())return;
+
+    //    auto buf = audio_datas_.front();
+    //    int mixed_size = 0;
+    //    int need_size = len;
+
+    //    cur_pts_ = buf.pts;
+    //    last_ms_ = GetCurrentTimeMsec();
+
+    //    while (mixed_size < len)
+    //    {
+    //        if (audio_datas_.empty())break;
+
+    //        buf = audio_datas_.front();
+
+    //        int size = buf.data.size() - buf.offset;
+    //        if (size > need_size)
+    //        {
+    //            size = need_size;
+    //        }
+
+    //        SDL_MixAudio(
+    //            stream + mixed_size,
+    //            buf.data.data() + buf.offset,
+    //            size, volume_
+    //        );
+
+    //        need_size -= size;
+    //        mixed_size += size;
+    //        buf.offset += size;
+    //        if (buf.offset >= buf.data.size())
+    //        {
+    //            audio_datas_.pop_front();
+    //        }
+    //    }
+    //}
+
+    //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
+    //{
+    //    SDL_memset(stream, 0, len);
+
+    //    audio_callback_time_ = av_gettime_relative();
+
+    //    int mixed_size = 0;
+    //    int need_size = len;
+
+    //    int buffer_offset = 0;
+
+    //    while (mixed_size < len)
+    //    {
+    //        //if (resampled_datas_.empty())
+    //        //{
+    //        //    break;
+    //        //}
+
+    //        //auto af = audio_frame_queue_->frameQueuePeekReadable();
+    //        int a = audioDecodeFrame();
+
+    //        //if (nb_storage_ < nb_per_second_)
+    //        //{
+    //        //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //        //    continue;
+    //        //}
+
+    //        if (resampled_datas_.empty()) break;
+
+    //        DonutAudioData buf = resampled_datas_.front();
+
+    //        uint8_t* raw_data = buf.data.data();
+    //        int raw_data_size = buf.data.size();
+
+    //        for (int i = 0; i < raw_data_size / 2; i++)
+    //        {
+    //            st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
+    //        }
+
+    //        sound_touch_->putSamples(st_source_buffer_, raw_data_size);
+
+    //        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    //        int num = sound_touch_->receiveSamples(st_resample_buffer_, raw_data_size);
+    //        //int num = sound_touch_->receiveSamples(st_resample_buffer_, raw_data_size / 4);
+    //        if (num == 0)
+    //        {
+    //            continue;
+    //        }
+    //        else
+    //        {
+    //            int size = need_size;
+    //            if (num > need_size)
+    //            {
+    //                size = need_size;
+    //            }
+
+    //            //SDL_MixAudioFormat(
+    //            //    stream + mixed_size,
+    //            //    (uint8_t*)st_resample_buffer_ + buffer_offset,
+    //            //    AUDIO_S16SYS,
+    //            //    size,
+    //            //    volume_
+    //            //);
+
+    //            //need_size -= raw_data_size;
+    //            //mixed_size += raw_data_size;
+    //            //buffer_offset += raw_data_size;
 
 
-    void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
+    //            SDL_MixAudioFormat(
+    //                stream + mixed_size,
+    //                (uint8_t*)st_resample_buffer_ + buffer_offset,
+    //                AUDIO_S16SYS,
+    //                num,
+    //                volume_
+    //            );
+
+    //            need_size -= num;
+    //            mixed_size += num;
+    //            buffer_offset += num;
+
+    //            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //            //DN_CORE_INFO("mixed size : {}", mixed_size);
+    //        }
+
+    //        int duration = buf.pts;
+    //    }
+    //}
+
+
+void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
+{
+    SDL_memset(stream, 0, len);
+
+    audio_callback_time_ = av_gettime_relative();
+
+    int mixed_size = 0;
+    int need_size = len;
+
+    int buffer_offset = 0;
+
+    int resampled_size = 0;
+
+    while (resampled_size < len)
     {
-        SDL_memset(stream, 0, len);
+        int resampled = audioDecodeFrame();
 
-        //std::unique_lock<std::mutex> lock(mtx_);
+        if (resampled_datas_.empty()) break;
 
-        audio_callback_time_ = av_gettime_relative();
-
-
-
-
-        int mixed_size = 0;
-        int need_size = len;
-
-        int buffer_offset = 0;
-
-        //cur_pts_ = buf.pts;     //µ±Ç°²¥·ÅµÄpts
-        //last_ms_ = GetCurrentTimeMsec();     //¼ÆÊ±¿ªÊ¼²¥·Å
-
-        while (mixed_size < len)
+        for (int i = 0; i < resampled / 2; i++)
         {
-            //if (resampled_datas_.empty())
-            //{
-            //    break;
-            //}
+            st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
+        }
 
-            //auto af = audio_frame_queue_->frameQueuePeekReadable();
-            int a = audioDecodeFrame();
-
-            //if (nb_storage_ < nb_per_second_)
-            //{
-            //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            //    continue;
-            //}
-
-            if (resampled_datas_.empty()) break;
-
-            DonutAudioData buf = resampled_datas_.front();
-
-            uint8_t* raw_data = buf.data.data();
-            int raw_data_size = buf.data.size();
-
-            for (int i = 0; i < raw_data_size / 2; i++)
-            {
-                st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
-            }
-
-            sound_touch_->putSamples(st_source_buffer_, raw_data_size);
-
-            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-            int num = sound_touch_->receiveSamples(st_resample_buffer_, raw_data_size / 4);
-            if (num == 0)
-            {
-                continue;
-            }
-            else
-            {
-                int size = need_size;
-                if (num > need_size)
-                {
-                    size = need_size;
-                }
-
-                SDL_MixAudioFormat(
-                    stream + mixed_size,
-                    (uint8_t*)st_resample_buffer_ + buffer_offset,
-                    AUDIO_S16SYS,
-                    size,
-                    volume_
-                );
-
-                //SDL_MixAudio(
-                //    stream + mixed_size,
-                //    (uint8_t*)resampled_buffer_ + buffer_offset,
-                //    size,
-                //    volume_
-                //);
-
-                need_size -= raw_data_size;
-                mixed_size += raw_data_size;
-                buffer_offset += raw_data_size;
-
-                //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                //DN_CORE_INFO("mixed size : {}", mixed_size);
-            }
-            
-            int duration = buf.pts;
-
-            //int size = buf.data.size() - buf.offset;//Ê£ÓàÎ´´¦ÀíµÄÊı¾İ
-            //if (size > need_size)
-            //{
-            //    size = need_size;
-            //}
-
-            //SDL_MixAudio(
-            //    stream + mixed_size,
-            //    buf.data.data() + buf.offset,
-            //    size, volume_
-            //);
-
-            //need_size -= size;
-            //mixed_size += size;
-            //buf.offset += size;
-            //if (buf.offset >= buf.data.size())
-            //{
-            //    audio_datas_.pop_front();
-            //}
+        sound_touch_->putSamples(st_source_buffer_, resampled);
+        int num = sound_touch_->receiveSamples(st_resample_buffer_, resampled);
+        if (num == 0)
+        {
+            continue;
+        }
+        else
+        {
+            resampled_size += num;
         }
     }
+
+    SDL_MixAudioFormat(
+        stream + mixed_size,
+        (uint8_t*)st_resample_buffer_ + buffer_offset,
+        AUDIO_S16SYS,
+        len,
+        volume_
+    );
+
+    //while (mixed_size < len)
+    //{
+    //    int size = need_size;
+
+    //    SDL_MixAudioFormat(
+    //        stream + mixed_size,
+    //        (uint8_t*)st_resample_buffer_ + buffer_offset,
+    //        AUDIO_S16SYS,
+    //        len,
+    //        volume_
+    //    );
+    //}
+}
+
+    //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
+    //{
+    //    SDL_memset(stream, 0, len);
+
+    //    //std::unique_lock<std::mutex> lock(mtx_);
+
+    //    audio_callback_time_ = av_gettime_relative();
+
+
+
+
+    //    int mixed_size = 0;
+    //    int need_size = len;
+
+    //    int buffer_offset = 0;
+
+    //    //cur_pts_ = buf.pts;     //å½“å‰æ’­æ”¾çš„pts
+    //    //last_ms_ = GetCurrentTimeMsec();     //è®¡æ—¶å¼€å§‹æ’­æ”¾
+
+    //    while (mixed_size < len)
+    //    {
+    //        //if (resampled_datas_.empty())
+    //        //{
+    //        //    break;
+    //        //}
+
+    //        //auto af = audio_frame_queue_->frameQueuePeekReadable();
+    //        int a = audioDecodeFrame();
+
+    //        //if (nb_storage_ < nb_per_second_)
+    //        //{
+    //        //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //        //    continue;
+    //        //}
+
+    //        if (resampled_datas_.empty()) break;
+
+    //        DonutAudioData buf = resampled_datas_.front();
+
+    //        uint8_t* raw_data = buf.data.data();
+    //        int raw_data_size = buf.data.size();
+
+    //        for (int i = 0; i < raw_data_size / 2; i++)
+    //        {
+    //            st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
+    //        }
+
+    //        sound_touch_->putSamples(st_source_buffer_, raw_data_size);
+
+    //        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    //        int num = sound_touch_->receiveSamples(st_resample_buffer_, raw_data_size / 4);
+    //        if (num == 0)
+    //        {
+    //            continue;
+    //        }
+    //        else
+    //        {
+    //            int size = need_size;
+    //            if (num > need_size)
+    //            {
+    //                size = need_size;
+    //            }
+
+    //            SDL_MixAudioFormat(
+    //                stream + mixed_size,
+    //                (uint8_t*)st_resample_buffer_ + buffer_offset,
+    //                AUDIO_S16SYS,
+    //                size,
+    //                volume_
+    //            );
+
+    //            //SDL_MixAudio(
+    //            //    stream + mixed_size,
+    //            //    (uint8_t*)resampled_buffer_ + buffer_offset,
+    //            //    size,
+    //            //    volume_
+    //            //);
+
+    //            need_size -= raw_data_size;
+    //            mixed_size += raw_data_size;
+    //            buffer_offset += raw_data_size;
+
+    //            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //            //DN_CORE_INFO("mixed size : {}", mixed_size);
+    //        }
+    //        
+    //        int duration = buf.pts;
+
+    //        //int size = buf.data.size() - buf.offset;//å‰©ä½™æœªå¤„ç†çš„æ•°æ®
+    //        //if (size > need_size)
+    //        //{
+    //        //    size = need_size;
+    //        //}
+
+    //        //SDL_MixAudio(
+    //        //    stream + mixed_size,
+    //        //    buf.data.data() + buf.offset,
+    //        //    size, volume_
+    //        //);
+
+    //        //need_size -= size;
+    //        //mixed_size += size;
+    //        //buf.offset += size;
+    //        //if (buf.offset >= buf.data.size())
+    //        //{
+    //        //    audio_datas_.pop_front();
+    //        //}
+    //    }
+    //}
 
     long long DonutSDLAudioPlayer::getCurrentPts()
     {
@@ -415,10 +605,10 @@ namespace Donut
 
         if (last_ms_ > 0)
         {
-            ms = GetCurrentTimeMsec() - last_ms_;//¾àÀëÉÏ´ÎĞ´Èë»º³åµÄ²¥·ÅÊ±¼äºÁÃë
+            ms = GetCurrentTimeMsec() - last_ms_;//è·ç¦»ä¸Šæ¬¡å†™å…¥ç¼“å†²çš„æ’­æ”¾æ—¶é—´æ¯«ç§’
         }
 
-        //pts ºÁÃë»»ËãptsµÄÊ±¼ä»ùÊı
+        //pts æ¯«ç§’æ¢ç®—ptsçš„æ—¶é—´åŸºæ•°
         if (timebase_ > 0)
         {
             ms = ms / (double)1000 / (double)timebase_;
@@ -452,7 +642,7 @@ namespace Donut
                     return -1;
                 }
 
-                av_usleep(1000);
+                //av_usleep(1000);
             }
 
             if (!(af = audio_frame_queue_->frameQueuePeekReadable()))
