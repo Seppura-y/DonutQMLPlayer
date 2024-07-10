@@ -1,5 +1,5 @@
-set QT=E:\Qt6_4_3
-set QTSDK=%QT%\6.6.3\msvc2019_64
+set QT=G:\application/Qt/Qt6
+set QTSDK=%QT%\6.4.2\msvc2019_64
 set CMAKE=%QT%\Tools\CMake_64\bin\cmake
 set OUTPATH=.\bin
 @echo cmake to Vs2022 

@@ -221,7 +221,7 @@ namespace Donut
         }
 
         // SDL 内部的音频缓冲区大小
-        audio_hw_buf_size_ = actual_spec.size;
+        //audio_hw_buf_size_ = actual_spec.size;
 
         //if (SDL_OpenAudio(&wanted_spec, nullptr) < 0)
         //{
@@ -262,9 +262,9 @@ namespace Donut
         is_resampler_init_ = true;
 
         // sample rate * channels * sizeof(short)
-        resampled_buffer_ = (uint8_t*)av_malloc(
-            resample_spec.bytes_per_sec
-        );
+        //resampled_buffer_ = (uint8_t*)av_malloc(
+        //    resample_spec.bytes_per_sec
+        //);
 
         st_source_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(resample_spec.bytes_per_sec));
 
@@ -443,7 +443,7 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
 
     int resampled_size = 0;
 
-    while (resampled_size < len)
+    while (mixed_size < len)
     {
         int resampled = audioDecodeFrame();
 
@@ -454,7 +454,8 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
             st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
         }
 
-        sound_touch_->putSamples(st_source_buffer_, resampled);
+        sound_touch_->putSamples(st_source_buffer_, resampled / 4);
+        //sound_touch_->putSamples((soundtouch::SAMPLETYPE*)resampled_buffer_, resampled / 4);
         int num = sound_touch_->receiveSamples(st_resample_buffer_, resampled);
         if (num == 0)
         {
@@ -462,30 +463,18 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
         }
         else
         {
+            mixed_size += num;
             resampled_size += num;
         }
     }
 
     SDL_MixAudioFormat(
-        stream + mixed_size,
-        (uint8_t*)st_resample_buffer_ + buffer_offset,
+        stream,
+        (uint8_t*)st_resample_buffer_,
         AUDIO_S16SYS,
-        len,
+        mixed_size,
         volume_
     );
-
-    //while (mixed_size < len)
-    //{
-    //    int size = need_size;
-
-    //    SDL_MixAudioFormat(
-    //        stream + mixed_size,
-    //        (uint8_t*)st_resample_buffer_ + buffer_offset,
-    //        AUDIO_S16SYS,
-    //        len,
-    //        volume_
-    //    );
-    //}
 }
 
     //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
@@ -641,8 +630,6 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
                 {
                     return -1;
                 }
-
-                //av_usleep(1000);
             }
 
             if (!(af = audio_frame_queue_->frameQueuePeekReadable()))
@@ -653,24 +640,18 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
 
         } while (af->serial_ != audio_frame_queue_->getSerial());
 
-        printf("af->frame_->format: %d\n", af->frame_->format);
-        AVSampleFormat f = (AVSampleFormat)(af->frame_->format);
-        printf("f: %d\n", f);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        int asdf = af->frame_->format;
+        //data_size = av_samples_get_buffer_size(
+        //    af->frame_->linesize,
+        //    af->frame_->channels,
+        //    af->frame_->nb_samples,
+        //    (AVSampleFormat)(af->frame_->format),
+        //    1);
 
-
-        data_size = av_samples_get_buffer_size(
-            af->frame_->linesize,
-            af->frame_->channels,
-            af->frame_->nb_samples,
-            f,
-            //(AVSampleFormat)(af->frame_->format),
-            0);
-
-        dec_channel_layout =
-            (af->frame_->channel_layout && af->frame_->channels == av_get_channel_layout_nb_channels(af->frame_->channel_layout)) ?
-            af->frame_->channel_layout : av_get_default_channel_layout(af->frame_->channels);
+        //dec_channel_layout =
+        //    (af->frame_->channel_layout && af->frame_->channels == av_get_channel_layout_nb_channels(af->frame_->channel_layout)) ?
+        //    af->frame_->channel_layout : av_get_default_channel_layout(af->frame_->channels);
 
         wanted_nb_samples = af->frame_->nb_samples;
 

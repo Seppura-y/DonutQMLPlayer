@@ -11,6 +11,7 @@
 #include "media_type.h"
 
 #include <QQuickItem>
+#include <QDateTime>
 
 namespace Donut
 {

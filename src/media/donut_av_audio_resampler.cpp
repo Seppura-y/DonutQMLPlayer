@@ -32,13 +32,13 @@ namespace Donut
         output_spec_ = out;
 
         int ret = 0;
-        int ch_layout = av_get_default_channel_layout(out.channels);
+        int ch_layout = av_get_default_channel_layout(output_spec_.channels);
         swr_ctx_ = swr_alloc_set_opts(
             nullptr,                                        // SwrContext
             ch_layout,                                      // out_ch_layout        AV_CH_LAYOUT_STEREO
             (AVSampleFormat)output_spec_.av_fmt,                     // out_sample_fmt
             output_spec_.sample_rate,                                // out_sample_rate
-            av_get_default_channel_layout(output_spec_.channels),    // in_ch_layout
+            av_get_default_channel_layout(input_spec_.channels),    // in_ch_layout
             (AVSampleFormat)input_spec_.av_fmt,                      // in_sample_fmt
             input_spec_.sample_rate,                                 // in_sample_rate
             0,
@@ -182,6 +182,7 @@ namespace Donut
 
         }
 
+        auto s = av_get_bytes_per_sample(output_spec_.av_fmt);
         out = (void**)output_buffer;
         resampled_data_size = nb_resampled * output_spec_.channels * av_get_bytes_per_sample(output_spec_.av_fmt);
 

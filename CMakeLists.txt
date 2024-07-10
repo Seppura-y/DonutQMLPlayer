@@ -144,6 +144,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/stb_image
     ${CMAKE_CURRENT_LIST_DIR}/include/ffmpeg
     ${CMAKE_CURRENT_LIST_DIR}/include/spdlog/include
+    ${CMAKE_CURRENT_LIST_DIR}/include/SDL2
+    ${CMAKE_CURRENT_LIST_DIR}/include/
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
