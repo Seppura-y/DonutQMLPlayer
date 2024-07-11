@@ -118,10 +118,13 @@ namespace Donut
     bool DonutSDLAudioPlayer::open(AudioSpec& spec)
     {
         std::lock_guard<std::mutex> lock(mtx_);
+        is_resampler_init_ = false;
         //this->input_spec_ = spec;
 
         //退出上一次音频
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         SDL_Init(SDL_INIT_AUDIO);
 
@@ -204,6 +207,9 @@ namespace Donut
             wanted_channel_layout = av_get_default_channel_layout(wanted_spec.channels);
         }
 
+        //wanted_spec.freq = next_sample_rates[next_sample_rate_idx];
+        //wanted_spec.channels = wanted_nb_channels;
+
         if (actual_spec.format != AUDIO_S16SYS)
         {
             DN_CORE_ERROR("SDL advised audio format %d is not supported!");
@@ -221,7 +227,7 @@ namespace Donut
         }
 
         // SDL 内部的音频缓冲区大小
-        //audio_hw_buf_size_ = actual_spec.size;
+        audio_hw_buf_size_ = actual_spec.size;
 
         //if (SDL_OpenAudio(&wanted_spec, nullptr) < 0)
         //{
@@ -263,16 +269,16 @@ namespace Donut
 
         // sample rate * channels * sizeof(short)
         //resampled_buffer_ = (uint8_t*)av_malloc(
-        //    resample_spec.bytes_per_sec
+        //    this->resample_spec_.bytes_per_sec
         //);
 
-        st_source_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(resample_spec.bytes_per_sec));
+        st_source_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(this->resample_spec_.bytes_per_sec));
 
-        st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(resample_spec.bytes_per_sec));
+        st_resample_buffer_ = static_cast<soundtouch::SAMPLETYPE*>(malloc(this->resample_spec_.bytes_per_sec));
 
         sound_touch_ = new soundtouch::SoundTouch();
-        sound_touch_->setSampleRate(resample_spec.sample_rate);
-        sound_touch_->setChannels(resample_spec.channels);
+        sound_touch_->setSampleRate(this->resample_spec_.sample_rate);
+        sound_touch_->setChannels(this->resample_spec_.channels);
         //sound_touch_->setTempo(2);
         sound_touch_->setTempo(playback_speed_);
         sound_touch_->setPitch(pitch_);
@@ -280,7 +286,7 @@ namespace Donut
         // 启动回调，开始播放
         SDL_PauseAudioDevice(audio_dev, 0);
 
-        nb_per_second_ = resample_spec.bytes_per_sec;
+        nb_per_second_ = this->resample_spec_.bytes_per_sec;
         is_exit_ = false;
         return true;
     }
@@ -443,9 +449,10 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
 
     int resampled_size = 0;
 
-    while (mixed_size < len)
+    while (resampled_size < len)
     {
         int resampled = audioDecodeFrame();
+        if (resampled == 0) break;
 
         if (resampled_datas_.empty()) break;
 
@@ -454,8 +461,7 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
             st_source_buffer_[i] = (resampled_buffer_[i * 2] + ((resampled_buffer_[i * 2 + 1]) << 8));
         }
 
-        sound_touch_->putSamples(st_source_buffer_, resampled / 4);
-        //sound_touch_->putSamples((soundtouch::SAMPLETYPE*)resampled_buffer_, resampled / 4);
+        sound_touch_->putSamples(st_source_buffer_, resampled);
         int num = sound_touch_->receiveSamples(st_resample_buffer_, resampled);
         if (num == 0)
         {
@@ -463,18 +469,52 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
         }
         else
         {
-            mixed_size += num;
             resampled_size += num;
         }
+
+
+        SDL_MixAudioFormat(
+            stream + mixed_size,
+            (uint8_t*)resampled_buffer_,
+            AUDIO_S16SYS,
+            resampled,
+            volume_
+        );
+
+        buffer_offset += resampled;
+        mixed_size += resampled;
+
+        //buffer_offset += num;
+        //mixed_size += num;
+
+        //need_size -= size;
+        //mixed_size += size;
+        //buf.offset += size;
     }
 
-    SDL_MixAudioFormat(
-        stream,
-        (uint8_t*)st_resample_buffer_,
-        AUDIO_S16SYS,
-        mixed_size,
-        volume_
-    );
+    //SDL_MixAudioFormat(
+    //    stream + mixed_size,
+    //    (uint8_t*)st_resample_buffer_,
+    //    AUDIO_S16SYS,
+    //    len,
+    //    volume_
+    //);
+
+
+
+
+    //while (mixed_size < len)
+    //{
+    //    int size = need_size;
+
+    //    SDL_MixAudioFormat(
+    //        stream + mixed_size,
+    //        (uint8_t*)st_resample_buffer_ + buffer_offset,
+    //        AUDIO_S16SYS,
+    //        len,
+    //        volume_
+    //    );
+    //}
 }
 
     //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
@@ -630,6 +670,8 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
                 {
                     return -1;
                 }
+
+                //av_usleep(1000);
             }
 
             if (!(af = audio_frame_queue_->frameQueuePeekReadable()))
@@ -640,22 +682,29 @@ void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
 
         } while (af->serial_ != audio_frame_queue_->getSerial());
 
+        //printf("af->frame_->format: %d\n", af->frame_->format);
+        //AVSampleFormat f = (AVSampleFormat)(af->frame_->format);
+        //printf("f: %d\n", f);
+
+        //int asdf = af->frame_->format;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        //data_size = av_samples_get_buffer_size(
-        //    af->frame_->linesize,
-        //    af->frame_->channels,
-        //    af->frame_->nb_samples,
-        //    (AVSampleFormat)(af->frame_->format),
-        //    1);
 
-        //dec_channel_layout =
-        //    (af->frame_->channel_layout && af->frame_->channels == av_get_channel_layout_nb_channels(af->frame_->channel_layout)) ?
-        //    af->frame_->channel_layout : av_get_default_channel_layout(af->frame_->channels);
+        data_size = av_samples_get_buffer_size(
+            af->frame_->linesize,
+            af->frame_->channels,
+            af->frame_->nb_samples,
+            //f,
+            (AVSampleFormat)(af->frame_->format),
+            1);
+
+        dec_channel_layout =
+            (af->frame_->channel_layout && af->frame_->channels == av_get_channel_layout_nb_channels(af->frame_->channel_layout)) ?
+            af->frame_->channel_layout : av_get_default_channel_layout(af->frame_->channels);
 
         wanted_nb_samples = af->frame_->nb_samples;
 
-        resampler_.initResampler(input_spec_, resample_spec_);
+        //resampler_.initResampler(input_spec_, resample_spec_);
 
         //lock.unlock();
         int resampled_size = resampler_.resampleAudio(af, (void**)&resampled_buffer_);
