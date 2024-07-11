@@ -76,6 +76,8 @@ namespace Donut
 
 		virtual void onSetPlaybackRate(float rate);
 
+		void setMute();
+
 		//********************* QML *********************
 	public:
 		Q_INVOKABLE void setDemuxer(DonutAVDemuxHandler* demuxer);

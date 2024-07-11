@@ -53,6 +53,7 @@ public:
     virtual void setSpeed(float s);
 
     void setVolume(int v){ volume_ = v; }
+    void setMute(){}
     void setTimebase(double b) { timebase_ = b; }
 
     void setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock);
@@ -76,7 +77,7 @@ protected:
     std::list<DonutAudioData> resampled_datas_;
     std::list<DonutAudioData> processsed_datas_;
 
-    float playback_speed_ = 1.;
+    float playback_speed_ = 1.0;
     double timebase_ = 0;
     unsigned char volume_ = 128;// 0~128
 

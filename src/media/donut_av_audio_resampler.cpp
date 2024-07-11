@@ -162,8 +162,6 @@ namespace Donut
             return -1;
         }
 
-
-
         int nb_resampled = swr_convert(
             swr_ctx_,
             output_buffer,
@@ -177,15 +175,8 @@ namespace Donut
             return -1;
         }
 
-        if(nb_resampled == out_count)
-        {
-
-        }
-
-        auto s = av_get_bytes_per_sample(output_spec_.av_fmt);
         out = (void**)output_buffer;
         resampled_data_size = nb_resampled * output_spec_.channels * av_get_bytes_per_sample(output_spec_.av_fmt);
-
         return resampled_data_size;
     }
 

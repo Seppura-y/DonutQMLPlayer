@@ -259,6 +259,7 @@ namespace Donut
 
 	void DonutQMLAVManager::setSoundVolume(int value)
 	{
+		audio_player_->setVolume(value);
 	}
 
 	void DonutQMLAVManager::onSeekingTimePos(double value)
@@ -289,6 +290,14 @@ namespace Donut
 
 	void DonutQMLAVManager::onSetPlaybackRate(float rate)
 	{
+	}
+
+	void DonutQMLAVManager::setMute()
+	{
+		if (audio_player_)
+		{
+			audio_player_->setVolume(0);
+		}
 	}
 
 	void DonutQMLAVManager::onVideoViewInitialized(QObject* view)

@@ -380,6 +380,8 @@ Window
                 volumePopup.x = pos.x - window.x - 13
                 volumePopup.y = pos.y - volumePopup.height - window.y
                 volumePopup.visible = true
+
+                qmlAVManager.setMute();
             }
 
             onSpeedUpButtonClicked:(rate)=>
