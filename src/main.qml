@@ -102,36 +102,55 @@ Window
         id: volumePopup
         width: 40
         height: 120
+        z: 120
+
         background: Rectangle
         {
             anchors.fill: parent
             color: "#2e3137"
             radius: 8
+
+            MouseArea
+            {
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered:
+                {
+                    volumePopup.isAboutToClose = false
+                }
+                onPositionChanged:(value)=> 
+                {
+                    volumePopup.isAboutToClose = false
+                }
+                onExited: 
+                {
+                    volumePopup.isAboutToClose = true
+                }
+            }
         }
-        z: 120
-        //Slider
-        //{
-        //    id: volumeSlider
-        //    from: 0
-        //    to: 100
-        //    value: 100
-        //    stepSize: 10
-        //    snapMode: Slider.SnapAlways
-        //    anchors.fill: parent
-        //    orientation: Qt.Vertical
-        //}
+
+        closePolicy: Popup.NoAutoClose
+
+        property bool isAboutToClose: false
+
+        function setValue(value)
+        {
+            slider.value = value
+        }
+
+
 
         Slider
         {
             id: slider
-            from: 0
-            to: 100
-            value: 100
+            from: 100
+            to: 0
+            value: 0
             stepSize: 10
             snapMode: Slider.SnapAlways
             anchors.fill: parent
             orientation: Qt.Vertical
-            focusPolicy: Qt.NoFocus
+            //focusPolicy: Qt.NoFocus
             topPadding: 0
             bottomPadding: 0
             //leftPadding: 0
@@ -140,6 +159,7 @@ Window
             MouseArea
             {
                 anchors.fill: parent
+                //hoverEnabled: true
                 property bool mouseClicked: false
 
                 drag.target: handleRect
@@ -153,7 +173,7 @@ Window
                     var value = slider.from + (clickPos / (slider.height - slider.topPadding - slider.bottomPadding)) * (slider.to - slider.from)
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
                 }
-                onPressed:
+                onPressed: (mouse)=>
                 {
                     mouseClicked = true
                     var clickPos = Math.max(slider.topPadding, Math.min(mouse.y - (handleRect.height / 2), slider.height - slider.bottomPadding - (handleRect.height / 2)))
@@ -162,13 +182,28 @@ Window
                 }
                 onPositionChanged: (mouse) =>
                 {
+                    volumePopup.isAboutToClose = false
                     if (drag.active)
                     {
-                        var clickPos = Math.max(slider.topPadding, Math.min(mouse.y - (handleRect.height / 2), slider.height - slider.bottomPadding - (handleRect.height / 2)))
+                        var clickPos = Math.max(slider.topPadding,
+                            Math.min(
+                                mouse.y - (handleRect.height / 2),
+                                slider.height - slider.bottomPadding - (handleRect.height / 2)
+                            )
+                        )
                         slider.value = slider.from + (clickPos / (slider.height - slider.topPadding - slider.bottomPadding)) * (slider.to - slider.from)
                         handleRect.y = clickPos
                     }
                 }
+                onEntered:
+                {
+                    volumePopup.isAboutToClose = false
+                }
+                onExited:
+                {
+                    volumePopup.isAboutToClose = true
+                }
+
                 onReleased: mouseClicked = false
             } // MouseArea
 
@@ -178,7 +213,9 @@ Window
                 width: 12
                 height: 12
                 radius: 6
+                //anchors.bottom: parent.bottom
                 color: slider.pressed ? "orange" : "white"
+                //y: slider.visualPosition * (slider.height - slider.topPadding)
                 y: slider.topPadding + (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding - height))
                 anchors.horizontalCenter: parent.horizontalCenter
                 MouseArea
@@ -189,12 +226,21 @@ Window
                     drag.axis: Drag.YAxis
                     drag.minimumY: slider.topPadding
                     drag.maximumY: slider.height - slider.bottomPadding - handleRect.height
-                    onEntered: handleRect.color = "orange"
-                    onExited: handleRect.color = "white"
+                    onEntered:
+                    {
+                        handleRect.color = "orange"
+                        volumePopup.isAboutToClose = false
+                    }
+                    onExited:
+                    {
+                        handleRect.color = "white"
+                        //volumePopup.isAboutToClose = true
+                    }
                     onPressed: handleRect.color = "orange"
                     onReleased: handleRect.color = "white"
                     onPositionChanged:
                     {
+                        volumePopup.isAboutToClose = false
                         if (drag.active)
                         {
                             slider.value = slider.from + (handleRect.y / (slider.height - slider.topPadding - slider.bottomPadding)) * (slider.to - slider.from)
@@ -210,6 +256,24 @@ Window
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "#bdbebf"
                 radius: 8
+                MouseArea
+                {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered:
+                    {
+                        volumePopup.isAboutToClose = false
+                    }
+                    onExited:
+                    {
+                        //volumePopup.isAboutToClose = true
+                    }
+
+                    onPositionChanged:
+                    {
+                        volumePopup.isAboutToClose = false
+                    }
+                }
             }
 
             contentItem: Item
@@ -224,21 +288,70 @@ Window
                     anchors.bottom: parent.bottom
                     color: "orange"
                     radius: 8
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered:
+                        {
+                            volumePopup.isAboutToClose = false
+                        }
+                        onExited:
+                        {
+                            //volumePopup.isAboutToClose = true
+                        }
+                        onPositionChanged:
+                        {
+                            volumePopup.isAboutToClose = false
+                        }
+                    }
                 }
             }
 
             onValueChanged:
             {
+                print("main slider onValueChanged : " + slider.visualPosition)
+
                 contentRect.height = (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding)) - (handleRect.height / 2)
+                //handleRect.y = slider.topPadding + (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding))
+                //handleRect.y = slider.height - (slider.visualPosition * (slider.height - slider.topPadding - slider.bottomPadding))
+                //print("handleRect.y = " + handleRect.y)
             }
 
             Component.onCompleted:
             {
                 contentRect.height = track.height
+                timer.start()
             }
         } // Slider
 
-    }
+	    Timer
+	    {
+		    id: timer
+		    interval: 500
+		    onTriggered:
+		    {
+                 volumePopup.close()
+		    }
+	    }
+
+        Connections
+        {
+            target: volumePopup
+            function onIsAboutToCloseChanged()
+            {
+                if(volumePopup.isAboutToClose)
+                {
+                    timer.start()
+                }
+                else
+                {
+                    visible = true
+                    timer.stop()
+                }
+            }
+        }
+    } // Popup
 
     // Titlebar, Controlbar and sidebar
     GridLayout
@@ -319,9 +432,6 @@ Window
                     }
                 }
             }
-
-
-
         }
 
         // Empty item as placeholder
@@ -362,7 +472,7 @@ Window
             Layout.bottomMargin: 1
 
             duration: 360
-            focusPolicy: Qt.ClickFocus
+            //focusPolicy: Qt.ClickFocus
             z: 100
             // isPlaying: mpv.state == MpvObject.VIDEO_PLAYING || mpv.state == MpvObject.TV_PLAYING
             // time: mpv.time
@@ -374,14 +484,31 @@ Window
             onSettingsButtonClicked: sideBar.openVideoOptions()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
-            onVolumeButtonClicked:(pos)=>
+            onVolumeButtonClicked:(value)=>
             {
-                print("onVolumeButtonClicked " + pos.x + " : " + pos.y)
-                volumePopup.x = pos.x - window.x - 13
-                volumePopup.y = pos.y - volumePopup.height - window.y
-                volumePopup.visible = true
+                //qmlAVManager.setVolume(value)
+                volumePopup.setValue(value)
+                //volumePopup.visible = true
+            }
 
-                qmlAVManager.setMute();
+            onVolumeButtonEntered: (entered, pos)=>
+            {
+                if(entered)
+                {
+                    volumePopup.isAboutToClose = false
+                }
+                if(entered && !volumePopup.visible)
+                {
+                    //print("onVolumeButtonClicked " + pos.x + " : " + pos.y)
+                    volumePopup.x = pos.x - window.x - 13
+                    volumePopup.y = pos.y - volumePopup.height - window.y
+                    
+                    volumePopup.visible = true
+                }
+                else if(!entered && volumePopup.visible)
+                {
+                    volumePopup.isAboutToClose = true
+                }
             }
 
             onSpeedUpButtonClicked:(rate)=>

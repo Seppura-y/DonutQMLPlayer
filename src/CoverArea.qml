@@ -6,7 +6,7 @@ MouseArea
 {
 	id: mouseArea
 
-	property bool autoHideBars: false
+	property bool autoHideBars: true
 	property var contextMenu
 	property var controlBar
 	property var sideBar
@@ -18,6 +18,9 @@ MouseArea
 	property int activeEdges: 0
 	property bool moveable: false
 	property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+
+	property bool isControlBarHovered: true
+	property bool isTitleBarHovered: true
 
 	hoverEnabled: true
 	acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -96,6 +99,8 @@ MouseArea
 
 	onPositionChanged: (mouse)=>
 	{
+		controlBar.visible = true
+		titleBar.visible = true
 		if(Qt.platform.os !== "osx" && moveable)
 		{
 			window.startSystemMove()
@@ -105,11 +110,6 @@ MouseArea
 		if(isMaterialUI)
 		{
 			titleBar.visible = true
-		}
-
-		if(autoHideBars)
-		{
-			timer.restart()
 		}
 
 		if(!mouseArea.pressed)
@@ -140,6 +140,33 @@ MouseArea
 			{
 				mouseArea.cursorShape = Qt.ArrowCursor
 			}
+		}
+
+		if(!controlBar.contains(controlBar.mapFromItem(mouseArea, mouse.x, mouse.y)))
+		{
+			//print("isControlBarHovered = false")
+			isControlBarHovered = false
+		}
+		else
+		{
+			//print("isControlBarHovered = true")
+			isControlBarHovered = true
+		}
+
+		if(!titleBar.contains(titleBar.mapFromItem(mouseArea, mouse.x, mouse.y)))
+		{
+			//print("isTitleBarHovered = false")
+			isTitleBarHovered = false
+		}
+		else
+		{
+			//print("isTitleBarHovered = true")
+			isTitleBarHovered = true
+		}
+
+		if(autoHideBars && !isControlBarHovered && !isTitleBarHovered && !timer.running)
+		{
+			timer.restart()
 		}
 
 		if(window.startSystemMove !== undefined && Qt.playform !== "osx")
@@ -195,21 +222,14 @@ MouseArea
 		interval: 2000
 		onTriggered:
 		{
-			if(mouseArea.pressed === true || sideBar.visible)
+			if(isControlBarHovered || isTitleBarHovered)
 			{
 				return
 			}
 
 			mouseArea.cursorShape = Qt.BlankCursor
-			if(!controlBar.contains(controlBar.mapFromItem(mouseArea, MouseArea.mouseX, mouseArea.mouseY)))
-			{
-				controlBar.visible = false
-			}
-
-			if(!titleBar.contains(titleBar.mapFromItem(mouseArea, MouseArea.mouseX, mouseArea.mouseY)))
-			{
-				titleBar.visible = false
-			}
+			controlBar.visible = false
+			titleBar.visible = false
 		}
 	}
 }

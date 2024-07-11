@@ -8,7 +8,6 @@ Control
 {
     id: controlBar
 
-
     FontLoader
     {
         id: fontAwesome
@@ -30,15 +29,18 @@ Control
     signal speedUpButtonClicked(var rate)
     signal speedDownButtonClicked(var rate)
     signal playModeButtonClicked()
-    signal volumeButtonClicked(point pos)
+    signal volumeButtonClicked(int value)
+    signal volumeButtonEntered(bool entered, point pos)
     signal settingsButtonClicked()
     signal fullscreenButtonClicked()
     signal sidebarButtonClicked()
 
     property bool isPlaying: false
+    property bool isMute: false
     property double playbackSpeed: 1.0
     property int duration: 120
     property int currentTime: 0
+    property int volume: 100
 
     function toHHMMSS(seconds)
     {
@@ -366,11 +368,27 @@ Control
 
                 onButtonClicked:
                 {
-                    var globalPos = volumeButton.mapToGlobal(Qt.point(0, 0));
-                    volumeButtonClicked(globalPos);
-                    slider.increase()
-                    print("volumeButton onClicked")
+                    if(isMute)
+                    {
+                        isMute = false
+                        volumeButtonClicked(volume);
+                    }
+                    else
+                    {
+                        isMute = true
+                        volumeButtonClicked(0);
+                    }
+
                 }
+
+
+                onButtonEntered: (value)=>
+                {
+                    var globalPos = volumeButton.mapToGlobal(Qt.point(5, 0))
+                    volumeButtonEntered(value, globalPos)
+                    //print("volumeButton onMouseEnter " + value)
+                }
+                
             }
 
 

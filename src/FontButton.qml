@@ -11,6 +11,9 @@ Button
     signal buttonChecked(bool isChecked)
     signal buttonClicked()
 
+    signal buttonEntered(bool isEntered)
+    signal buttonHovered(bool isHovered)
+
     FontLoader
     {
         id: fontAwesome
@@ -45,7 +48,7 @@ Button
                 btnRect.color = "dimgray"
                 btnText.color = "orange"
             }
-            
+            buttonEntered(true)
         }
 
         onPressed:
@@ -64,6 +67,7 @@ Button
                 btnRect.color = "#2e3137"
                 btnText.color = "silver"
             }
+            buttonEntered(false)
         }
 
         onReleased:

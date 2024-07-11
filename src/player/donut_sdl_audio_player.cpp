@@ -361,63 +361,6 @@ namespace Donut
         }
     }
 
-
-    //void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)
-    //{
-    //    SDL_memset(stream, 0, len);
-
-    //    audio_callback_time_ = av_gettime_relative();
-
-    //    int mixed_size = 0;
-    //    const int sample_size = sizeof(short); // 16-bit samples
-    //    const int num_channels = 2; // Stereo
-
-    //    while (mixed_size < len)
-    //    {
-    //        int resampled = audioDecodeFrame();
-
-    //        if (resampled_datas_.empty()) break;
-
-    //        // Convert resampled buffer to SoundTouch format
-    //        for (int i = 0; i < resampled / 2; i++)
-    //        {
-    //            st_source_buffer_[i] = (resampled_buffer_[i * 2] | (resampled_buffer_[i * 2 + 1] << 8));
-    //        }
-
-    //        sound_touch_->putSamples(st_source_buffer_, resampled / 4);
-
-    //        int num_samples_needed = (len - mixed_size) / (sample_size * num_channels);
-    //        int num_samples = sound_touch_->receiveSamples(st_resample_buffer_, num_samples_needed);
-
-    //        if (num_samples == 0)
-    //        {
-    //            continue;
-    //        }
-
-    //        int bytes_received = num_samples * sample_size * num_channels;
-    //        if (mixed_size + bytes_received > len)
-    //        {
-    //            bytes_received = len - mixed_size;
-    //            num_samples = bytes_received / (sample_size * num_channels);
-    //        }
-
-    //        SDL_MixAudioFormat(
-    //            stream + mixed_size,
-    //            (uint8_t*)st_resample_buffer_,
-    //            AUDIO_S16SYS,
-    //            bytes_received,
-    //            volume_
-    //        );
-
-    //        mixed_size += bytes_received;
-    //    }
-
-    //    if (mixed_size < len)
-    //    {
-    //        SDL_memset(stream + mixed_size, 0, len - mixed_size);
-    //    }
-    //}
-
     long long DonutSDLAudioPlayer::getCurrentPts()
     {
         double ms = 0;
