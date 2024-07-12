@@ -13,5 +13,6 @@
         <file>VideoOptions.qml</file>
         <file>Settings.qml</file>
         <file>CoverArea.qml</file>
+        <file>VolumePopup.qml</file>
     </qresource>
 </RCC>

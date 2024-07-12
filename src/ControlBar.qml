@@ -30,6 +30,7 @@ Control
     signal speedDownButtonClicked(var rate)
     signal playModeButtonClicked()
     signal volumeButtonClicked(int value)
+    signal volumeButtonMute()
     signal volumeButtonEntered(bool entered, point pos)
     signal settingsButtonClicked()
     signal fullscreenButtonClicked()
