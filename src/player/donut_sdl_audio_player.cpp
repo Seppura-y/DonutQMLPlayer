@@ -51,7 +51,7 @@ namespace Donut
         if (data)
         {
             auto frame = static_cast<AVFrame*>(data);
-
+            if (frame->data == nullptr) return;
             AVRational tb = AVRational{ 1, frame->sample_rate };
 
             if (audio_frame_queue_)

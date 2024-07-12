@@ -288,15 +288,17 @@ Popup
         }
     } // Slider
     
-      Timer
-      {
-          id: timer
-          interval: 500
-          onTriggered:
-          {
-              volumePopup.close()
-          }
-      }
+    Timer
+    {
+        id: timer
+        interval: 500
+        onTriggered:
+        {
+            volumePopup.close()
+            visible = false
+            //print("volume timer visible = false")
+        }
+    }
     
     Connections
     {
@@ -306,11 +308,13 @@ Popup
             if(volumePopup.isAboutToClose)
             {
                 timer.start()
+                //print("onIsAboutToCloseChanged timer start")
             }
             else
             {
                 visible = true
                 timer.stop()
+                //print("onIsAboutToCloseChanged visible = true")
             }
         }
     }

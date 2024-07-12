@@ -256,18 +256,25 @@ Window
             {
                 if(entered)
                 {
+                    //print("onVolumeButtonEntered " + pos.x + " : " + pos.y)
                     volumePopup.isAboutToClose = false
                 }
-                if(entered && !volumePopup.visible)
+                if(entered)
+                //if(entered && !volumePopup.visible)
                 {
-                    //print("onVolumeButtonClicked " + pos.x + " : " + pos.y)
+                    //print("onVolumeButtonEntered pos " + pos.x + " : " + pos.y)
+                    //print("onVolumeButtonEntered windows " + window.x + " : " + window.y)
+                    //print("onVolumeButtonEntered popup " + volumePopup.x + " : " + volumePopup.y)
+                    //print("======================================= ")
                     volumePopup.x = pos.x - window.x - 13
                     volumePopup.y = pos.y - volumePopup.height - window.y
                     
                     volumePopup.visible = true
                 }
-                else if(!entered && volumePopup.visible)
+                else if(!entered)
+                //else if(!entered && volumePopup.visible)
                 {
+                    //print("onVolumeButtonEntered volumePopup.isAboutToClose = true " + pos.x + " : " + pos.y)
                     volumePopup.isAboutToClose = true
                 }
             }

@@ -57,7 +57,7 @@ namespace Donut
 	{
 		while (!is_exit_)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			auto a_serial = a_packet_queue_->getSerial();
 
 			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
