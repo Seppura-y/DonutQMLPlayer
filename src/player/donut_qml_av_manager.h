@@ -63,7 +63,7 @@ namespace Donut
 
 		virtual void setTimePos(double value);
 
-		virtual void setSoundVolume(int value);
+		Q_INVOKABLE void setSoundVolume(int value);
 
 	public slots:
 		virtual void onSeekingTimePos(double value);

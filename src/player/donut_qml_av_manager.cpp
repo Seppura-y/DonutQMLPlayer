@@ -259,7 +259,8 @@ namespace Donut
 
 	void DonutQMLAVManager::setSoundVolume(int value)
 	{
-		audio_player_->setVolume(value);
+		if(audio_player_)
+			audio_player_->setVolume(value);
 	}
 
 	void DonutQMLAVManager::onSeekingTimePos(double value)
@@ -278,6 +279,7 @@ namespace Donut
 
 	void DonutQMLAVManager::onSetSoundVolume(int value)
 	{
+		DN_CORE_WARN("onSetSoundVolume " + value);
 	}
 
 	void DonutQMLAVManager::onPlayOrPause(bool status)

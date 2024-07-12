@@ -372,12 +372,16 @@ Control
                     if(isMute)
                     {
                         isMute = false
-                        volumeButtonClicked(volume);
+                        //volumeButtonClicked(volume)
+                        volumeButtonMute()
+                        txt = String.fromCodePoint(0xf028)
                     }
                     else
                     {
                         isMute = true
-                        volumeButtonClicked(0);
+                        //volumeButtonClicked(0)
+                        volumeButtonMute()
+                        txt = String.fromCodePoint(0xf2e2)
                     }
 
                 }

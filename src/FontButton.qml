@@ -74,7 +74,7 @@ Button
         {
             btnRect.color = "dimgray"
             btnText.color = "silver"
-            print("onReleased")
+            //print("onReleased")
         }
 
         onClicked:

@@ -103,6 +103,12 @@ Window
         width: 40
         height: 120
         z: 120
+
+        onVolumeValueUpdate: (value)=>
+        {
+            //print("onVolumValueUpdate : " + value)
+            qmlAVManager.setSoundVolume(value)
+        }
     }
 
     // Titlebar, Controlbar and sidebar
@@ -238,10 +244,12 @@ Window
             // onSeekRequested: mpv.seek(time);
             onVolumeButtonClicked:(value)=>
             {
-                //qmlAVManager.setVolume(value)
                 volumePopup.setValue(value)
+            }
+
+            onVolumeButtonMute:
+            {
                 volumePopup.setMute()
-                //volumePopup.visible = true
             }
 
             onVolumeButtonEntered: (entered, pos)=>
