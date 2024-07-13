@@ -338,13 +338,16 @@ namespace Donut
 
 	Q_INVOKABLE void DonutQMLAVManager::setPlaybackRate(float value)
 	{
-		playback_rate_ = value;
-		DN_CORE_WARN("playback rate : " + std::to_string(value));
+		playback_speed_ = value;
+		if (audio_player_)
+		{
+			audio_player_->setPlaybackSpeed(playback_speed_);
+		}
 	}
 
 	Q_INVOKABLE float DonutQMLAVManager::getPlaybackRate()
 	{
-		return playback_rate_;
+		return playback_speed_;
 	}
 
 	int DonutQMLAVManager::onOpenMediaFile(QString path)

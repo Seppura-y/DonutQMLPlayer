@@ -8,6 +8,7 @@ Control {
 
     signal openFileRequested()
     signal openUrlRequested()
+    signal playingIndexChanged()
 
 //    property MpvObject mpv: null
 
@@ -58,6 +59,7 @@ Control {
             id: playlist
             onOpenFileRequested: sideBar.openFileRequested()
             //onOpenUrlRequested: sideBar.openUrlRequested()
+            onPlayingIndexChanged: sideBar.playingIndexChanged()
         }
 
         // Settings

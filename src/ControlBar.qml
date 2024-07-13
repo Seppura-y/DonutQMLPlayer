@@ -444,6 +444,27 @@ Control
         } // RowLayout
     } // ColumnLayout
 
+    Connections
+    {
+        target: controlBar
+        function onIsMuteChanged()
+        {
+            if(isMute)
+            {
+                volumeButton.txt = String.fromCodePoint(0xf2e2)
+            }
+            else
+            {
+                volumeButton.txt = String.fromCodePoint(0xf028)
+            }
+        }
 
+        function onIsPlayingChanged()
+        {
+            playPauseButton.txt = String.fromCodePoint(0x23f8)
+
+            playPauseButton.checked = true
+        }
+    }
 
 }

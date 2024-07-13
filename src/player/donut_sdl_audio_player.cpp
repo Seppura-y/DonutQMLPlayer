@@ -433,4 +433,11 @@ namespace Donut
             return false;
         }
     }
+
+    void DonutSDLAudioPlayer::setPlaybackSpeed(float speed)
+    {
+        playback_speed_ = speed;
+        if(sound_touch_)
+            sound_touch_->setTempo(playback_speed_);
+    }
 }

@@ -17,7 +17,7 @@ Popup
     property bool isMute: false
     property int upperValue: 100
     property int lowerValue: 0
-    property int volume: 100
+    property int volumeValue: 100
     
     
     signal volumeValueUpdate(int value)
@@ -33,15 +33,26 @@ Popup
     
     function setValue(value)
     {
+        print("setValue")
         slider.value = slider.to * (value / upperValue)
     }
     
     function setMute()
     {
-        if(slider.value != slider.from)
-            slider.value = slider.from
-        else
+        if(slider.value != slider.from && slider.value != slider.to)
+        {
+            volumeValue = slider.visualPosition * upperValue
             slider.value = slider.to
+        }
+        else if(slider.value === slider.from)
+        {
+            volumeValue = slider.visualPosition * upperValue
+            slider.value = slider.to
+        }
+        else if(slider.value === slider.to)
+        {
+            slider.value = slider.to * (1.0 - volumeValue / upperValue)
+        }
     }
     
     
@@ -272,8 +283,12 @@ Popup
             }
             else
             {
-                contentRect.height = (slider.visualPosition * slider.height)
-                handleRect.y = slider.height - (handleRect.height) - slider.topPadding
+                contentRect.height = (slider.visualPosition * slider.height) - (handleRect.height / 2)
+                handleRect.y = slider.height - contentRect.height - (handleRect.height / 2)
+                if(slider.visualPosition === 0)
+                {
+                    handleRect.y = slider.height - (handleRect.height / 2)
+                }
             }
             volumePopup.volumeValueUpdate(slider.visualPosition * upperValue)
         }

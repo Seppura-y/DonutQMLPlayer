@@ -62,6 +62,8 @@ public:
 
     void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
 
+    virtual void setPlaybackSpeed(float speed) = 0;
+
 protected:
     IDonutAudioPlayer();
     virtual void callback(unsigned char* stream, int len) = 0;

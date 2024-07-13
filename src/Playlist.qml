@@ -9,7 +9,7 @@ Item
 	id: playList
 
 	signal openFileRequested()
-	
+	signal playingIndexChanged()
 	GridLayout
 	{
 		anchors.fill: parent
@@ -100,6 +100,11 @@ Item
 		onPlayingSingleDrop:
 		{
 			PlaylistModel.playItem(index);
+		}
+
+		onPlayingIndexChanged:
+		{
+			playingIndexChanged()
 		}
 	}
 }

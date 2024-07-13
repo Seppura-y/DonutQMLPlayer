@@ -32,6 +32,7 @@ public:
 
 
     bool isNormalPlaybackRate();
+    void setPlaybackSpeed(float speed) override;
 public:
     int getSoundTouchData(void** pcm_buffer);
 

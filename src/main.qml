@@ -107,6 +107,14 @@ Window
         onVolumeValueUpdate: (value)=>
         {
             //print("onVolumValueUpdate : " + value)
+            if(value === 0)
+            {
+                controlBar.isMute = true
+            }
+            else
+            {
+                controlBar.isMute = false
+            }
             qmlAVManager.setSoundVolume(value)
         }
     }
@@ -217,6 +225,11 @@ Window
             //mpv: mpv
             onOpenFileRequested: fileDialog.open()
             //onOpenUrlRequested: openUrlDialog.visible = true
+
+            onPlayingIndexChanged: 
+            {
+                controlBar.isPlaying = true
+            }
         }
 
         // Controlbar
@@ -242,10 +255,11 @@ Window
             onSettingsButtonClicked: sideBar.openVideoOptions()
             // onExplorerButtonClicked: sidebar.openExplorer()
             // onSeekRequested: mpv.seek(time);
-            onVolumeButtonClicked:(value)=>
-            {
-                volumePopup.setValue(value)
-            }
+
+            //onVolumeButtonClicked:(value)=>
+            //{
+            //    volumePopup.setValue(value)
+            //}
 
             onVolumeButtonMute:
             {
@@ -256,25 +270,18 @@ Window
             {
                 if(entered)
                 {
-                    //print("onVolumeButtonEntered " + pos.x + " : " + pos.y)
                     volumePopup.isAboutToClose = false
                 }
                 if(entered)
-                //if(entered && !volumePopup.visible)
                 {
-                    //print("onVolumeButtonEntered pos " + pos.x + " : " + pos.y)
-                    //print("onVolumeButtonEntered windows " + window.x + " : " + window.y)
-                    //print("onVolumeButtonEntered popup " + volumePopup.x + " : " + volumePopup.y)
-                    //print("======================================= ")
+
                     volumePopup.x = pos.x - window.x - 13
                     volumePopup.y = pos.y - volumePopup.height - window.y
                     
                     volumePopup.visible = true
                 }
                 else if(!entered)
-                //else if(!entered && volumePopup.visible)
                 {
-                    //print("onVolumeButtonEntered volumePopup.isAboutToClose = true " + pos.x + " : " + pos.y)
                     volumePopup.isAboutToClose = true
                 }
             }

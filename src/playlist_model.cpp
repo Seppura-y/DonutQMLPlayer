@@ -97,7 +97,11 @@ void PlaylistModel::playItem(int index)
 {
 	if (index >= 0 && index < titles_.count())
 	{
-		Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile(file_urls_[index].toLocalFile());
+		int ret = Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile(file_urls_[index].toLocalFile());
+		if (ret == 0)
+		{
+			playingIndexChanged();
+		}
 	}
 	
 }

@@ -114,7 +114,7 @@ namespace Donut
 
 			if (
 				(hasVideo() && v_packet_queue_ && v_packet_queue_->packetQueueHasEnoughPackets())
-				||
+				&&
 				(hasAudio() && a_packet_queue_ && a_packet_queue_->packetQueueHasEnoughPackets())
 				)
 			{
