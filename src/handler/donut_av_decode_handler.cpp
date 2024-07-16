@@ -7,6 +7,7 @@ extern"C"
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
     #include <libavutil/avutil.h>
+    #include <libavutil/time.h>
 }
 
 namespace Donut
@@ -53,6 +54,7 @@ namespace Donut
 
     int Donut::DonutAVDecodeHandler::openDecoder(std::shared_ptr<DonutAVParamWarpper> param)
     {
+        timebase_ = *param->time_base;
         return openDecoder(param->para);
     }
 
@@ -96,11 +98,113 @@ namespace Donut
         this->packet_queue_ = packet_queue;
     }
 
-    void DonutAVDecodeHandler::setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock)
+    void DonutAVDecodeHandler::setClocks(std::shared_ptr<DonutAVClock>& master, std::shared_ptr<DonutAVClock>& clock)
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        audio_clock_ = a_clock;
-        video_clock_ = v_clock;
+        master_clock_ = master;
+        clock_ = clock;
+    }
+
+    void DonutAVDecodeHandler::setSleepTime(bool need_sync, double time)
+    {
+        is_need_sync_ = need_sync;
+        sleep_ms_ = time * 1000000;
+    }
+
+    double DonutAVDecodeHandler::getFrameDiffTime(AVFrame* frame)
+    {
+        if (!master_clock_ || !clock_) return 0;
+
+        if (master_clock_ == clock_)
+        {
+            is_need_sync_ = false;
+            return 0;
+        }
+        else
+        {
+            is_need_sync_ = true;
+        }
+
+        double pts = frame->pts;
+        if (pts == AV_NOPTS_VALUE)
+        {
+            pts = 0;
+        }
+        auto para = decoder_.copyCodecParam();
+        AVRational* timebase = para->time_base;
+        pts *= av_q2d(*timebase);
+        if (pts > 0)
+        {
+            clock_->setClockAt(pts, 0, pts);
+        }
+
+        double diff = master_clock_->pts_ - clock_->pts_;
+
+        return diff;
+    }
+
+    double DonutAVDecodeHandler::getDelayTime(double diff)
+    {
+        double delay_time = 0;
+        double default_delay_time = 0.04;
+        if (diff > 0.003)
+        {
+            // master超前，调整睡眠时间为2/3
+            delay_time = delay_time * 2 / 3;
+            if (delay_time < default_delay_time / 2)
+            {
+                // 睡眠时间最少是默认值(40ms)的 2/3
+                delay_time = default_delay_time * 2 / 3;
+            }
+            else if (delay_time > default_delay_time * 2)
+            {
+                // 睡眠时间最少是默认值(40ms)的 2倍
+                delay_time = default_delay_time * 2;
+            }
+        }
+        else if (diff < -0.003)
+        {
+            // master落后，调整为delay time的1.5倍
+            delay_time = delay_time * 3 / 2;
+            if (delay_time < default_delay_time / 2)
+            {
+                // 睡眠时间最少是默认值(40ms)的 2/3
+                delay_time = default_delay_time * 2 / 3;
+            }
+            else if (delay_time > default_delay_time * 2)
+            {
+                // 睡眠时间最少是默认值(40ms)的 2倍
+                delay_time = default_delay_time * 2;
+            }
+        }
+
+        // master超前500ms
+        if (diff >= 0.5)
+        {
+            // 直接跳过本帧
+            delay_time = 0;
+        }
+        else if (diff <= -0.5)
+        {
+            // master落后超过500ms，2倍默认值(2 * 40ms)
+            delay_time = default_delay_time * 2;
+        }
+
+        // master超前10秒，不进行同步，直接清空slave队列
+        if (diff >= 10)
+        {
+            packet_queue_->packetQueueFlush();
+            delay_time = default_delay_time;
+        }
+
+        // master落后10秒，不进行同步，直接清空master队列
+        if (diff <= -10)
+        {
+            packet_queue_->packetQueueFlush();
+            delay_time = default_delay_time;
+        }
+
+        return delay_time;
     }
 
     void Donut::DonutAVDecodeHandler::threadLoop()
@@ -108,6 +212,10 @@ namespace Donut
         AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
+            if (is_need_sync_)
+            {
+                std::this_thread::sleep_for(std::chrono::microseconds(sleep_ms_));
+            }
             int serial = -1;
             {
                 if (packet_queue_->packetQueueHasEnoughPackets())
@@ -134,6 +242,14 @@ namespace Donut
                         //    }
 
                         //}
+
+                        auto pts = decoded_frame->pts;
+                        pts *= av_q2d(timebase_);
+                        auto cur = av_gettime_relative();
+                        clock_->setClockAt(pts, 0, cur);
+
+                        double diff = getFrameDiffTime(decoded_frame);
+                        sleep_ms_ = (int)(getDelayTime(diff) * 1000000);
                         notify(decoded_frame);
                     }
                     //av_frame_unref(decoded_frame);

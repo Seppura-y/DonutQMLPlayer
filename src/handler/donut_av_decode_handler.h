@@ -34,9 +34,15 @@ namespace Donut
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue> frame_queue);
 		void setPacketQueue(std::shared_ptr<DonutAVPacketQueue> packet_queue);
 
-		void setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock);
+		void setClocks(std::shared_ptr<DonutAVClock>& master_clock, std::shared_ptr<DonutAVClock>& clock);
+
+		void setSleepTime(bool need_sync, double time);
 	protected:
 		void threadLoop() override;
+
+	private:
+		double getFrameDiffTime(AVFrame* frame);
+		double getDelayTime(double diff);
 	private:
 		bool is_need_play_ = false;
 
@@ -51,8 +57,13 @@ namespace Donut
 
 		int stream_index_ = -1;
 
-		std::shared_ptr<DonutAVClock> audio_clock_;
-		std::shared_ptr<DonutAVClock> video_clock_;
+		std::shared_ptr<DonutAVClock> master_clock_;
+		std::shared_ptr<DonutAVClock> clock_;
+
+		bool is_need_sync_ = false;
+		int sleep_ms_ = 0;
+
+		AVRational timebase_{0};
 	};
 
 	template<typename T>

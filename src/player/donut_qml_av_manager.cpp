@@ -6,7 +6,6 @@
 extern"C"
 {
 #include <libavformat/avformat.h>
-//#include <>
 }
 
 namespace Donut
@@ -59,6 +58,16 @@ namespace Donut
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			auto a_serial = a_packet_queue_->getSerial();
+
+			if (v_packet_queue_->packetQueueNeedFlush())
+			{
+				v_packet_queue_->packetQueueFlush();
+			}
+
+			if (a_packet_queue_->packetQueueNeedFlush())
+			{
+				a_packet_queue_->packetQueueFlush();
+			}
 
 			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
 			//if (a_remaining)
@@ -188,6 +197,7 @@ namespace Donut
 		if (video_view_)
 		{
 			video_view_->setClocks(audio_clock_, video_clock_);
+			v_decode_handler_->setClocks(audio_clock_, video_clock_);
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
 			//v_decode_handler_->setFrameQueue(v_frame_queue_);
@@ -198,6 +208,7 @@ namespace Donut
 		{
 			//audio_player_->setFrameQueue(a_frame_queue_);
 			audio_player_->setClocks(audio_clock_, video_clock_);
+			a_decode_handler_->setClocks(audio_clock_, audio_clock_);
 			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
 			//a_decode_handler_->setFrameQueue(a_frame_queue_);
@@ -214,84 +225,6 @@ namespace Donut
 	int DonutQMLAVManager::initManager(int width, int height, int fmt, void* win_id)
 	{
 		return 0;
-	}
-
-	void DonutQMLAVManager::destroyManager()
-	{
-	}
-
-
-	void DonutQMLAVManager::setTargetUrl(std::string url)
-	{
-	}
-
-	void DonutQMLAVManager::updateTimePos(qint64 value)
-	{
-	}
-
-	void DonutQMLAVManager::updateTotalDuration(QTime value)
-	{
-	}
-
-	void DonutQMLAVManager::updateSoundVolume(int value)
-	{
-	}
-
-	void DonutQMLAVManager::mediaEndReached()
-	{
-	}
-
-	void DonutQMLAVManager::setPlaying()
-	{
-	}
-
-	void DonutQMLAVManager::setPause()
-	{
-	}
-
-	void DonutQMLAVManager::setStop()
-	{
-	}
-
-	void DonutQMLAVManager::setTimePos(double value)
-	{
-	}
-
-	void DonutQMLAVManager::setSoundVolume(int value)
-	{
-		if(audio_player_)
-			audio_player_->setVolume(value);
-	}
-
-	void DonutQMLAVManager::onSeekingTimePos(double value)
-	{
-
-	}
-
-	void DonutQMLAVManager::onSeekForward()
-	{
-		serial_++;
-	}
-
-	void DonutQMLAVManager::onSeekBackward()
-	{
-	}
-
-	void DonutQMLAVManager::onSetSoundVolume(int value)
-	{
-		DN_CORE_WARN("onSetSoundVolume " + value);
-	}
-
-	void DonutQMLAVManager::onPlayOrPause(bool status)
-	{
-	}
-
-	void DonutQMLAVManager::onStop()
-	{
-	}
-
-	void DonutQMLAVManager::onSetPlaybackRate(float rate)
-	{
 	}
 
 	void DonutQMLAVManager::setMute()
@@ -386,8 +319,9 @@ namespace Donut
 				a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 0);
 
 				audio_player_->setFrameQueue(a_frame_queue_);
-
-				audio_player_->open(demux_handler_->copyAudioParameters()->para);
+				
+				auto warpper = demux_handler_->copyAudioParameters();
+				audio_player_->open(*warpper);
 			}
 
 			this->addNode(audio_player_);
@@ -413,5 +347,78 @@ namespace Donut
 	void DonutQMLAVManager::onMediaEOF()
 	{
 		qDebug() << "DonutQMLAVManager::onMediaEOF()";
+	}
+
+	void DonutQMLAVManager::destroyManager()
+	{
+	}
+
+
+	void DonutQMLAVManager::setTargetUrl(std::string url)
+	{
+	}
+
+	void DonutQMLAVManager::updateTimePos(qint64 value)
+	{
+	}
+
+	void DonutQMLAVManager::updateTotalDuration(QTime value)
+	{
+	}
+
+	void DonutQMLAVManager::updateSoundVolume(int value)
+	{
+	}
+
+	void DonutQMLAVManager::mediaEndReached()
+	{
+	}
+
+	void DonutQMLAVManager::setPlaying()
+	{
+	}
+
+	void DonutQMLAVManager::setPause()
+	{
+	}
+
+	void DonutQMLAVManager::setStop()
+	{
+	}
+
+	void DonutQMLAVManager::setTimePos(double value)
+	{
+	}
+
+	void DonutQMLAVManager::setSoundVolume(int value)
+	{
+		if (audio_player_)
+			audio_player_->setVolume(value);
+	}
+
+	void DonutQMLAVManager::onSeekingTimePos(double value)
+	{
+
+	}
+
+	void DonutQMLAVManager::onSeekForward()
+	{
+		serial_++;
+	}
+
+	void DonutQMLAVManager::onSeekBackward()
+	{
+	}
+
+	void DonutQMLAVManager::onPlayOrPause(bool status)
+	{
+	}
+
+	void DonutQMLAVManager::onStop()
+	{
+	}
+
+	void DonutQMLAVManager::onSetPlaybackRate(float rate)
+	{
 	}
 }

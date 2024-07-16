@@ -71,6 +71,9 @@ public:
 	int packetQueueGetStreamIndex();
 
 	bool packetQueueHasEnoughPackets();
+
+	void packetQueueSetMasterFlush(bool flush);
+	bool packetQueueNeedFlush() { return flush_and_sync_; }
 protected:
 	//int packetQueuePutPrivate(std::shared_ptr<DonutAVPacket> pkt);
 private:
@@ -82,6 +85,9 @@ private:
 
 	int stream_index_ = -1;
 	AVStream* stream_;
+
+	bool is_master_ = false;
+	bool flush_and_sync_ = false;
 
 
 	std::mutex mtx_;

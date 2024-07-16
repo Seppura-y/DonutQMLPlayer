@@ -70,7 +70,6 @@ namespace Donut
 		virtual void onSeekForward();
 		virtual void onSeekBackward();
 
-		virtual void onSetSoundVolume(int value);
 		virtual void onPlayOrPause(bool status);
 		virtual void onStop();
 
@@ -120,7 +119,8 @@ namespace Donut
 		void sigStop();
 
 	private:
-
+		double getFrameDiffTime(AVFrame* frame);
+		double getDelayTime(double diff);
 
 
 	protected:

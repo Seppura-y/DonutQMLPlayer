@@ -186,6 +186,16 @@ void DonutAVPacketQueue::packetQueueStart()
 
 std::shared_ptr<DonutAVPacket> DonutAVPacketQueue::packetQueueGet(int block, int* serial)
 {
+	//bool flush = false;
+	//{
+	//	std::unique_lock<std::mutex> lock(mtx_);
+	//	flush = flush_and_sync_;
+	//}
+	//if (flush)
+	//{
+	//	packetQueueFlush();
+	//}
+
 	std::unique_lock<std::mutex> lock(mtx_);
 	if (abort_request_)
 	{
@@ -250,6 +260,12 @@ bool DonutAVPacketQueue::packetQueueHasEnoughPackets()
 		abort_request_ ||
 		nb_packets_ > MIN_FRAMES && (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
 	return is_enough;
+}
+
+void DonutAVPacketQueue::packetQueueSetMasterFlush(bool flush)
+{
+	std::unique_lock<std::mutex> lock(mtx_);
+	flush_and_sync_ = flush;
 }
 
 }

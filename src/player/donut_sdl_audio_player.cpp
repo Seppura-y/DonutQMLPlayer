@@ -72,23 +72,6 @@ namespace Donut
                     int a = 0;
                 }
             }
-
-            //int resampled = resampler_.resampleAudio(frame, (void**)&resampled_buffer_);
-
-
-            ////double clock = nb_resampled_ / output_spec_.sample_rate* output_spec_.channels* av_get_bytes_per_sample((AVSampleFormat)output_spec_.av_fmt);
-            //double clock = frame->pts + (double)frame->nb_samples / frame->sample_rate;
-            //double duration = frame->duration;
-
-            //nb_storage_ += resampled * resample_spec_.channels * av_get_bytes_per_sample((AVSampleFormat)resample_spec_.av_fmt);
-
-            ////std::this_thread::sleep_for(std::chrono::milliseconds((int)duration));
-            //if (resampled > 0)
-            //{
-            //    pushResampled(resampled_buffer_, resampled, duration);
-            //}
-
-            //av_frame_unref(frame);
         }
 
     }
@@ -324,9 +307,21 @@ namespace Donut
 
             if (resampled_datas_.empty()) break;
 
+            auto resampled_data = resampled_datas_.back();
+            resampled_datas_.pop_back();
+
+            resampled_data.data.size();
+            if (audio_clock_)
+            {
+                auto pts = resampled_data.pts;
+                pts *= av_q2d(tb_);
+                if(pts > 0)
+                audio_clock_->pts_ = pts;
+
+            }
             for (int i = 0; i < resampled / 2; i++)
             {
-                st_source_buffer_[i] = (resampled_buffer_[i * 2] | ((resampled_buffer_[i * 2 + 1]) << 8));
+                st_source_buffer_[i] = (resampled_data.data[i * 2] | ((resampled_data.data[i * 2 + 1]) << 8));
             }
 
             sound_touch_->putSamples(st_source_buffer_, resampled / 4);
@@ -416,7 +411,7 @@ namespace Donut
 
         if (resampled_data_size > 0)
         {
-            pushResampled(resampled_buffer_, resampled_data_size, af->frame_->duration);
+            pushResampled(resampled_buffer_, resampled_data_size, af->frame_->pts);
         }
 
         return resampled_data_size;

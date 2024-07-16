@@ -67,6 +67,7 @@ bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
     if (para.time_base->num > 0)
     {
         timebase_ = (double)para.time_base->den / (double)para.time_base->num;
+        tb_ = *para.time_base;
     }
 
     return open(para.para);
@@ -103,8 +104,6 @@ bool IDonutAudioPlayer::open(AVCodecParameters* para)
     resample_spec_.sample_rate = para->sample_rate;
     resample_spec_.sample_size = av_get_bytes_per_sample((AVSampleFormat)resample_spec_.av_fmt);
     resample_spec_.sdl_fmt = AUDIO_S16SYS;
-
-
 
     //unsigned short samples = 1024;
     //int frame_size = 0;
