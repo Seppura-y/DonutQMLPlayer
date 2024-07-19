@@ -227,6 +227,16 @@ namespace Donut
                         continue;
                     }
 
+                    if (last_serial_ == -1)
+                    {
+                        last_serial_ = serial;
+                    }
+
+                    do
+                    {
+                        
+                    } while (serial != last_serial_);
+
                     decoder_.sendPacket(pkt);
 
                     

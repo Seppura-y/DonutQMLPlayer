@@ -34,6 +34,20 @@ Window
         {
             console.log("DonutQMLAVManager initialized")
         }
+
+        Connections
+        {
+            target: qmlAVManager
+            onSigUpdateTotalDurationSec: (duration)=>
+            {
+                controlBar.duration = duration
+            }
+
+            onSigUpdateTimePosSec: (value)=>
+            {
+                controlBar.currentTime = value
+            }
+        }
     }
 
     DonutScene
@@ -294,6 +308,12 @@ Window
             onSpeedDownButtonClicked:(rate)=>
             {
                 qmlAVManager.setPlaybackRate(rate);
+            }
+
+            onSeekRequested: (value)=>
+            {
+                print("qmlAVManager.onSeekTimePos(value)")
+                qmlAVManager.onSeekingTimePos(value)
             }
         } // ControlBar
     } // GridLayout

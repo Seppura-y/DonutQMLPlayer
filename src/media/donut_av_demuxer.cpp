@@ -122,7 +122,7 @@ int DonutAVDemuxer::seekByPts(long long pts, int stream_index)
         return -1;
     }
     int ret = av_seek_frame(fmt_ctx_, stream_index, pts, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
-    PRINT_ERR_I(ret);
+
     return 0;
 }
 
@@ -133,7 +133,15 @@ int64_t DonutAVDemuxer::getTotalDuration()
     {
         return -1;
     }
-    return fmt_ctx_->duration;
+
+    int tns, thh, tmm, tss;
+
+    int64_t total_duration = fmt_ctx_->duration / 1000000LL;
+    thh = total_duration / 3600;
+    tmm = (total_duration % 3600) / 60;
+    tss = (total_duration % 60);
+
+    return total_duration;
 }
 
 AVStream* DonutAVDemuxer::getVideoStream(int index)
@@ -146,6 +154,48 @@ AVStream* DonutAVDemuxer::getVideoStream(int index)
 AVStream* DonutAVDemuxer::getAudioStream(int index)
 {
     return nullptr;
+}
+
+int64_t DonutAVDemuxer::getStartTime()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    if (fmt_ctx_)
+    {
+        return fmt_ctx_->start_time;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int DonutAVDemuxer::seekFile(int64_t min, int64_t target, int64_t max, int flags)
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    int ret = 0;
+    if (fmt_ctx_)
+    {
+        ret = avformat_seek_file(fmt_ctx_, -1, min, target, max, flags);
+        if (ret < 0)
+        {
+            DN_CORE_WARN("%s : error while seeking", fmt_ctx_->url);
+        }
+    }
+
+    return ret;
+}
+
+int64_t DonutAVDemuxer::getStreamStartTime(int stream_index)
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    if (fmt_ctx_)
+    {
+        return fmt_ctx_->streams[stream_index]->start_time;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 //DonutAVRational DonutAVDemuxer::getFrameRate()

@@ -37,7 +37,7 @@ namespace Donut
 		// h264 sps pps
 		int copyCodecExtraData(uint8_t* buffer, int& size);
 
-		int seek(long long pts);
+		void seekByTimePos(double value);
 		int64_t getTotalDuration() { return total_duration_; };
 
 		int getVideoFramerate();
@@ -71,6 +71,11 @@ namespace Donut
 
 		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
 		std::shared_ptr<DonutAVPacketQueue> v_packet_queue_;
+
+		int64_t seek_pos_ = 0;
+		int64_t seek_delta_ = 0;
+		int seek_req_ = 0;
+		int seek_flags_ = 0;
 	};
 
 }

@@ -10,11 +10,13 @@ extern"C"
 
 namespace Donut {
 
+std::shared_ptr<DonutAVPacket> DonutAVPacket::flush_packet_ = std::make_shared<DonutAVPacket>();
 
 DonutAVPacket::DonutAVPacket()
 	: packet_(av_packet_alloc())
 {
-
+	av_init_packet(packet_);
+	packet_->data = (uint8_t*)packet_;
 }
 
 DonutAVPacket::~DonutAVPacket()
@@ -98,9 +100,24 @@ void DonutAVPacket::setStreamIndex(int index)
 	packet_->stream_index = index;
 }
 
-
-
-
+bool DonutAVPacket::isFlushPacket()
+{
+	if (packet_)
+	{
+		if (packet_ == flush_packet_.get()->packet_)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
 
 DonutAVPacketQueue::DonutAVPacketQueue()
 	: serial_(0), nb_packets_(0), size_(0), duration_(0), abort_request_(0)
@@ -114,7 +131,7 @@ DonutAVPacketQueue::~DonutAVPacketQueue()
 int DonutAVPacketQueue::packetQueuePut(std::shared_ptr<DonutAVPacket>& pkt)
 {
 	int ret = 0;
-	pkt->setSerial(serial_);
+
 
 	std::unique_lock<std::mutex> lock(mtx_);
 	if (abort_request_)
@@ -123,6 +140,13 @@ int DonutAVPacketQueue::packetQueuePut(std::shared_ptr<DonutAVPacket>& pkt)
 	}
 
 	pkt_list_.push(pkt);
+
+	if (pkt->isFlushPacket())
+	{
+		serial_++;
+	}
+
+	pkt->setSerial(serial_);
 
 	nb_packets_++;
 	size_ += pkt->getSize();

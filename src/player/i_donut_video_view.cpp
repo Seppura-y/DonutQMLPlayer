@@ -19,8 +19,15 @@ namespace Donut
 		video_clock_ = v_clock;
 	}
 
+	void IDonutVideoView::setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue)
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+		video_frame_queue_ = queue;
+	}
+
 	void IDonutVideoView::updateVideoPts(double pts, int64_t pos, int serial)
 	{
+		std::lock_guard<std::mutex> lock(mtx_);
 		double time = av_gettime_relative() / 1000000.0;
 		video_clock_->pts_ = pts;
 		video_clock_->last_updated_ = time;

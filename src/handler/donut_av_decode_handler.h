@@ -64,6 +64,8 @@ namespace Donut
 		int sleep_ms_ = 0;
 
 		AVRational timebase_{0};
+
+		int last_serial_ = -1;
 	};
 
 	template<typename T>

@@ -43,6 +43,11 @@ public:
 	void setStreamIndex(int index);
 
 	AVPacket* getPacket() { return packet_; }
+
+	bool isFlushPacket();
+
+public:
+	static std::shared_ptr<DonutAVPacket> flush_packet_;
 private:
 	AVPacket* packet_ = nullptr;
 	int serial_;
@@ -56,6 +61,9 @@ public:
 
 	int isAbortRequest() { return abort_request_; }
 	int getSerial() { return serial_; }
+	void setSerial() { serial_++; }
+
+	int getSize() { std::lock_guard<std::mutex> lock(mtx_);  return size_; }
 
 	int packetQueuePut(std::shared_ptr<DonutAVPacket>& pkt);
 	int packetQueuePutNullpacket(std::shared_ptr<DonutAVPacket> pkt, int stream_index);

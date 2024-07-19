@@ -1,5 +1,7 @@
 #include "donut_av_demux_handler.h"
 
+#include "donut_av_global.h"
+
 extern"C"
 {
 #include <libavformat/avformat.h>
@@ -79,9 +81,19 @@ namespace Donut
 		return 0;
 	}
 
-	int Donut::DonutAVDemuxHandler::seek(long long pts)
+	void DonutAVDemuxHandler::seekByTimePos(double value)
 	{
-		return 0;
+		std::lock_guard<std::mutex> lock(mtx_);
+		int64_t ts = value * total_duration_;
+		int64_t start_time = demuxer_.getStartTime();
+		if ( start_time != AV_NOPTS_VALUE)
+		{
+			ts += start_time;
+		}
+		seek_pos_ = ts;
+		seek_delta_ = 0;
+		seek_flags_ &= ~AVSEEK_FLAG_BYTE;
+		seek_req_ = 1;
 	}
 
 	int Donut::DonutAVDemuxHandler::getVideoFramerate()
@@ -112,7 +124,39 @@ namespace Donut
 				continue;
 			}
 
+			if (seek_req_)
+			{
+				int64_t seek_target = seek_pos_;
+				int64_t seek_min = seek_delta_ > 0 ? seek_target - seek_delta_ + 2 : INT64_MIN;
+				int64_t seek_max = seek_delta_ < 0 ? seek_target - seek_delta_ - 2 : INT64_MAX;
+
+				int ret = demuxer_.seekFile(seek_min, seek_target, seek_max, seek_flags_);
+				if (ret < 0)
+				{
+
+				}
+				else
+				{
+					if (hasAudio())
+					{
+						a_packet_queue_->packetQueueFlush();
+						a_packet_queue_->packetQueuePut(DonutAVPacket::flush_packet_);
+					}
+
+					if (hasVideo())
+					{
+						v_packet_queue_->packetQueueFlush();
+						v_packet_queue_->packetQueuePut(DonutAVPacket::flush_packet_);
+					}
+				}
+				seek_req_ = 0;
+			}
+
 			if (
+				// condition 1
+				(a_packet_queue_->getSize() + v_packet_queue_->getSize() > MAX_QUEUE_SIZE) ||
+
+				// condition 2
 				(hasVideo() && v_packet_queue_ && v_packet_queue_->packetQueueHasEnoughPackets())
 				&&
 				(hasAudio() && a_packet_queue_ && a_packet_queue_->packetQueueHasEnoughPackets())
@@ -138,6 +182,7 @@ namespace Donut
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				continue;
 			}
+
 
 			
 			if (handler_nodes_.size() != 0)

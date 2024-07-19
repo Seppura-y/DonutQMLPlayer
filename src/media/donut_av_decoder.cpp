@@ -193,9 +193,13 @@ namespace Donut
 		ret = avcodec_receive_frame(codec_ctx_, frame);
 		if (ret < 0)
 		{
-			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+			if (ret == AVERROR(EAGAIN))
 			{
 				ret = -1;
+			}
+			else if (ret == AVERROR_EOF)
+			{
+				ret = -2;
 			}
 			else
 			{

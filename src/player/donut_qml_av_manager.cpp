@@ -69,6 +69,8 @@ namespace Donut
 				a_packet_queue_->packetQueueFlush();
 			}
 
+			emit sigUpdateTimePosSec(audio_clock_->pts_);
+
 			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
 			//if (a_remaining)
 			//{
@@ -174,11 +176,11 @@ namespace Donut
 		v_decode_handler_ = new DonutAVDecodeHandler();
 
 		v_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		//v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
+		v_frame_queue_ = std::make_shared<DonutAVFrameQueue>(v_packet_queue_, 3, 1);
 		v_clock_ = std::make_shared<DonutAVClock>();
 
 		a_packet_queue_ = std::make_shared<DonutAVPacketQueue>();
-		//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 1);
+		a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 1);
 		a_clock_ = std::make_shared<DonutAVClock>();
 
 		// video decoder 要放在audio decoder上面，否则avcodec_send_packet时会警告 invalid arguement
@@ -197,11 +199,12 @@ namespace Donut
 		if (video_view_)
 		{
 			video_view_->setClocks(audio_clock_, video_clock_);
+			video_view_->setFrameQueue(v_frame_queue_);
+
 			v_decode_handler_->setClocks(audio_clock_, video_clock_);
 			v_decode_handler_->addNode(video_view_);
 			v_decode_handler_->setPacketQueue(v_packet_queue_);
-			//v_decode_handler_->setFrameQueue(v_frame_queue_);
-
+			v_decode_handler_->setFrameQueue(v_frame_queue_);
 		}
 
 		if (audio_player_)
@@ -211,7 +214,7 @@ namespace Donut
 			a_decode_handler_->setClocks(audio_clock_, audio_clock_);
 			a_decode_handler_->addNode(audio_player_);
 			a_decode_handler_->setPacketQueue(a_packet_queue_);
-			//a_decode_handler_->setFrameQueue(a_frame_queue_);
+			a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
 
 		return 0;
@@ -292,10 +295,11 @@ namespace Donut
 
 		initManager();
 
-		demux_handler_->setEofCallback([this]() {
-			qDebug() << "eof";
-			this->sigMediaEOF();
-			});
+		// 2.5.F 检测码流是否已经播放完
+		demux_handler_->setEofCallback([this]()
+		{
+			emit sigMediaEOF();
+		});
 
 		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
 		{
@@ -326,6 +330,9 @@ namespace Donut
 
 			this->addNode(audio_player_);
 
+			total_duration_ = demux_handler_->getTotalDuration();
+			emit sigUpdateTotalDurationSec(total_duration_);
+
 			demux_handler_->start();
 			v_decode_handler_->start();
 			a_decode_handler_->start();
@@ -346,7 +353,14 @@ namespace Donut
 	}
 	void DonutQMLAVManager::onMediaEOF()
 	{
-		qDebug() << "DonutQMLAVManager::onMediaEOF()";
+		//qDebug() << "DonutQMLAVManager::onMediaEOF()";
+
+		// 2.5.F 检测码流是否已经播放完
+
+		if (is_loop_)
+		{
+
+		}
 	}
 
 	void DonutQMLAVManager::destroyManager()
@@ -398,7 +412,8 @@ namespace Donut
 
 	void DonutQMLAVManager::onSeekingTimePos(double value)
 	{
-
+		demux_handler_->seekByTimePos(value);
+		serial_++;
 	}
 
 	void DonutQMLAVManager::onSeekForward()
@@ -408,6 +423,7 @@ namespace Donut
 
 	void DonutQMLAVManager::onSeekBackward()
 	{
+		serial_++;
 	}
 
 	void DonutQMLAVManager::onPlayOrPause(bool status)

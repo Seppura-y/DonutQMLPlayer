@@ -36,6 +36,8 @@ Control
     signal fullscreenButtonClicked()
     signal sidebarButtonClicked()
 
+    signal seekRequested(int value)
+
     property bool isPlaying: false
     property bool isMute: false
     property double playbackSpeed: 1.0
@@ -67,15 +69,19 @@ Control
             id: slider
             from: 0
             to: duration
+            value: currentTime
             focusPolicy: Qt.NoFocus
             Layout.fillWidth: true
             Layout.preferredHeight: 12
             stepSize: 1
             leftPadding: 0
+
+            property bool mousePressed: false
+
             MouseArea
             {
                 anchors.fill: parent
-                property bool mouseClicked: false
+                
 
                 drag.target: handleRect
                 drag.axis: Drag.XAxis
@@ -89,16 +95,14 @@ Control
                     slider.value = Math.max(slider.from, Math.min(value, slider.to))
                 }
 
-                // ����Slider�ϲ���ĩ�˺ͳ�����Χ������
-                onPressed:
+                onPressed: (mouse)=>
                 {
-                    mouseClicked = true
+                    slider.mousePressed = true
                     var clickPos = Math.max(slider.leftPadding, Math.min(mouse.x - (handleRect.width / 2), slider.width - slider.rightPadding - (handleRect.width / 2)));
                     slider.value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
                     handleRect.x = clickPos;
                 }
 
-                // ����Slider�ϲ���ĩ�˺ͳ�����Χ������
                 onPositionChanged: (mouse)=>
                 {
                     if (drag.active)
@@ -107,8 +111,17 @@ Control
                         slider.value = slider.from + (clickPos / (slider.width - slider.leftPadding - slider.rightPadding)) * (slider.to - slider.from);
                         handleRect.x = clickPos;
                     }
+                    else
+                    {
+
+                    }
                 }
-                onReleased: mouseClicked = false
+                onReleased:
+                {
+                    seekRequested(slider.value)
+                    print("slider onPressedChanged: ")
+                    slider.mousePressed = false
+                }
             }
 
             handle: Rectangle
@@ -132,9 +145,7 @@ Control
 
                     onEntered: handleRect.color = "orange"
                     onExited: handleRect.color = "white"
-
                     onPressed: handleRect.color = "orange"
-
                     onReleased: handleRect.color = "white"
 
                     onPositionChanged:
@@ -169,13 +180,19 @@ Control
                 }
             }
 
-            //�����ڴ�С�����仯ʱ��handle��λ�ø���Slider�ĵ�ǰֵ��̬����
             onValueChanged:
             {
-                //var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
-                //handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
-                //currentTime = slider.value
-                //print("slider value : " + slider.value)
+                if(!slider.mousePressed)
+                {
+                    var newPosition = slider.leftPadding + (value - from) / (to - from) * (width - slider.leftPadding - slider.rightPadding);
+                    handleRect.x = Math.min(newPosition, width - slider.rightPadding - handleRect.width);
+                    currentTime = slider.value
+                    //print("slider value : " + slider.value)
+                }
+                else
+                {
+
+                }
             }
 
             onWidthChanged:
@@ -189,6 +206,7 @@ Control
                 {
                     // released
                     seekRequested(value)
+                    print("slider onPressedChanged:")
                 }
             }
         } // Slider
@@ -464,6 +482,11 @@ Control
             playPauseButton.txt = String.fromCodePoint(0x23f8)
 
             playPauseButton.checked = true
+        }
+
+        function onCurrentTimeChanged()
+        {
+            slider.value = currentTime
         }
     }
 

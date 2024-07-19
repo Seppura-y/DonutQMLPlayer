@@ -33,6 +33,8 @@ namespace Donut
 		uint8_t* getPpsData();
 		int getSpsSize();
 		int getPpsSize();
+
+		void resetSerial(int serial) { finished_serial_ = serial; }
 	protected:
 		AVFrame* decoded_frame_ = nullptr;
 
@@ -49,6 +51,8 @@ namespace Donut
 		int pps_size_ = -1;
 		std::string sps_data_;
 		std::string pps_data_;
+
+		int finished_serial_ = -1;
 	};
 
 }

@@ -29,6 +29,11 @@ namespace Donut
 
 		AVStream** getVideoStreams() { return video_streams_; }
 		AVStream** getAudioStreams() { return audio_streams_; }
+
+		int64_t getStreamStartTime(int stream_index);
+		int64_t getStartTime();
+
+		int seekFile(int64_t min, int64_t target, int64_t max, int flags);
 	private:
 		int vs_count_ = 0;
 		int as_count_ = 0;

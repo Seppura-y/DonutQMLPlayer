@@ -66,7 +66,6 @@ namespace Donut
 		Q_INVOKABLE void setSoundVolume(int value);
 
 	public slots:
-		virtual void onSeekingTimePos(double value);
 		virtual void onSeekForward();
 		virtual void onSeekBackward();
 
@@ -94,11 +93,14 @@ namespace Donut
 		int onMediaPlayStart();
 
 		void onMediaEOF();
+		Q_INVOKABLE virtual void onSeekingTimePos(double value);
 		//********************* QML *********************
 
 	signals:
 		void sigUpdateTimePos(QTime value);
+		void sigUpdateTimePosSec(int value);
 		void sigUpdateTotalDuration(QTime value);
+		void sigUpdateTotalDurationSec(int value);
 		void sigUpdateSoundVolume(int value);
 		//void sigMediaEndReached();
 
@@ -149,7 +151,7 @@ namespace Donut
 		static DonutQMLAVManager* s_instance_;
 
 		std::shared_ptr<DonutAVPacketQueue> v_packet_queue_;
-		//std::shared_ptr<DonutAVFrameQueue>	v_frame_queue_;
+		std::shared_ptr<DonutAVFrameQueue>	v_frame_queue_;
 		std::shared_ptr<DonutAVClock> v_clock_;
 
 		std::shared_ptr<DonutAVPacketQueue> a_packet_queue_;
@@ -165,6 +167,8 @@ namespace Donut
 
 		std::shared_ptr<DonutAVClock> audio_clock_;
 		std::shared_ptr<DonutAVClock> video_clock_;
+
+		bool is_loop_ = false;
 	};
 }
 
