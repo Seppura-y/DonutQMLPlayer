@@ -35,6 +35,8 @@ namespace Donut
 		int getPpsSize();
 
 		void resetSerial(int serial) { finished_serial_ = serial; }
+
+		void decoderFlush();
 	protected:
 		AVFrame* decoded_frame_ = nullptr;
 

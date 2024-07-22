@@ -84,7 +84,7 @@ namespace Donut
 	void DonutAVDemuxHandler::seekByTimePos(double value)
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
-		int64_t ts = value * total_duration_;
+		int64_t ts = value * total_duration_ * 1000000LL;
 		int64_t start_time = demuxer_.getStartTime();
 		if ( start_time != AV_NOPTS_VALUE)
 		{
@@ -150,6 +150,8 @@ namespace Donut
 					}
 				}
 				seek_req_ = 0;
+
+				continue;
 			}
 
 			if (

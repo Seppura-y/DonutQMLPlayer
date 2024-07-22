@@ -286,4 +286,13 @@ namespace Donut
 		return 0;
 	}
 
+	void DonutAVDecoder::decoderFlush()
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+		if (codec_ctx_)
+		{
+			avcodec_flush_buffers(codec_ctx_);
+		}
+	}
+
 }

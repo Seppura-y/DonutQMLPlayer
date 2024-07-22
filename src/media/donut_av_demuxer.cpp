@@ -178,7 +178,7 @@ int DonutAVDemuxer::seekFile(int64_t min, int64_t target, int64_t max, int flags
         ret = avformat_seek_file(fmt_ctx_, -1, min, target, max, flags);
         if (ret < 0)
         {
-            DN_CORE_WARN("%s : error while seeking", fmt_ctx_->url);
+            DN_CORE_WARN("{0} : error while seeking", fmt_ctx_->url);
         }
     }
 

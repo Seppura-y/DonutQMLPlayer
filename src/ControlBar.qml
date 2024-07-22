@@ -36,7 +36,7 @@ Control
     signal fullscreenButtonClicked()
     signal sidebarButtonClicked()
 
-    signal seekRequested(int value)
+    signal seekRequested(double value)
 
     property bool isPlaying: false
     property bool isMute: false
@@ -56,6 +56,14 @@ Control
         if (minutes < 10) {minutes = "0"+minutes;}
         if (seconds < 10) {seconds = "0"+seconds;}
         return hours+':'+minutes+':'+seconds;
+    }
+
+    function updateTimePosSec(seconds)
+    {
+        if(!slider.mousePressed)
+        {
+            currentTime = seconds
+        }
     }
 
     ColumnLayout
@@ -118,8 +126,7 @@ Control
                 }
                 onReleased:
                 {
-                    seekRequested(slider.value)
-                    print("slider onPressedChanged: ")
+                    seekRequested(slider.value / slider.to)
                     slider.mousePressed = false
                 }
             }
@@ -205,8 +212,7 @@ Control
                 if (!pressed)
                 {
                     // released
-                    seekRequested(value)
-                    print("slider onPressedChanged:")
+                    seekRequested(slider.value / slider.to)
                 }
             }
         } // Slider

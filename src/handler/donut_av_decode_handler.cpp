@@ -232,10 +232,14 @@ namespace Donut
                         last_serial_ = serial;
                     }
 
-                    do
+
+                    if (serial != last_serial_)
                     {
-                        
-                    } while (serial != last_serial_);
+                        decoder_.decoderFlush();
+                        pkt.reset();
+                        last_serial_ = serial;
+                        continue;
+                    } 
 
                     decoder_.sendPacket(pkt);
 

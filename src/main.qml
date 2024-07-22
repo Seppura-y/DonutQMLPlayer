@@ -45,7 +45,7 @@ Window
 
             onSigUpdateTimePosSec: (value)=>
             {
-                controlBar.currentTime = value
+                controlBar.updateTimePosSec(value)
             }
         }
     }
@@ -312,7 +312,6 @@ Window
 
             onSeekRequested: (value)=>
             {
-                print("qmlAVManager.onSeekTimePos(value)")
                 qmlAVManager.onSeekingTimePos(value)
             }
         } // ControlBar

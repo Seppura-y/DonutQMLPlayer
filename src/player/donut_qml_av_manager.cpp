@@ -414,6 +414,8 @@ namespace Donut
 	{
 		demux_handler_->seekByTimePos(value);
 		serial_++;
+
+		DN_CORE_ERROR("onSeekingTimePos : {0}", value);
 	}
 
 	void DonutQMLAVManager::onSeekForward()
