@@ -45,40 +45,43 @@ namespace Donut
 
     void DonutSDLAudioPlayer::updateHandler(void* data)
     {
-        int num = 0;
-        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        //if (data)
+        //{
+        //    auto frame = static_cast<AVFrame*>(data);
+        //    if (frame->data == nullptr) return;
+        //    AVRational tb = AVRational{ 1, frame->sample_rate };
 
-        if (data)
-        {
-            auto frame = static_cast<AVFrame*>(data);
-            if (frame->data == nullptr) return;
-            AVRational tb = AVRational{ 1, frame->sample_rate };
+        //    if (audio_frame_queue_)
+        //    {
+        //        auto dn_frame = audio_frame_queue_->frameQueuePeekWritable();
 
-            if (audio_frame_queue_)
-            {
-                //std::unique_lock<std::mutex> lock(mtx_);
-                auto dn_frame = audio_frame_queue_->frameQueuePeekWritable();
+        //        if (dn_frame)
+        //        {
+        //            dn_frame->pts_ = (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts * av_q2d(tb);
+        //            dn_frame->pos_ = frame->pkt_pos;
+        //            dn_frame->serial_ = audio_frame_queue_->getSerial();
+        //            dn_frame->duration_ = av_q2d(AVRational{ frame->nb_samples, frame->sample_rate });
 
-                if (dn_frame)
-                {
-                    dn_frame->pts_ = (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts * av_q2d(tb);
-                    dn_frame->pos_ = frame->pkt_pos;
-                    dn_frame->serial_ = audio_frame_queue_->getSerial();
-                    dn_frame->duration_ = av_q2d(AVRational{ frame->nb_samples, frame->sample_rate });
+        //            av_frame_move_ref(dn_frame->frame_, frame);
+        //            audio_frame_queue_->frameQueuePush(dn_frame);
 
-                    av_frame_move_ref(dn_frame->frame_, frame);
-                    audio_frame_queue_->frameQueuePush(dn_frame);
-
-                    int a = 0;
-                }
-            }
-        }
+        //            int a = 0;
+        //        }
+        //    }
+        //}
 
     }
 
     void DonutSDLAudioPlayer::threadLoop()
     {
-
+        while (!is_exit_)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if (audio_frame_queue_)
+            {
+                auto ser = audio_frame_queue_->getSerial();
+            }
+        }
     }
 
     void DonutSDLAudioPlayer::pause(bool is_pause)
@@ -401,6 +404,7 @@ namespace Donut
             {
                 return -1;
             }
+
             audio_frame_queue_->frameQueueNext();
 
         } while (af->serial_ != audio_frame_queue_->getSerial());
@@ -413,6 +417,9 @@ namespace Donut
         {
             pushResampled(resampled_buffer_, resampled_data_size, af->frame_->pts);
         }
+
+        //audio_frame_queue_->frameQueueNext();
+
 
         return resampled_data_size;
     }

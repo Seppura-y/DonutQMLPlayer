@@ -87,23 +87,23 @@ namespace Donut
 		int num = 0;
 		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		
-		if (data)
-		{
-			AVPacket* pkt = static_cast<AVPacket*>(data);
+		//if (data)
+		//{
+		//	AVPacket* pkt = static_cast<AVPacket*>(data);
 
-			if (pkt->stream_index == video_index_)
-			{
-				auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
-				v_packet_queue_->packetQueuePut(dn_pkt);
-			}
-			else if (pkt->stream_index == audio_index_)
-			{
-				auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
-				a_packet_queue_->packetQueuePut(dn_pkt);
-			}
+		//	if (pkt->stream_index == video_index_)
+		//	{
+		//		auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
+		//		v_packet_queue_->packetQueuePut(dn_pkt);
+		//	}
+		//	else if (pkt->stream_index == audio_index_)
+		//	{
+		//		auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
+		//		a_packet_queue_->packetQueuePut(dn_pkt);
+		//	}
 
-			av_packet_unref(pkt);
-		}
+		//	av_packet_unref(pkt);
+		//}
 	}
 
 	int DonutQMLAVManager::resetManager()
@@ -320,7 +320,7 @@ namespace Donut
 				a_decode_handler_->openDecoder(demux_handler_->copyAudioParameters());
 
 				a_packet_queue_->packetQueueSetStreamIndex(audio_index_);
-				a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 0);
+				//a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 0);
 
 				audio_player_->setFrameQueue(a_frame_queue_);
 				
@@ -337,6 +337,7 @@ namespace Donut
 			v_decode_handler_->start();
 			a_decode_handler_->start();
 			this->start();
+			audio_player_->start();
 			return 0;
 		}
 		else
@@ -414,8 +415,6 @@ namespace Donut
 	{
 		demux_handler_->seekByTimePos(value);
 		serial_++;
-
-		DN_CORE_ERROR("onSeekingTimePos : {0}", value);
 	}
 
 	void DonutQMLAVManager::onSeekForward()

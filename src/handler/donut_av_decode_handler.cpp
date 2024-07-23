@@ -212,10 +212,7 @@ namespace Donut
         AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
-            if (is_need_sync_)
-            {
-                std::this_thread::sleep_for(std::chrono::microseconds(sleep_ms_));
-            }
+
             int serial = -1;
             {
                 if (packet_queue_->packetQueueHasEnoughPackets())
@@ -257,14 +254,29 @@ namespace Donut
 
                         //}
 
-                        auto pts = decoded_frame->pts;
-                        pts *= av_q2d(timebase_);
-                        auto cur = av_gettime_relative();
-                        clock_->setClockAt(pts, 0, cur);
+                        std::shared_ptr<DonutAVFrame> frame = frame_queue_->frameQueuePeekWritable();
+                        if (!frame)
+                        {
+                            std::this_thread::sleep_for(std::chrono::microseconds(1));
+                            continue;
+                        }
+                        //auto new_frame = std::make_shared<DonutAVFrame>(decoded_frame);
+                        //frame = new_frame;
+                        frame->setFrame(decoded_frame, serial);
+                        frame_queue_->frameQueuePush(frame);
 
-                        double diff = getFrameDiffTime(decoded_frame);
-                        sleep_ms_ = (int)(getDelayTime(diff) * 1000000);
-                        notify(decoded_frame);
+                        //auto pts = decoded_frame->pts;
+                        //pts *= av_q2d(timebase_);
+                        //auto cur = av_gettime_relative();
+                        //clock_->setClockAt(pts, 0, cur);
+
+                        //double diff = getFrameDiffTime(decoded_frame);
+                        //sleep_ms_ = (int)(getDelayTime(diff) * 1000000);
+                        //if (is_need_sync_)
+                        //{
+                        //    std::this_thread::sleep_for(std::chrono::microseconds(sleep_ms_));
+                        //}
+                        //notify(decoded_frame);
                     }
                     //av_frame_unref(decoded_frame);
                     //av_frame_free(&decoded_frame);

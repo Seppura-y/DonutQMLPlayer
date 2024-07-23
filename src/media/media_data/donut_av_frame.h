@@ -24,6 +24,7 @@ public:
 	DonutAVFrame(AVFrame* frame);
 	DonutAVFrame(const DonutAVFrame& other) noexcept;
 	DonutAVFrame(const DonutAVFrame&& other) noexcept;
+	DonutAVFrame(std::shared_ptr<DonutAVFrame>& other) noexcept;
 
 	DonutAVFrame& operator=(const DonutAVFrame& other);
 	DonutAVFrame& operator=(const DonutAVFrame&& other);
@@ -34,6 +35,7 @@ public:
 
 	int getSerial() { return serial_; }
 	AVFrame* getFrame() { return frame_; }
+	void setFrame(AVFrame* frame, int serial);
 public:
 	AVFrame* frame_ = nullptr;
 
@@ -64,7 +66,7 @@ public:
 	std::shared_ptr<DonutAVFrame> frameQueuePeekNext();
 	std::shared_ptr<DonutAVFrame> frameQueuePeekLast();
 	std::shared_ptr<DonutAVFrame> frameQueuePeekWritable();
-	std::shared_ptr<DonutAVFrame>& frameQueuePeekReadable();
+	std::shared_ptr<DonutAVFrame> frameQueuePeekReadable();
 
 	void frameQueuePush(std::shared_ptr<DonutAVFrame>& frame);
 	void frameQueueNext();

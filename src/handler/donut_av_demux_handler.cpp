@@ -186,11 +186,28 @@ namespace Donut
 			}
 
 
+			if (demux_pkt->stream_index == video_index_)
+			{
+				auto dn_pkt = std::make_shared<DonutAVPacket>(demux_pkt);
+				v_packet_queue_->packetQueuePut(dn_pkt);
+			}
+			else if (demux_pkt->stream_index == audio_index_)
+			{
+				auto dn_pkt = std::make_shared<DonutAVPacket>(demux_pkt);
+				a_packet_queue_->packetQueuePut(dn_pkt);
+			}
+
+			av_packet_unref(demux_pkt);
+
 			
-			if (handler_nodes_.size() != 0)
-				notify(demux_pkt);
-			else
-				av_packet_unref(demux_pkt);
+			//if (handler_nodes_.size() != 0)
+			//{
+			//	notify(demux_pkt);
+			//}
+			//else
+			//{
+			//	av_packet_unref(demux_pkt);
+			//}
 		}
 
 		av_packet_free(&demux_pkt);

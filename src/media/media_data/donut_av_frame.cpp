@@ -45,6 +45,19 @@ namespace Donut
 		*this = std::move(other);
 	}
 
+	DonutAVFrame::DonutAVFrame(std::shared_ptr<DonutAVFrame>& other) noexcept
+		: DonutAVFrame()
+	{
+		AVRational tb = AVRational{ 1, other->frame_->sample_rate };
+
+		pts_ = (other->frame_->pts == AV_NOPTS_VALUE) ? NAN : other->frame_->pts * av_q2d(tb);
+		pos_ = other->frame_->pkt_pos;
+		serial_ = other->serial_;
+		duration_ = av_q2d(AVRational{ other->frame_->nb_samples, other->frame_->sample_rate });
+
+		av_frame_move_ref(this->frame_, other->frame_);
+	}
+
 	DonutAVFrame& DonutAVFrame::operator=(const DonutAVFrame& other)
 	{
 		av_frame_unref(this->frame_);
@@ -87,6 +100,18 @@ namespace Donut
 			format_ = frame_->format;
 		}
 		return format_;
+	}
+
+	void DonutAVFrame::setFrame(AVFrame* frame, int serial)
+	{
+		AVRational tb = AVRational{ 1, frame->sample_rate };
+
+		pts_ = (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts * av_q2d(tb);
+		pos_ = frame->pkt_pos;
+		serial_ = serial;
+		duration_ = av_q2d(AVRational{ frame->nb_samples, frame->sample_rate });
+
+		av_frame_move_ref(this->frame_, frame);
 	}
 
 
@@ -142,12 +167,33 @@ namespace Donut
 		return frame_queue_[rindex_];
 	}
 
+	//std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekWritable()
+	//{
+	//	std::unique_lock<std::mutex> lock(mtx_);
+	//	if (size_ >= max_size_ && !pkt_queue_->isAbortRequest())
+	//	{
+	//		cond_.wait(lock);
+	//	}
+
+	//	if (pkt_queue_->isAbortRequest())
+	//	{
+	//		return nullptr;
+	//	}
+
+	//	return frame_queue_[windex_];
+	//}
+
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekWritable()
 	{
 		std::unique_lock<std::mutex> lock(mtx_);
 		if (size_ >= max_size_ && !pkt_queue_->isAbortRequest())
 		{
 			cond_.wait(lock);
+			//if (cond_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout)
+			//{
+			//	// 处理超时情况
+			//	return nullptr;
+			//}
 		}
 
 		if (pkt_queue_->isAbortRequest())
@@ -158,12 +204,25 @@ namespace Donut
 		return frame_queue_[windex_];
 	}
 
-	std::shared_ptr<DonutAVFrame>& DonutAVFrameQueue::frameQueuePeekReadable()
+	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekReadable()
 	{
+		//std::unique_lock<std::mutex> lock(mtx_);
+		//if (size_ - rindex_shown_ <= 0 && !pkt_queue_->isAbortRequest())
+		//{
+		//	cond_.wait(lock);
+		//	//cond_.wait_for(lock, std::chrono::milliseconds(10));
+		//}
+
 		std::unique_lock<std::mutex> lock(mtx_);
 		if (size_ - rindex_shown_ <= 0 && !pkt_queue_->isAbortRequest())
 		{
 			cond_.wait(lock);
+			//if (cond_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout)
+			//{
+			//	// 处理超时情况
+			//	//lock.unlock();
+			//	return std::make_shared<DonutAVFrame>();
+			//}
 		}
 
 		if (pkt_queue_->isAbortRequest())
