@@ -310,6 +310,8 @@ namespace Donut
 				v_decode_handler_->setStreamIndex(video_index_);
 				v_decode_handler_->setStream(demux_handler_->getVideoStream(0));
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());
+
+				video_view_->setFrameQueue(v_frame_queue_);
 			}
 
 			if (demux_handler_->hasAudio())
@@ -338,6 +340,7 @@ namespace Donut
 			a_decode_handler_->start();
 			this->start();
 			audio_player_->start();
+			video_view_->start();
 			return 0;
 		}
 		else

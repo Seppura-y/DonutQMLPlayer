@@ -173,25 +173,45 @@ namespace Donut
 
     void DonutScene::updateHandler(void* data)
     {
-        std::unique_lock<std::mutex> lock(mtx_);
-        av_frame_unref(decoded_frame_);
-        if (data)
-        {
-            auto frame = static_cast<AVFrame*>(data);
+        //std::unique_lock<std::mutex> lock(mtx_);
+        //av_frame_unref(decoded_frame_);
+        //if (data)
+        //{
+        //    auto frame = static_cast<AVFrame*>(data);
 
-            {
-                av_frame_ref(decoded_frame_, frame);
-                frame_updated_ = false;
-                lock.unlock();
-            }
+        //    {
+        //        av_frame_ref(decoded_frame_, frame);
+        //        frame_updated_ = false;
+        //        lock.unlock();
+        //    }
 
-            av_frame_unref(frame);
-        }
+        //    av_frame_unref(frame);
+        //}
     }
 
 
     void DonutScene::threadLoop()
     {
+        while (!is_exit_)
+        {
+            std::unique_lock<std::mutex> lock(mtx_);
+            av_frame_unref(decoded_frame_);
+
+            auto frame = video_frame_queue_->frameQueuePeekReadable();
+            if (frame)
+            {
+                {
+                    av_frame_ref(decoded_frame_, frame->frame_);
+                    frame_updated_ = false;
+                    lock.unlock();
+                }
+
+                av_frame_unref(frame->frame_);
+                video_frame_queue_->frameQueueNext();
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
     }
 
     void DonutScene::timerEvent(QTimerEvent* ev)

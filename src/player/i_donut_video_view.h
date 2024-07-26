@@ -16,11 +16,16 @@ namespace Donut
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
 
 	protected:
+		double getFrameDiffTime(AVFrame* frame);
+		double getDelayTime(double diff);
+
 		void updateVideoPts(double pts, int64_t pos, int serial);
 	protected:
 		std::shared_ptr<DonutAVClock> audio_clock_;
 		std::shared_ptr<DonutAVClock> video_clock_;
 		std::shared_ptr<DonutAVFrameQueue> video_frame_queue_;
+
+		int delay_time_ = 1;
 	};
 }
 #endif
