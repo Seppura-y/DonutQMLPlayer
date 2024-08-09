@@ -265,10 +265,10 @@ namespace Donut
                         frame->setFrame(decoded_frame, serial);
                         frame_queue_->frameQueuePush(frame);
 
-                        auto pts = decoded_frame->pts;
-                        pts *= av_q2d(timebase_);
-                        auto cur = av_gettime_relative();
-                        clock_->setClockAt(pts, 0, cur);
+                        //auto pts = decoded_frame->pts;
+                        //pts *= av_q2d(timebase_);
+                        //auto cur = av_gettime_relative();
+                        //clock_->setClockAt(pts, 0, cur);
 
                         //double diff = getFrameDiffTime(decoded_frame);
                         //sleep_ms_ = (int)(getDelayTime(diff) * 1000000);

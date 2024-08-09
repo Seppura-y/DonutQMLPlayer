@@ -58,7 +58,7 @@ public:
 
     void setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::shared_ptr<DonutAVClock>& v_clock);
 
-    void updateAuidoPts(double pts, int64_t pos, int serial);
+    void updateAuidoPts(double pts, int64_t pos, int serial, double time);
 
     void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
 

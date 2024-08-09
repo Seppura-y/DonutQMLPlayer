@@ -170,9 +170,8 @@ void IDonutAudioPlayer::setClocks(std::shared_ptr<DonutAVClock>& a_clock, std::s
     video_clock_ = v_clock;
 }
 
-void IDonutAudioPlayer::updateAuidoPts(double pts, int64_t pos, int serial)
+void IDonutAudioPlayer::updateAuidoPts(double pts, int64_t pos, int serial, double time)
 {
-    double time = av_gettime_relative() / 1000000.0;
     audio_clock_->pts_ = pts;
     audio_clock_->last_updated_ = time;
     audio_clock_->pts_drift_ = audio_clock_->pts_ - time;

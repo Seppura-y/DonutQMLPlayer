@@ -358,7 +358,7 @@ namespace Donut
             mixed_size += bytes_received;
         }
 
-        updateAuidoPts(af_end_time_ - (double)(2 * audio_hw_buf_size_ + audio_write_buf_size_) / resample_spec_.bytes_per_sec, 0, 0);
+        //updateAuidoPts(af_end_time_ - (double)(2 * audio_hw_buf_size_ + audio_write_buf_size_) / resample_spec_.bytes_per_sec, 0, 0);
         //if (mixed_size < len)
         //{
         //    SDL_memset(stream + mixed_size, 0, len - mixed_size);
