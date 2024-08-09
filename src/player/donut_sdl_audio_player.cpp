@@ -306,6 +306,10 @@ namespace Donut
         while (mixed_size < len)
         {
             int resampled = audioDecodeFrame();
+            if (resampled < 0)
+            {
+
+            }
             //if (resampled == 0) break;
 
             if (resampled_datas_.empty()) break;
@@ -353,10 +357,12 @@ namespace Donut
 
             mixed_size += bytes_received;
         }
-        if (mixed_size < len)
-        {
-            SDL_memset(stream + mixed_size, 0, len - mixed_size);
-        }
+
+        updateAuidoPts(af_end_time_ - (double)(2 * audio_hw_buf_size_ + audio_write_buf_size_) / resample_spec_.bytes_per_sec, 0, 0);
+        //if (mixed_size < len)
+        //{
+        //    SDL_memset(stream + mixed_size, 0, len - mixed_size);
+        //}
     }
 
     long long DonutSDLAudioPlayer::getCurrentPts()
@@ -418,6 +424,14 @@ namespace Donut
             pushResampled(resampled_buffer_, resampled_data_size, af->frame_->pts);
         }
 
+        if (!isnan(af->pts_))
+        {
+            af_end_time_ = af->pts_ + (double)af->frame_->nb_samples / af->frame_->sample_rate;
+        }
+        else
+        {
+            af_end_time_ = NAN;
+        }
         //audio_frame_queue_->frameQueueNext();
 
 

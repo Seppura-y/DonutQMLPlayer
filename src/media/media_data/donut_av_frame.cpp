@@ -206,13 +206,6 @@ namespace Donut
 
 	std::shared_ptr<DonutAVFrame> DonutAVFrameQueue::frameQueuePeekReadable()
 	{
-		//std::unique_lock<std::mutex> lock(mtx_);
-		//if (size_ - rindex_shown_ <= 0 && !pkt_queue_->isAbortRequest())
-		//{
-		//	cond_.wait(lock);
-		//	//cond_.wait_for(lock, std::chrono::milliseconds(10));
-		//}
-
 		std::unique_lock<std::mutex> lock(mtx_);
 		if (size_ - rindex_shown_ <= 0 && !pkt_queue_->isAbortRequest())
 		{
@@ -230,7 +223,7 @@ namespace Donut
 			auto null_frame = std::make_shared<DonutAVFrame>();
 			return null_frame;
 		}
-		int idx = (rindex_ + rindex_shown_) % max_size_;
+
 		return frame_queue_[(rindex_ + rindex_shown_) % max_size_];
 	}
 

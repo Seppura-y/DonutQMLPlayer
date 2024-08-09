@@ -25,7 +25,7 @@ namespace Donut
     {
         connect(this, &QQuickItem::windowChanged, this, &DonutScene::onWindowChanged);
         connect(this, &DonutScene::sigItemInitialized, this, &DonutScene::onItemInitialized);
-        startTimer(1000 / 60);
+        startTimer(1);
         setFlag(ItemHasContents, true);
 
         QSurfaceFormat format;
@@ -198,6 +198,8 @@ namespace Donut
             av_frame_unref(decoded_frame_);
 
             auto frame = video_frame_queue_->frameQueuePeekReadable();
+
+            frame = video_frame_queue_->frameQueuePeekLast();
             if (frame)
             {
                 {
@@ -208,14 +210,27 @@ namespace Donut
 
                 av_frame_unref(frame->frame_);
                 video_frame_queue_->frameQueueNext();
+
+                double diff = getFrameDiffTime(frame->frame_);
+                delay_time_ = (int)(getDelayTime(diff) * 1000000);
+                if (is_need_sync_)
+                {
+                    std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
+                }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            //QQuickItem::update();
+            //update();
         }
 
     }
 
     void DonutScene::timerEvent(QTimerEvent* ev)
     {
+        if (is_need_sync_)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
+        }
         QQuickItem::update();
     }
 

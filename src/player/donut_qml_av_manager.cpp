@@ -198,7 +198,6 @@ namespace Donut
 		demux_handler_->setAudioQueue(a_packet_queue_);
 		if (video_view_)
 		{
-			video_view_->setClocks(audio_clock_, video_clock_);
 			video_view_->setFrameQueue(v_frame_queue_);
 
 			v_decode_handler_->setClocks(audio_clock_, video_clock_);
@@ -306,7 +305,13 @@ namespace Donut
 
 			if (demux_handler_->hasVideo())
 			{
+				auto audio_timebase = *demux_handler_->copyAudioParameters()->time_base;
+				auto video_timebase = *demux_handler_->copyVideoParameters()->time_base;
+				audio_clock_->timebase_ = audio_timebase;
+				video_clock_->timebase_ = video_timebase;
+				video_view_->setClocks(audio_clock_, video_clock_);
 				video_index_ = demux_handler_->getVideoIndex();
+
 				v_decode_handler_->setStreamIndex(video_index_);
 				v_decode_handler_->setStream(demux_handler_->getVideoStream(0));
 				v_decode_handler_->openDecoder(demux_handler_->copyVideoParameters());

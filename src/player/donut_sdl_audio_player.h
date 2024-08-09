@@ -69,6 +69,11 @@ private:
 
     // SDL_OpenAudioDevice返回的SDL_AudioSpec中记录
     int audio_hw_buf_size_ = 0;
+
+    int audio_write_buf_size_ = 0;
+    int audio_buf_index_ = 0;
+
+    double af_end_time_ = 0;
 };
 
 

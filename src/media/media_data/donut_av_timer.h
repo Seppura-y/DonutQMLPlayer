@@ -3,6 +3,11 @@
 
 #include "core.h"
 
+extern"C"
+{
+#include <libavutil/rational.h>
+}
+
 namespace Donut{
 
 
@@ -24,6 +29,7 @@ public:
     int paused_;
     int* queue_serial_;    /* pointer to the current packet queue serial, used for obsolete clock detection */
 
+    AVRational timebase_;
 public:
     void setClockAt(double pts, int serial, double time);
 };
