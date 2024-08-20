@@ -152,6 +152,7 @@ namespace Donut
 	public:
 		AVCodecParameters* para = nullptr;
 		AVRational* time_base = nullptr;
+		AVRational framerate_ = { 0 };
 		static DonutAVParamWarpper* create();
 		~DonutAVParamWarpper();
 		//private:

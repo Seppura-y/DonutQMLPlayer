@@ -55,6 +55,7 @@ namespace Donut
     int Donut::DonutAVDecodeHandler::openDecoder(std::shared_ptr<DonutAVParamWarpper> param)
     {
         timebase_ = *param->time_base;
+        framerate_ = param->framerate_;
         return openDecoder(param->para);
     }
 
@@ -109,6 +110,11 @@ namespace Donut
     {
         is_need_sync_ = need_sync;
         sleep_ms_ = time * 1000000;
+    }
+
+    void DonutAVDecodeHandler::setVideoFramerate(int num, int den)
+    {
+        framerate_ = { num, den };
     }
 
     double DonutAVDecodeHandler::getFrameDiffTime(AVFrame* frame)
@@ -227,6 +233,7 @@ namespace Donut
                     if (last_serial_ == -1)
                     {
                         last_serial_ = serial;
+                        frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
                     }
 
 
@@ -262,8 +269,30 @@ namespace Donut
                         }
                         //auto new_frame = std::make_shared<DonutAVFrame>(decoded_frame);
                         //frame = new_frame;
+
+                        if (framerate_.num != 0 && framerate_.den != 0)
+                        {
+                            frame->duration_ = av_q2d(AVRational { framerate_.den, framerate_.num });
+                            frame->pts_ = (decoded_frame->pts == AV_NOPTS_VALUE) ? NAN : decoded_frame->pts * av_q2d(timebase_);
+                        }
+
+                        double pts = decoded_frame->pts;
+                        if (pts == AV_NOPTS_VALUE)
+                        {
+                            pts = 0;
+                        }
+                        auto para = decoder_.copyCodecParam();
+                        AVRational* timebase = para->time_base;
+                        pts *= av_q2d(*timebase);
+                        if (pts > 0)
+                        {
+                            clock_->setClockAt(pts, 0, pts);
+                        }
+
                         frame->setFrame(decoded_frame, serial);
                         frame_queue_->frameQueuePush(frame);
+
+
 
                         //auto pts = decoded_frame->pts;
                         //pts *= av_q2d(timebase_);

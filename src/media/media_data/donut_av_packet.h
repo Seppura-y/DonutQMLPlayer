@@ -102,6 +102,8 @@ private:
 	std::condition_variable cond_;
 
 	std::queue<std::shared_ptr<DonutAVPacket>> pkt_list_;
+
+	friend class DonutAVFrame;
 };
 
 }

@@ -37,6 +37,8 @@ namespace Donut
 		void setClocks(std::shared_ptr<DonutAVClock>& master_clock, std::shared_ptr<DonutAVClock>& clock);
 
 		void setSleepTime(bool need_sync, double time);
+
+		void setVideoFramerate(int num, int den);
 	protected:
 		void threadLoop() override;
 
@@ -63,7 +65,8 @@ namespace Donut
 		bool is_need_sync_ = false;
 		int sleep_ms_ = 0;
 
-		AVRational timebase_{0};
+		AVRational timebase_{ 0 };
+		AVRational framerate_{ 0 };
 
 		int last_serial_ = -1;
 	};

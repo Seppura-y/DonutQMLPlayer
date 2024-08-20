@@ -78,6 +78,9 @@ public:
 	void frameQueueDestroy();
 
 	int getSerial() { return pkt_queue_->getSerial(); }
+
+	void setFrameTimer(double time) { frame_timer_ = time; }
+	double getFrameTimer() { return frame_timer_; }
 private:
 	std::mutex mtx_;
 	std::condition_variable cond_;
@@ -92,6 +95,8 @@ private:
 	int rindex_shown_ = 0;
 
 	int stream_index_ = -1;
+
+	double frame_timer_ = -1;
 };
 
 

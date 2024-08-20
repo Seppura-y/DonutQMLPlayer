@@ -21,17 +21,19 @@ public:
 class DONUT_API DonutAVClock
 {
 public:
-    double pts_;           /* clock base */
-    double pts_drift_;     /* clock base minus time at which we updated the clock */
-    double last_updated_;
-    double speed_;
-    int serial_;           /* clock is based on a packet with this serial */
-    int paused_;
+    double pts_ = 0;           /* clock base */
+    double pts_drift_ = 0;     /* clock base minus time at which we updated the clock */
+    double last_updated_ = 0;
+    double speed_ = 1;
+    int serial_ = 0;           /* clock is based on a packet with this serial */
+    int paused_ = 0;
     int* queue_serial_;    /* pointer to the current packet queue serial, used for obsolete clock detection */
 
     AVRational timebase_;
 public:
+    DonutAVClock();
     void setClockAt(double pts, int serial, double time);
+    double getClock();
 };
 
 class DONUT_API DonutAVRational

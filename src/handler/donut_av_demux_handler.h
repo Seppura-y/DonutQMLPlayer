@@ -40,7 +40,7 @@ namespace Donut
 		void seekByTimePos(double value);
 		int64_t getTotalDuration() { return total_duration_; };
 
-		int getVideoFramerate();
+		DonutAVRational getVideoFramerate();
 
 		using eof_callback = std::function<void(void)>;
 

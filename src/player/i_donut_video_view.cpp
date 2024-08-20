@@ -1,11 +1,14 @@
 #include "i_donut_video_view.h"
 
+#include "donut_av_global.h"
+#include "donut_qml_av_manager.h"
 //extern"C"
 //{
 //    #include <libavcodec/avcodec.h>
 //    #include <libavutil/rational.h>
 //	#include <libavutil/avutil.h>
 //	#include <libavutil/time.h>
+//    #include <libavutil/common.h>
 //}
 
 namespace Donut
@@ -30,6 +33,11 @@ namespace Donut
 		video_frame_queue_ = queue;
 	}
 
+    void IDonutVideoView::setManager(DonutQMLAVManager* manager)
+    {
+        manager_ = manager;
+    }
+
 	void IDonutVideoView::updateVideoPts(double pts, int64_t pos, int serial)
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
@@ -39,6 +47,44 @@ namespace Donut
 		clock_->pts_drift_ = clock_->pts_ - time;
 		clock_->serial_ = serial;
 	}
+
+    double IDonutVideoView::computeTargetDelay(double last_duration)
+    {
+        double sync_threshold, diff = 0;
+        if (!master_clock_ || !clock_) return 0;
+
+        if (master_clock_ == clock_)
+        {
+            is_need_sync_ = false;
+            return 0;
+        }
+        else
+        {
+            is_need_sync_ = true;
+        }
+
+        diff = clock_->getClock() - master_clock_->getClock();
+
+        sync_threshold = FFMAX(AV_SYNC_THRESHOLD_MIN, FFMIN(AV_SYNC_THRESHOLD_MAX, last_duration));
+
+        if (!isnan(diff) && fabs(diff) < manager_->max_frame_duration_)
+        {
+            if (diff <= -sync_threshold)
+            {
+                last_duration = FFMAX(0, last_duration + diff);
+            }
+            else if (diff >= sync_threshold && last_duration > AV_SYNC_FRAMEDUP_THRESHOLD)
+            {
+                last_duration = last_duration + diff;
+            }
+            else if (diff >= sync_threshold)
+            {
+                last_duration = 2 * last_duration;
+            }
+        }
+
+        return last_duration;
+    }
 
     double IDonutVideoView::getFrameDiffTime(AVFrame* frame)
     {

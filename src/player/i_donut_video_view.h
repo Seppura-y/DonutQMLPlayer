@@ -4,6 +4,9 @@
 #include "i_donut_av_base_handler.h"
 #include "donut_av_timer.h"
 #include "donut_av_frame.h"
+
+//#include "donut_qml_av_manager.h"
+
 extern"C"
 {
 #include <libavcodec/avcodec.h>
@@ -15,6 +18,7 @@ extern"C"
 
 namespace Donut
 {
+	class DonutQMLAVManager;
 	class IDonutVideoView : public IDonutAVBaseHandler
 	{
 	public:
@@ -22,19 +26,25 @@ namespace Donut
 		void setClocks(std::shared_ptr<DonutAVClock>& m_clock, std::shared_ptr<DonutAVClock>& clock);
 
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
+		void setManager(DonutQMLAVManager* manager);
 
 	protected:
 		double getFrameDiffTime(AVFrame* frame);
 		double getDelayTime(double diff);
 
 		void updateVideoPts(double pts, int64_t pos, int serial);
+
+		double computeTargetDelay(double delay);
 	protected:
+		DonutQMLAVManager* manager_;
+
 		std::shared_ptr<DonutAVClock> master_clock_;
 		std::shared_ptr<DonutAVClock> clock_;
 		std::shared_ptr<DonutAVFrameQueue> video_frame_queue_;
 
 		int delay_time_ = 1;
 		bool is_need_sync_ = true;
+		double frame_timer_ = 0;
 
 		AVRational master_timebase_{ 1, 1 };
 		AVRational timebase_{ 1, 1 };

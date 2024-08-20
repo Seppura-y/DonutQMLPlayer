@@ -96,9 +96,9 @@ namespace Donut
 		seek_req_ = 1;
 	}
 
-	int Donut::DonutAVDemuxHandler::getVideoFramerate()
+	DonutAVRational Donut::DonutAVDemuxHandler::getVideoFramerate()
 	{
-		return 0;
+		return demuxer_.getVideoFramerate();
 	}
 
 	void DonutAVDemuxHandler::setAudioQueue(std::shared_ptr<DonutAVPacketQueue>& audio_queue)

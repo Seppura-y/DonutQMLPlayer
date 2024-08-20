@@ -1,5 +1,8 @@
 ﻿#include "donut_scene.h"
 
+#include "log.h"
+#include "donut_av_global.h"
+
 #include <QtQuick/qquickwindow.h>
 #include <QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
@@ -11,6 +14,7 @@
 extern"C"
 {
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 }
 
 namespace Donut
@@ -192,45 +196,137 @@ namespace Donut
 
     void DonutScene::threadLoop()
     {
+        double remaining_time = 0.01;
         while (!is_exit_)
         {
             std::unique_lock<std::mutex> lock(mtx_);
             av_frame_unref(decoded_frame_);
 
-            auto frame = video_frame_queue_->frameQueuePeekReadable();
-
-            frame = video_frame_queue_->frameQueuePeekLast();
-            if (frame)
+            retry:
+            if (video_frame_queue_->frameQueueNbRemaining() == 0)
             {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                DN_CORE_ERROR("video_frame_queue_->frameQueueNbRemaining() == 0");
+            }
+            else
+            {
+                double last_duration, duration, delay;
+                double time;
+                std::shared_ptr<DonutAVFrame> vp, last_vp;
+
+                last_vp = video_frame_queue_->frameQueuePeekLast();
+                vp = video_frame_queue_->frameQueuePeek();
+
+                //if (vp->serial_ != manager_->getSerial())
+                //{
+                //    video_frame_queue_->frameQueueNext();
+                //    goto retry;
+                //}
+
+                if (last_vp->getSerial() != vp->getSerial())
                 {
-                    av_frame_ref(decoded_frame_, frame->frame_);
-                    frame_updated_ = false;
-                    lock.unlock();
+                    video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
+                    //frame_timer_ = av_gettime_relative() / 1000000.0;
                 }
 
-                av_frame_unref(frame->frame_);
-                video_frame_queue_->frameQueueNext();
-
-                double diff = getFrameDiffTime(frame->frame_);
-                delay_time_ = (int)(getDelayTime(diff) * 1000000);
-                if (is_need_sync_)
+                if (vp->serial_ == last_vp->serial_)
                 {
-                    std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
+                    //double duration = vp->frame_->pts - last_vp->frame_->pts;
+                    double duration = vp->pts_ - last_vp->pts_;
+                    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
+                    {
+                        //last_duration = last_vp->frame_->duration;
+                        last_duration = last_vp->duration_;
+                    }
+                    else
+                    {
+                        last_duration = duration;
+                    }
+                }
+
+                delay = computeTargetDelay(last_duration);
+
+                time = av_gettime_relative() / 1000000.0;
+
+                double frame_timer = video_frame_queue_->getFrameTimer();
+
+                if (time < frame_timer + delay)
+                {
+                    remaining_time = FFMIN(frame_timer + delay - time, remaining_time);
+                    DN_CORE_ERROR("1 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
+                    DN_CORE_ERROR("1 FFMIN {} {}", frame_timer + delay - time, remaining_time);
+                    av_usleep(remaining_time * 1000000.0);
+                    //continue;
+                }
+
+                video_frame_queue_->setFrameTimer(frame_timer + delay);
+
+                if (delay > 0 && time - video_frame_queue_->getFrameTimer() > AV_SYNC_THRESHOLD_MAX)
+                {
+                    video_frame_queue_->setFrameTimer(time);
+                }
+
+                clock_->setClockAt(vp->pts_, vp->pos_, vp->serial_);
+
+                DN_CORE_ERROR("2 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
+                DN_CORE_ERROR("2 FFMIN {} {}", frame_timer + delay - time, remaining_time);
+                av_usleep(remaining_time * 1000000.0);
+                //av_usleep(delay * 1000000.0);
+
+                auto frame = video_frame_queue_->frameQueuePeekReadable();
+
+                frame = video_frame_queue_->frameQueuePeekLast();
+                if (frame)
+                {
+                    {
+                        av_frame_ref(decoded_frame_, frame->frame_);
+                        frame_updated_ = false;
+                        lock.unlock();
+                    }
+
+                    av_frame_unref(frame->frame_);
+                    video_frame_queue_->frameQueueNext();
                 }
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            //QQuickItem::update();
-            //update();
-        }
 
+            av_usleep(remaining_time * 1000000.0);
+
+            //std::this_thread::sleep_for(std::chrono::milliseconds(33));
+
+            //auto rem = video_frame_queue_->frameQueueNbRemaining();
+            //auto frame = video_frame_queue_->frameQueuePeekReadable();
+            //frame = video_frame_queue_->frameQueuePeekLast();
+            //if (frame)
+            //{
+            //    {
+            //        av_frame_ref(decoded_frame_, frame->frame_);
+            //        frame_updated_ = false;
+            //        lock.unlock();
+            //    }
+
+            //    av_frame_unref(frame->frame_);
+            //    video_frame_queue_->frameQueueNext();
+
+            //    double diff = getFrameDiffTime(frame->frame_);
+            //    delay_time_ = (int)(getDelayTime(diff) * 1000000);
+            //    if (is_need_sync_)
+            //    {
+            //        std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
+            //    }
+            //}
+            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            ////QQuickItem::update();
+            ////update();
+
+        }
     }
 
     void DonutScene::timerEvent(QTimerEvent* ev)
     {
-        if (is_need_sync_)
-        {
-            std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
-        }
+        //if (is_need_sync_)
+        //{
+        //    std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
+        //}
         QQuickItem::update();
     }
 
