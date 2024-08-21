@@ -35,6 +35,7 @@ namespace Donut
 		void updateVideoPts(double pts, int64_t pos, int serial);
 
 		double computeTargetDelay(double delay);
+		double computeDuration(std::shared_ptr<DonutAVFrame> vp, std::shared_ptr<DonutAVFrame> last_vp);
 	protected:
 		DonutQMLAVManager* manager_;
 

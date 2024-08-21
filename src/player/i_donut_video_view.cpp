@@ -64,7 +64,10 @@ namespace Donut
         }
 
         diff = clock_->getClock() - master_clock_->getClock();
-
+        //if (diff < -0.4)
+        //{
+        //    return 0;
+        //}
 
         sync_threshold = FFMAX(AV_SYNC_THRESHOLD_MIN, FFMIN(AV_SYNC_THRESHOLD_MAX, last_duration));
 
@@ -92,6 +95,27 @@ namespace Donut
         //    return 0.0;
         //}
 
+        return last_duration;
+    }
+
+    double IDonutVideoView::computeDuration(std::shared_ptr<DonutAVFrame> vp, std::shared_ptr<DonutAVFrame> last_vp)
+    {
+        double last_duration = 0;
+
+        if (vp->serial_ == last_vp->serial_)
+        {
+            //double duration = vp->frame_->pts - last_vp->frame_->pts;
+            double duration = vp->pts_ - last_vp->pts_;
+            if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
+            {
+                //last_duration = last_vp->frame_->duration;
+                last_duration = last_vp->duration_;
+            }
+            else
+            {
+                last_duration = duration;
+            }
+        }
         return last_duration;
     }
 

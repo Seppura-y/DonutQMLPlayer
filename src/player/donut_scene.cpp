@@ -230,20 +230,22 @@ namespace Donut
                     //frame_timer_ = av_gettime_relative() / 1000000.0;
                 }
 
-                if (vp->serial_ == last_vp->serial_)
-                {
-                    //double duration = vp->frame_->pts - last_vp->frame_->pts;
-                    double duration = vp->pts_ - last_vp->pts_;
-                    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
-                    {
-                        //last_duration = last_vp->frame_->duration;
-                        last_duration = last_vp->duration_;
-                    }
-                    else
-                    {
-                        last_duration = duration;
-                    }
-                }
+                last_duration = computeDuration(vp, last_vp);
+
+                //if (vp->serial_ == last_vp->serial_)
+                //{
+                //    //double duration = vp->frame_->pts - last_vp->frame_->pts;
+                //    double duration = vp->pts_ - last_vp->pts_;
+                //    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
+                //    {
+                //        //last_duration = last_vp->frame_->duration;
+                //        last_duration = last_vp->duration_;
+                //    }
+                //    else
+                //    {
+                //        last_duration = duration;
+                //    }
+                //}
 
                 delay = computeTargetDelay(last_duration);
 
@@ -256,7 +258,7 @@ namespace Donut
                 {
                     double calculate = frame_timer + delay - time;
                     remaining_time = FFMIN(calculate, remaining_time);
-                    DN_CORE_ERROR("1 FFMIN {} {}", calculate, remaining_time);
+                    //DN_CORE_ERROR("1 FFMIN {} {}", calculate, remaining_time);
                     //DN_CORE_ERROR("1 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
                     //DN_CORE_ERROR("1 FFMIN {} {}", frame_timer + delay - time, remaining_time);
                     av_usleep(remaining_time * 1000000.0);
@@ -265,13 +267,11 @@ namespace Donut
                     remaining_time = 0.01;
                     continue_count++;
                     continue;
-                    //goto display;
                 }
                 else
                 {
 
                     DN_CORE_ERROR("Continue Count {}", continue_count);
-
                     continue_count = 0;
 
                     time = av_gettime_relative() / 1000000.0;
@@ -298,22 +298,26 @@ namespace Donut
                 {
                     double next_duration = 0;
                     auto next_vp = video_frame_queue_->frameQueuePeekLast();
-                    if (next_vp->serial_ == vp->serial_)
-                    {
-                        //double duration = vp->frame_->pts - last_vp->frame_->pts;
-                        double duration = next_vp->pts_ - vp->pts_;
-                        if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
-                        {
-                            //last_duration = last_vp->frame_->duration;
-                            next_duration = next_vp->duration_;
-                        }
-                        else
-                        {
-                            next_duration = duration;
-                        }
-                    }
-                    time = av_gettime_relative() / 1000000.0;
-                    if (time > video_frame_queue_->getFrameTimer() + next_duration)
+                    next_duration = computeDuration(next_vp, vp);
+                    //if (next_vp->serial_ == vp->serial_)
+                    //{
+                    //    //double duration = vp->frame_->pts - last_vp->frame_->pts;
+                    //    double duration = next_vp->pts_ - vp->pts_;
+                    //    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
+                    //    {
+                    //        //last_duration = last_vp->frame_->duration;
+                    //        next_duration = next_vp->duration_;
+                    //    }
+                    //    else
+                    //    {
+                    //        next_duration = duration;
+                    //    }
+                    //}
+                    //time = av_gettime_relative() / 1000000.0;
+                    auto f_timer = video_frame_queue_->getFrameTimer();
+                    auto f_end = f_timer + next_duration;
+                    //if (time > video_frame_queue_->getFrameTimer() + next_duration)
+                    if (time > f_end)
                     {
                         video_frame_queue_->frameQueueNext();
                         continue;
@@ -338,37 +342,7 @@ namespace Donut
                 }
             }
 
-        //display:
-        //    DN_CORE_ERROR("1 remaining : {:.6f}", remaining_time);
-            //av_usleep(remaining_time * 1000000.0);
-
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-            //auto rem = video_frame_queue_->frameQueueNbRemaining();
-            //auto frame = video_frame_queue_->frameQueuePeekReadable();
-            //frame = video_frame_queue_->frameQueuePeekLast();
-            //if (frame)
-            //{
-            //    {
-            //        av_frame_ref(decoded_frame_, frame->frame_);
-            //        frame_updated_ = false;
-            //        lock.unlock();
-            //    }
-
-            //    av_frame_unref(frame->frame_);
-            //    video_frame_queue_->frameQueueNext();
-
-            //    double diff = getFrameDiffTime(frame->frame_);
-            //    delay_time_ = (int)(getDelayTime(diff) * 1000000);
-            //    if (is_need_sync_)
-            //    {
-            //        std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
-            //    }
-            //}
-            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            ////QQuickItem::update();
-            ////update();
-
         }
     }
 
