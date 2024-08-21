@@ -285,7 +285,8 @@ namespace Donut
                 //    video_frame_queue_->setFrameTimer(time);
                 //}
 
-                clock_->setClockAt(vp->pts_, vp->pos_, vp->serial_);
+                //clock_->setClockAt(vp->pts_, vp->serial_, vp->pos_);
+                clock_->setClockAt(vp->pts_, vp->serial_, time);
 
                 //DN_CORE_ERROR("2 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
                 //DN_CORE_ERROR("2 FFMIN {} {}", frame_timer + delay - time, remaining_time);
@@ -311,7 +312,7 @@ namespace Donut
                             next_duration = duration;
                         }
                     }
-
+                    time = av_gettime_relative() / 1000000.0;
                     if (time > video_frame_queue_->getFrameTimer() + next_duration)
                     {
                         video_frame_queue_->frameQueueNext();
@@ -320,6 +321,8 @@ namespace Donut
                 }
 
                 auto frame = video_frame_queue_->frameQueuePeekReadable();
+
+                clock_->setClockAt(vp->pts_, vp->serial_, time);
 
                 frame = video_frame_queue_->frameQueuePeekLast();
                 if (frame)

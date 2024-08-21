@@ -76,7 +76,7 @@ namespace Donut
             }
             else if (diff >= sync_threshold && last_duration > AV_SYNC_FRAMEDUP_THRESHOLD)
             {
-                if (diff > AV_SYNC_THRESHOLD_MAX)
+                if (fabs(diff) > AV_SYNC_THRESHOLD_MAX)
                 {
                     return 0.0;
                 }
@@ -87,6 +87,10 @@ namespace Donut
                 last_duration = 2 * last_duration;
             }
         }
+        //else
+        //{
+        //    return 0.0;
+        //}
 
         return last_duration;
     }

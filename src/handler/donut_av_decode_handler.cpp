@@ -286,7 +286,7 @@ namespace Donut
                         pts *= av_q2d(*timebase);
                         if (pts > 0)
                         {
-                            clock_->setClockAt(pts, 0, pts);
+                            clock_->setClockAt(pts, 0, av_gettime_relative() / 1000000.0);
                         }
 
                         frame->setFrame(decoded_frame, serial);
