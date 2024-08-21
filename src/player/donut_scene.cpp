@@ -197,6 +197,7 @@ namespace Donut
     void DonutScene::threadLoop()
     {
         double remaining_time = 0.01;
+        int continue_count = 0;
         while (!is_exit_)
         {
             std::unique_lock<std::mutex> lock(mtx_);
@@ -250,28 +251,73 @@ namespace Donut
 
                 double frame_timer = video_frame_queue_->getFrameTimer();
 
+
                 if (time < frame_timer + delay)
                 {
-                    remaining_time = FFMIN(frame_timer + delay - time, remaining_time);
-                    DN_CORE_ERROR("1 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
-                    DN_CORE_ERROR("1 FFMIN {} {}", frame_timer + delay - time, remaining_time);
+                    double calculate = frame_timer + delay - time;
+                    remaining_time = FFMIN(calculate, remaining_time);
+                    DN_CORE_ERROR("1 FFMIN {} {}", calculate, remaining_time);
+                    //DN_CORE_ERROR("1 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
+                    //DN_CORE_ERROR("1 FFMIN {} {}", frame_timer + delay - time, remaining_time);
                     av_usleep(remaining_time * 1000000.0);
-                    //continue;
+                    //av_usleep(remaining_time * 1000000.0);
+                    //video_frame_queue_->setFrameTimer(frame_timer + remaining_time);
+                    remaining_time = 0.01;
+                    continue_count++;
+                    continue;
+                    //goto display;
                 }
-
-                video_frame_queue_->setFrameTimer(frame_timer + delay);
-
-                if (delay > 0 && time - video_frame_queue_->getFrameTimer() > AV_SYNC_THRESHOLD_MAX)
+                else
                 {
+
+                    DN_CORE_ERROR("Continue Count {}", continue_count);
+
+                    continue_count = 0;
+
+                    time = av_gettime_relative() / 1000000.0;
                     video_frame_queue_->setFrameTimer(time);
                 }
 
+                //video_frame_queue_->setFrameTimer(frame_timer + delay);
+
+                //if (delay > 0 && time - video_frame_queue_->getFrameTimer() > AV_SYNC_THRESHOLD_MAX)
+                //{
+                //    video_frame_queue_->setFrameTimer(time);
+                //}
+
                 clock_->setClockAt(vp->pts_, vp->pos_, vp->serial_);
 
-                DN_CORE_ERROR("2 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
-                DN_CORE_ERROR("2 FFMIN {} {}", frame_timer + delay - time, remaining_time);
-                av_usleep(remaining_time * 1000000.0);
+                //DN_CORE_ERROR("2 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
+                //DN_CORE_ERROR("2 FFMIN {} {}", frame_timer + delay - time, remaining_time);
+                //remaining_time = delay;
+                //av_usleep(remaining_time * 1000000.0);
                 //av_usleep(delay * 1000000.0);
+
+                if (video_frame_queue_->frameQueueNbRemaining() > 1)
+                {
+                    double next_duration = 0;
+                    auto next_vp = video_frame_queue_->frameQueuePeekLast();
+                    if (next_vp->serial_ == vp->serial_)
+                    {
+                        //double duration = vp->frame_->pts - last_vp->frame_->pts;
+                        double duration = next_vp->pts_ - vp->pts_;
+                        if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
+                        {
+                            //last_duration = last_vp->frame_->duration;
+                            next_duration = next_vp->duration_;
+                        }
+                        else
+                        {
+                            next_duration = duration;
+                        }
+                    }
+
+                    if (time > video_frame_queue_->getFrameTimer() + next_duration)
+                    {
+                        video_frame_queue_->frameQueueNext();
+                        continue;
+                    }
+                }
 
                 auto frame = video_frame_queue_->frameQueuePeekReadable();
 
@@ -289,9 +335,11 @@ namespace Donut
                 }
             }
 
-            av_usleep(remaining_time * 1000000.0);
+        //display:
+        //    DN_CORE_ERROR("1 remaining : {:.6f}", remaining_time);
+            //av_usleep(remaining_time * 1000000.0);
 
-            //std::this_thread::sleep_for(std::chrono::milliseconds(33));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             //auto rem = video_frame_queue_->frameQueueNbRemaining();
             //auto frame = video_frame_queue_->frameQueuePeekReadable();

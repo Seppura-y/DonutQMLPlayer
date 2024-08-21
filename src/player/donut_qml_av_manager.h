@@ -171,7 +171,8 @@ namespace Donut
 		bool is_loop_ = false;
 
 		double frame_timer_ = 0;
-		double max_frame_duration_ = 3600.0;
+		double max_frame_duration_ = 0.5;
+		//double max_frame_duration_ = 3600.0;
 
 		friend class IDonutVideoView;
 		friend class DonutScene;
