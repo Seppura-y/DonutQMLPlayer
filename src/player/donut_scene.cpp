@@ -17,6 +17,20 @@ extern"C"
 #include <libavformat/avformat.h>
 }
 
+#include <chrono>
+
+double getTime()
+{
+    std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> tp
+        = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
+
+    auto tmp = std::chrono::duration_cast<std::chrono::microseconds>(tp.time_since_epoch());
+
+    double time = (long long)tmp.count() / 1000000.0;
+
+    return time;
+}
+
 namespace Donut
 {
     DonutSceneRenderer* DonutScene::s_renderer_ = nullptr;
@@ -226,7 +240,8 @@ namespace Donut
 
                 if (last_vp->getSerial() != vp->getSerial())
                 {
-                    video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
+                    //video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
+                    video_frame_queue_->setFrameTimer(getTime());
                     //frame_timer_ = av_gettime_relative() / 1000000.0;
                 }
 
@@ -249,7 +264,8 @@ namespace Donut
 
                 delay = computeTargetDelay(last_duration);
 
-                time = av_gettime_relative() / 1000000.0;
+                time = getTime();
+                //time = av_gettime_relative() / 1000000.0;
 
                 double frame_timer = video_frame_queue_->getFrameTimer();
 
@@ -274,7 +290,8 @@ namespace Donut
                     //DN_CORE_ERROR("Continue Count {}", continue_count);
                     continue_count = 0;
 
-                    time = av_gettime_relative() / 1000000.0;
+                    time = getTime();
+                    //time = av_gettime_relative() / 1000000.0;
                     video_frame_queue_->setFrameTimer(time);
                 }
 
@@ -316,7 +333,8 @@ namespace Donut
                     //time = av_gettime_relative() / 1000000.0;
                     auto f_timer = video_frame_queue_->getFrameTimer();
                     auto f_end = f_timer + next_duration;
-                    auto new_time = av_gettime_relative() / 1000000.0;
+                    auto new_time = getTime();
+                    //auto new_time = av_gettime_relative() / 1000000.0;
                     //if (time > video_frame_queue_->getFrameTimer() + next_duration)
                     if (new_time > f_end)
                     {
@@ -354,7 +372,10 @@ namespace Donut
         //{
         //    std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
         //}
-        QQuickItem::update();
+        if (!frame_updated_)
+        {
+            QQuickItem::update();
+        }
     }
 
     void DonutScene::mousePressEvent(QMouseEvent* ev)
