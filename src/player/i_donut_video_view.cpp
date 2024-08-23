@@ -64,10 +64,10 @@ namespace Donut
         }
 
         diff = clock_->getClock() - master_clock_->getClock();
-        //if (diff < -0.4)
-        //{
-        //    return 0;
-        //}
+        if (diff < -0.1)
+        {
+            return 0;
+        }
 
         sync_threshold = FFMAX(AV_SYNC_THRESHOLD_MIN, FFMIN(AV_SYNC_THRESHOLD_MAX, last_duration));
 
@@ -79,10 +79,10 @@ namespace Donut
             }
             else if (diff >= sync_threshold && last_duration > AV_SYNC_FRAMEDUP_THRESHOLD)
             {
-                if (fabs(diff) > AV_SYNC_THRESHOLD_MAX)
-                {
-                    return 0.0;
-                }
+                //if (fabs(diff) > AV_SYNC_THRESHOLD_MAX)
+                //{
+                //    return 0.0;
+                //}
                 last_duration = last_duration + diff;
             }
             else if (diff >= sync_threshold)

@@ -29,7 +29,7 @@ namespace Donut
     {
         connect(this, &QQuickItem::windowChanged, this, &DonutScene::onWindowChanged);
         connect(this, &DonutScene::sigItemInitialized, this, &DonutScene::onItemInitialized);
-        startTimer(1);
+        startTimer(1, Qt::TimerType::PreciseTimer);
         setFlag(ItemHasContents, true);
 
         QSurfaceFormat format;
@@ -271,7 +271,7 @@ namespace Donut
                 else
                 {
 
-                    DN_CORE_ERROR("Continue Count {}", continue_count);
+                    //DN_CORE_ERROR("Continue Count {}", continue_count);
                     continue_count = 0;
 
                     time = av_gettime_relative() / 1000000.0;
@@ -316,10 +316,12 @@ namespace Donut
                     //time = av_gettime_relative() / 1000000.0;
                     auto f_timer = video_frame_queue_->getFrameTimer();
                     auto f_end = f_timer + next_duration;
+                    auto new_time = av_gettime_relative() / 1000000.0;
                     //if (time > video_frame_queue_->getFrameTimer() + next_duration)
-                    if (time > f_end)
+                    if (new_time > f_end)
                     {
                         video_frame_queue_->frameQueueNext();
+                        frame_updated_ = true;
                         continue;
                     }
                 }
