@@ -180,6 +180,7 @@ std::shared_ptr<DonutAVParamWarpper> DonutAVFormatBase::copyAudioParameters()
 	}
 	avcodec_parameters_copy(param->para, fmt_ctx_->streams[audio_index_]->codecpar);
 	*param->time_base = fmt_ctx_->streams[audio_index_]->time_base;
+	//*param->time_base = { 1, fmt_ctx_->streams[audio_index_]->codecpar->sample_rate };
 	return param;
 }
 

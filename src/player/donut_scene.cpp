@@ -51,6 +51,8 @@ namespace Donut
         format.setMinorVersion(5);
         format.setProfile(QSurfaceFormat::CoreProfile);
 
+        format.setSwapInterval(1);
+
         context_ = new QOpenGLContext(this);
         context_->setFormat(format);
         if (!context_->create())
@@ -220,7 +222,7 @@ namespace Donut
             retry:
             if (video_frame_queue_->frameQueueNbRemaining() == 0)
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
                 DN_CORE_ERROR("video_frame_queue_->frameQueueNbRemaining() == 0");
             }
             else
@@ -240,8 +242,8 @@ namespace Donut
 
                 if (last_vp->getSerial() != vp->getSerial())
                 {
-                    //video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
-                    video_frame_queue_->setFrameTimer(getTime());
+                    video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
+                    //video_frame_queue_->setFrameTimer(getTime());
                     //frame_timer_ = av_gettime_relative() / 1000000.0;
                 }
 
@@ -263,9 +265,13 @@ namespace Donut
                 //}
 
                 delay = computeTargetDelay(last_duration);
+                if (delay == 0)
+                {
+                    frame_updated_ = true;
+                }
 
-                time = getTime();
-                //time = av_gettime_relative() / 1000000.0;
+                //time = getTime();
+                time = av_gettime_relative() / 1000000.0;
 
                 double frame_timer = video_frame_queue_->getFrameTimer();
 
@@ -290,8 +296,8 @@ namespace Donut
                     //DN_CORE_ERROR("Continue Count {}", continue_count);
                     continue_count = 0;
 
-                    time = getTime();
-                    //time = av_gettime_relative() / 1000000.0;
+                    //time = getTime();
+                    time = av_gettime_relative() / 1000000.0;
                     video_frame_queue_->setFrameTimer(time);
                 }
 
@@ -333,8 +339,8 @@ namespace Donut
                     //time = av_gettime_relative() / 1000000.0;
                     auto f_timer = video_frame_queue_->getFrameTimer();
                     auto f_end = f_timer + next_duration;
-                    auto new_time = getTime();
-                    //auto new_time = av_gettime_relative() / 1000000.0;
+                    //auto new_time = getTime();
+                    auto new_time = av_gettime_relative() / 1000000.0;
                     //if (time > video_frame_queue_->getFrameTimer() + next_duration)
                     if (new_time > f_end)
                     {
@@ -362,7 +368,7 @@ namespace Donut
                 }
             }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
     }
 

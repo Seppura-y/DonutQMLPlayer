@@ -40,6 +40,8 @@ namespace Donut
 
 		AVStream* video_streams_[8]{ nullptr };
 		AVStream* audio_streams_[8]{ nullptr };
+
+		int64_t total_duration_ = 0;
 	};
 }
 
