@@ -36,6 +36,7 @@ public:
 	int getSerial() { return serial_; }
 	AVFrame* getFrame() { return frame_; }
 	void setFrame(AVFrame* frame, int serial);
+	void setFrame(AVFrame* frame, int serial, AVRational timebase);
 public:
 	AVFrame* frame_ = nullptr;
 

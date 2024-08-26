@@ -122,6 +122,25 @@ namespace Donut
 		av_frame_move_ref(this->frame_, frame);
 	}
 
+	void DonutAVFrame::setFrame(AVFrame* frame, int serial, AVRational timebase)
+	{
+		if (frame->width != 0)
+		{
+			//duration_ = (frame_rate_)
+		}
+		else if (frame->sample_rate != 0)
+		{
+			pts_ = (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts * av_q2d(timebase);
+			pos_ = frame->pkt_pos;
+			serial_ = serial;
+			//duration_ = av_q2d(AVRational{ frame->nb_samples, frame->sample_rate });
+			duration_ = frame->duration;
+		}
+
+
+		av_frame_move_ref(this->frame_, frame);
+	}
+
 
 
 

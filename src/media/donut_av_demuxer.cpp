@@ -123,6 +123,14 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
         total_duration_ = FFMAX(FFMAX(video_duration_, audio_duration_), total_duration_);
     }
 
+    //AVPacket* packet = av_packet_alloc();
+    //while (av_read_frame(fmt_ctx, packet) >= 0)
+    //{
+    //    DN_CORE_ERROR("read index : {}", packet->stream_index);
+    //    av_packet_unref(packet);
+    //}
+    //avformat_seek_file(fmt_ctx, -1, 0, 0, 0, 0);
+
     av_dict_free(&opt);
 
     return fmt_ctx;

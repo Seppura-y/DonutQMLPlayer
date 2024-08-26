@@ -218,7 +218,10 @@ namespace Donut
         AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
-            std::string adsf = stream_index_ == 0 ? "audio" : "video";
+            auto par = decoder_.copyCodecParam();
+            bool is_audio = par->para->sample_rate > 0 ? true : false;
+
+            //bool is_audio = stream_index_ == 0 ? true : false;
             int serial = -1;
             {
                 if (packet_queue_->packetQueueHasEnoughPackets())
@@ -264,6 +267,7 @@ namespace Donut
                         std::shared_ptr<DonutAVFrame> frame = frame_queue_->frameQueuePeekWritable();
                         if (!frame)
                         {
+                            av_frame_unref(decoded_frame);
                             std::this_thread::sleep_for(std::chrono::microseconds(1));
                             continue;
                         }
@@ -298,7 +302,7 @@ namespace Donut
                             //    DN_CORE_INFO("{} clock_->setClockAt({})", is_audio ? "audio" : "video", pts);
                         }
 
-                        frame->setFrame(decoded_frame, serial);
+                        frame->setFrame(decoded_frame, serial, timebase_);
                         frame_queue_->frameQueuePush(frame);
 
 

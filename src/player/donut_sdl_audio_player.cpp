@@ -308,7 +308,7 @@ namespace Donut
             int resampled = audioDecodeFrame();
             if (resampled < 0)
             {
-
+                DN_CORE_ERROR("resamped < 0", resampled);
             }
             //if (resampled == 0) break;
 

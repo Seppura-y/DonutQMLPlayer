@@ -275,15 +275,17 @@ int DonutAVPacketQueue::packetQueueGetStreamIndex()
 
 bool DonutAVPacketQueue::packetQueueHasEnoughPackets()
 {
-	//auto a = av_q2d(stream_->time_base) * duration_;
-	//auto b = stream_index_ < 0;
-	//auto c = abort_request_;
-	//auto d = nb_packets_ > MIN_FRAMES;
-	//auto e = (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
+	auto a = av_q2d(stream_->time_base) * duration_;
+	auto b = stream_index_ < 0;
+	auto c = abort_request_;
+	auto d = nb_packets_ > MIN_FRAMES;
+	auto e = (!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
 	bool is_enough = stream_index_ == -1 ||
 		abort_request_ ||
 		nb_packets_ > MIN_FRAMES &&
-		(!duration_ || (stream_ && av_q2d(stream_->codecpar->sample_rate > 0 ? AVRational{1, stream_->codecpar->sample_rate} : stream_->time_base) * duration_ > 1.0));
+		//(!duration_ || (stream_ && av_q2d(stream_->codecpar->sample_rate > 0 ? AVRational{ 1, stream_->codecpar->sample_rate } : stream_->time_base) * duration_ > 1.0));
+		(!duration_ || (stream_ && av_q2d(stream_->time_base) * duration_ > 1.0));
+	;
 	return is_enough;
 }
 

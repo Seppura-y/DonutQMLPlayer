@@ -66,10 +66,10 @@ namespace Donut
         diff = clock_->getClock() - master_clock_->getClock();
         auto c = clock_->getClock();
         auto mc = master_clock_->getClock();
-        if (diff < -0.1)
-        {
-            return 0;
-        }
+        //if (diff < -0.1)
+        //{
+        //    return 0;
+        //}
 
         sync_threshold = FFMAX(AV_SYNC_THRESHOLD_MIN, FFMIN(AV_SYNC_THRESHOLD_MAX, last_duration));
 
