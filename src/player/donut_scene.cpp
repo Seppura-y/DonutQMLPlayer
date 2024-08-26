@@ -223,7 +223,7 @@ namespace Donut
             if (video_frame_queue_->frameQueueNbRemaining() == 0)
             {
                 std::this_thread::sleep_for(std::chrono::microseconds(1));
-                DN_CORE_ERROR("video_frame_queue_->frameQueueNbRemaining() == 0");
+                //DN_CORE_ERROR("video_frame_queue_->frameQueueNbRemaining() == 0");
             }
             else
             {

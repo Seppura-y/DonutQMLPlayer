@@ -22,6 +22,7 @@ namespace Donut
 		int seekByPts(long long pts, int stream_index);
 
 		int64_t getTotalDuration();
+		int64_t getTotalDuration(int64_t& total, int64_t& audio, int64_t& video);
 		//DonutAVRational getFrameRate();
 		
 		AVStream* getVideoStream(int index);
@@ -41,7 +42,12 @@ namespace Donut
 		AVStream* video_streams_[8]{ nullptr };
 		AVStream* audio_streams_[8]{ nullptr };
 
+		AVRational video_timebase_ = { 0 };
+		AVRational audio_timebase_ = { 0 };
+
 		int64_t total_duration_ = 0;
+		int64_t video_duration_ = 0;
+		int64_t audio_duration_ = 0;
 	};
 }
 

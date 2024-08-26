@@ -62,6 +62,8 @@ namespace Donut
 		int audio_index_ = -1;
 
 		int64_t total_duration_ = -1;
+		int64_t audio_duration_ = -1;
+		int64_t video_duration_ = -1;
 		int frame_rate_ = -1;
 
 		AVStream** video_streams_ = nullptr;

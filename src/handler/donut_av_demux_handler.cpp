@@ -43,7 +43,8 @@ namespace Donut
 		audio_index_ = demuxer_.getAudioIndex();
 		video_index_ = demuxer_.getVideoIndex();
 
-		this->total_duration_ = demuxer_.getTotalDuration();
+		//this->total_duration_ = demuxer_.getTotalDuration();
+		demuxer_.getTotalDuration(total_duration_, audio_duration_, video_duration_);
 
 		video_streams_ = demuxer_.getVideoStreams();
 		audio_streams_ = demuxer_.getAudioStreams();
@@ -84,6 +85,7 @@ namespace Donut
 	void DonutAVDemuxHandler::seekByTimePos(double value)
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
+		//int64_t ts = value * audio_duration_;
 		int64_t ts = value * total_duration_ * 1000000LL;
 		int64_t start_time = demuxer_.getStartTime();
 		if ( start_time != AV_NOPTS_VALUE)
@@ -131,6 +133,7 @@ namespace Donut
 				int64_t seek_max = seek_delta_ < 0 ? seek_target - seek_delta_ - 2 : INT64_MAX;
 
 				int ret = demuxer_.seekFile(seek_min, seek_target, seek_max, seek_flags_);
+				//int ret = demuxer_.seekByPts(seek_target, audio_index_);
 				if (ret < 0)
 				{
 

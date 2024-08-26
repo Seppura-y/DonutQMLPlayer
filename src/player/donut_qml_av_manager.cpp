@@ -71,7 +71,7 @@ namespace Donut
 
 			std::unique_lock<std::mutex> lock(mtx_);
 			emit sigUpdateTimePosSec(audio_clock_->pts_);
-
+			//DN_CORE_ERROR("sigUpdateTimePosSec({})", audio_clock_->pts_);
 			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
 			//if (a_remaining)
 			//{

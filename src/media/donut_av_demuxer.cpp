@@ -53,48 +53,65 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
 
     av_dump_format(fmt_ctx, 0, url, 0);
 
+    total_duration_ = fmt_ctx->duration;
+    if (total_duration_ == AV_NOPTS_VALUE)
+    {
+        total_duration_ = 0;
+    }
+
     for (auto i = 0; i < fmt_ctx->nb_streams; i++)
     {
         AVStream* stream = nullptr;
         if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             stream = fmt_ctx->streams[i];
+            video_timebase_ = stream->time_base;
             if (stream->duration == AV_NOPTS_VALUE)
             {
-
+                AVPacket* packet = av_packet_alloc();
+                while (av_read_frame(fmt_ctx, packet) >= 0)
+                {
+                    if (packet->stream_index == i)
+                    {
+                        int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
+                        if (pts != AV_NOPTS_VALUE)
+                        {
+                            video_duration_ = video_duration_ > pts ? video_duration_ : pts;
+                        }
+                    }
+                    av_packet_unref(packet);
+                }
+                avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
+                fmt_ctx->streams[i]->duration = video_duration_;
             }
+            video_duration_ = fmt_ctx->streams[i]->duration;
             video_streams_[vs_count_] = stream;
             vs_count_++;
         }
         else if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             stream = fmt_ctx->streams[i];
-            //if (stream->duration == AV_NOPTS_VALUE)
-            //{
-            //    int64_t duration = 0;
-            //    AVPacket* packet = av_packet_alloc();
-            //    while (av_read_frame(fmt_ctx, packet) >= 0)
-            //    {
-            //        int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
-            //        if (pts != AV_NOPTS_VALUE)
-            //        {
-            //            AVRational av_timebase_q = AVRational{ 1, 1000000 };
-            //            //duration = ((duration) > (av_rescale_q(pts, stream->time_base, av_timebase_q))
-            //            //    ?
-            //            //    (duration)
-            //            //    : (av_rescale_q(pts, stream->time_base, av_timebase_q))
-            //            //);
-            //            duration = duration > pts ? duration : pts;
-            //        }
-
-            //        av_packet_unref(packet);
-            //    }
-
-            //    total_duration_ = total_duration_ > duration ? total_duration_ : duration;
-            //    fmt_ctx->streams[i]->duration = duration;
-            //    stream->time_base = { 1, stream->codecpar->sample_rate };
-            //    avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
-            //}
+            if (stream->duration == AV_NOPTS_VALUE)
+            {
+                AVPacket* packet = av_packet_alloc();
+                while (av_read_frame(fmt_ctx, packet) >= 0)
+                {
+                    if (packet->stream_index == i)
+                    {
+                        int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
+                        if (pts != AV_NOPTS_VALUE)
+                        {
+                            audio_duration_ = audio_duration_ > pts ? audio_duration_ : pts;
+                        }
+                    }
+                    av_packet_unref(packet);
+                }
+                avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
+                fmt_ctx->streams[i]->duration = audio_duration_;
+                //fmt_ctx->streams[i]->time_base = { 1, stream->codecpar->sample_rate };
+            }
+            audio_timebase_ = fmt_ctx->streams[i]->time_base;
+            audio_duration_ = fmt_ctx->streams[i]->duration;
             audio_streams_[as_count_] = fmt_ctx->streams[i];
             as_count_++;
         }
@@ -102,6 +119,8 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
         {
 
         }
+
+        total_duration_ = FFMAX(FFMAX(video_duration_, audio_duration_), total_duration_);
     }
 
     av_dict_free(&opt);
@@ -169,9 +188,11 @@ int DonutAVDemuxer::seekByPts(long long pts, int stream_index)
     {
         return -1;
     }
-    int ret = av_seek_frame(fmt_ctx_, stream_index, pts, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
+    int ret = 0;
 
-    return 0;
+    ret = av_seek_frame(fmt_ctx_, stream_index, pts, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
+
+    return ret;
 }
 
 int64_t DonutAVDemuxer::getTotalDuration()
@@ -190,6 +211,26 @@ int64_t DonutAVDemuxer::getTotalDuration()
     tss = (total_duration % 60);
 
     return total_duration;
+}
+
+int64_t DonutAVDemuxer::getTotalDuration(int64_t& total, int64_t& audio, int64_t& video)
+{
+    if (!fmt_ctx_)
+    {
+        return -1;
+    }
+    //total = fmt_ctx_->duration / 1000000LL;
+    //audio = fmt_ctx_->streams[audio_index_]->duration / 1000000LL;
+    //video = fmt_ctx_->streams[video_index_]->duration / 1000000LL;
+
+    //total = fmt_ctx_->duration / 1000000LL;
+    //audio = fmt_ctx_->streams[audio_index_]->duration;
+    //video = fmt_ctx_->streams[video_index_]->duration;
+
+    total = total_duration_ / 1000000LL;
+    audio = audio_duration_;
+    video = video_duration_;
+    return total;
 }
 
 AVStream* DonutAVDemuxer::getVideoStream(int index)

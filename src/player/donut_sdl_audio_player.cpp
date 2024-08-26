@@ -322,8 +322,12 @@ namespace Donut
             {
                 auto pts = resampled_data.pts;
                 pts *= av_q2d(tb_);
-                if(pts > 0)
-                audio_clock_->pts_ = pts;
+                if (pts > 0)
+                {
+                    std::unique_lock<std::mutex> lock(mtx_);
+                    audio_clock_->pts_ = pts;
+                    //DN_CORE_ERROR("audio_clock_->pts_ = {}", pts);
+                }
 
             }
             for (int i = 0; i < resampled / 2; i++)

@@ -68,6 +68,9 @@ bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
     {
         timebase_ = (double)para.time_base->den / (double)para.time_base->num;
         tb_ = *para.time_base;
+
+        //一定要使用format context的timebase，否则对不上解码帧的时间
+        //tb_ = para.samplerate_;
     }
 
     return open(para.para);

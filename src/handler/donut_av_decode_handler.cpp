@@ -218,7 +218,7 @@ namespace Donut
         AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
-
+            std::string adsf = stream_index_ == 0 ? "audio" : "video";
             int serial = -1;
             {
                 if (packet_queue_->packetQueueHasEnoughPackets())
@@ -282,11 +282,20 @@ namespace Donut
                             pts = 0;
                         }
                         auto para = decoder_.copyCodecParam();
-                        AVRational* timebase = para->time_base;
-                        pts *= av_q2d(*timebase);
+                        //AVRational* timebase = para->time_base;
+                        pts *= av_q2d(timebase_);
                         if (pts > 0)
                         {
-                            clock_->setClockAt(pts, 0, av_gettime_relative() / 1000000.0);
+                            bool is_audio = para->para->sample_rate > 0 ? true : false;
+                            //if (is_audio)
+                            //    DN_CORE_ERROR("clock_ : {}", clock_->pts_);
+
+                            clock_->setClockAt(pts, serial, av_gettime_relative() / 1000000.0);
+                            //if (is_audio)
+                            //    DN_CORE_ERROR("clock_->setClockAt({})", pts);
+                            //is_audio ? DN_CORE_ERROR("{} clock_->setClockAt({})", is_audio ? "audio" : "video", pts)
+                            //    : 
+                            //    DN_CORE_INFO("{} clock_->setClockAt({})", is_audio ? "audio" : "video", pts);
                         }
 
                         frame->setFrame(decoded_frame, serial);
