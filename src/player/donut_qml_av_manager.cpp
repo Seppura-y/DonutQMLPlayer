@@ -138,11 +138,11 @@ namespace Donut
 				a_packet_queue_.reset();
 			}
 
-			if (a_frame_queue_)
-			{
-				a_frame_queue_->frameQueueDestroy();
-				a_frame_queue_.reset();
-			}
+			//if (a_frame_queue_)
+			//{
+			//	a_frame_queue_->frameQueueDestroy();
+			//	a_frame_queue_.reset();
+			//}
 		}
 
 		{
@@ -159,11 +159,11 @@ namespace Donut
 				v_packet_queue_.reset();
 			}
 
-			if (v_frame_queue_)
-			{
-				v_frame_queue_->frameQueueDestroy();
-				v_frame_queue_.reset();
-			}
+			//if (v_frame_queue_)
+			//{
+			//	v_frame_queue_->frameQueueDestroy();
+			//	v_frame_queue_.reset();
+			//}
 		}
 
 		{
@@ -318,7 +318,6 @@ namespace Donut
 	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		this->stop();
-		video_view_->stop();
 
 		if (path.toStdString() != current_url_)
 		{
@@ -382,6 +381,7 @@ namespace Donut
 
 			this->start();
 			audio_player_->start();
+			video_view_->stop();
 			video_view_->start();
 
 			is_paused_ = false;

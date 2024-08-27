@@ -147,11 +147,6 @@ namespace Donut
 
         video_frame_queue_.reset();
         video_frame_queue_ = nullptr;
-
-        //lock.unlock();
-        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        //lock.lock();
-        //is_resetting_ = false;
     }
 
     void DonutScene::setQMLAvManager(DonutQMLAVManager* manager)
@@ -265,15 +260,6 @@ namespace Donut
             //    std::this_thread::sleep_for(std::chrono::microseconds(1000));
             //    continue;
             //}
-
-
-            //if (is_resetting_)
-            //{
-            //    lock.unlock();
-            //    video_frame_queue_->frameQueueReset();
-            //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            //    continue;
-            //}
             if (!is_paused_)
             {
                 av_frame_unref(decoded_frame_);
@@ -288,11 +274,6 @@ namespace Donut
                     //{
                     //    is_resetting_ = false;
                     //    lock.unlock();
-                    //    video_frame_queue_->frameQueueReset();
-                    //}
-
-                    //if (video_frame_queue_->frameQueueNbRemaining() == 0)
-                    //{
                     //    video_frame_queue_->frameQueueReset();
                     //}
                     continue;
