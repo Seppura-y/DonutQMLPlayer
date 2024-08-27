@@ -27,6 +27,7 @@ namespace Donut
 
 		void setFrameQueue(std::shared_ptr<DonutAVFrameQueue>& queue);
 		void setManager(DonutQMLAVManager* manager);
+		void setPaused(bool pause);
 
 	protected:
 		double getFrameDiffTime(AVFrame* frame);

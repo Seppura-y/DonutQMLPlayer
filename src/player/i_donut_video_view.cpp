@@ -215,4 +215,9 @@ namespace Donut
 
         return delay_time;
     }
+
+    void IDonutVideoView::setPaused(bool pause)
+    {
+        is_paused_ = pause;
+    }
 }

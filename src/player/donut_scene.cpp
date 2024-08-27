@@ -149,35 +149,38 @@ namespace Donut
     void DonutScene::onUpdate()
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        if (!frame_updated_ && decoded_frame_ && decoded_frame_->data[0])
+        if (!is_paused_)
         {
-            if (decoded_frame_->format == AV_PIX_FMT_YUV420P ||
-                decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
+            if (!frame_updated_ && decoded_frame_ && decoded_frame_->data[0])
             {
-                if (!y_texture_)
+                if (decoded_frame_->format == AV_PIX_FMT_YUV420P ||
+                    decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
                 {
-                    y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420);
+                    if (!y_texture_)
+                    {
+                        y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420);
+                    }
+
+                    if (!u_texture_)
+                    {
+                        u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+                    }
+
+                    if (!v_texture_)
+                    {
+                        v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+                    }
+
+                    y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
+                    u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
+                    v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
                 }
 
-                if (!u_texture_)
-                {
-                    u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                }
-
-                if (!v_texture_)
-                {
-                    v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                }
-
-                y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
-                u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
-                v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
+                frame_updated_ = true;
             }
 
-            frame_updated_ = true;
+            av_frame_unref(decoded_frame_);
         }
-
-        av_frame_unref(decoded_frame_);
 
         s_renderer_->beginScene(scene_camera_);
 
@@ -198,20 +201,7 @@ namespace Donut
 
     void DonutScene::updateHandler(void* data)
     {
-        //std::unique_lock<std::mutex> lock(mtx_);
-        //av_frame_unref(decoded_frame_);
-        //if (data)
-        //{
-        //    auto frame = static_cast<AVFrame*>(data);
 
-        //    {
-        //        av_frame_ref(decoded_frame_, frame);
-        //        frame_updated_ = false;
-        //        lock.unlock();
-        //    }
-
-        //    av_frame_unref(frame);
-        //}
     }
 
 
@@ -222,167 +212,121 @@ namespace Donut
         while (!is_exit_)
         {
             std::unique_lock<std::mutex> lock(mtx_);
-            av_frame_unref(decoded_frame_);
+            if (!is_paused_)
+            {
+                av_frame_unref(decoded_frame_);
 
             retry:
-            if (video_frame_queue_->frameQueueNbRemaining() == 0)
-            {
-                std::this_thread::sleep_for(std::chrono::microseconds(1));
-                //DN_CORE_ERROR("video_frame_queue_->frameQueueNbRemaining() == 0");
-            }
-            else
-            {
-                double last_duration, duration, delay;
-                double time;
-                std::shared_ptr<DonutAVFrame> vp, last_vp;
-
-                last_vp = video_frame_queue_->frameQueuePeekLast();
-                vp = video_frame_queue_->frameQueuePeek();
-
-                //if (vp->serial_ != manager_->getSerial())
-                //{
-                //    video_frame_queue_->frameQueueNext();
-                //    goto retry;
-                //}
-
-                if (last_vp->getSerial() != vp->getSerial())
+                if (video_frame_queue_->frameQueueNbRemaining() == 0)
                 {
-                    video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
-                    //video_frame_queue_->setFrameTimer(getTime());
-                    //frame_timer_ = av_gettime_relative() / 1000000.0;
-                }
-
-                last_duration = computeDuration(vp, last_vp);
-
-                //if (vp->serial_ == last_vp->serial_)
-                //{
-                //    //double duration = vp->frame_->pts - last_vp->frame_->pts;
-                //    double duration = vp->pts_ - last_vp->pts_;
-                //    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
-                //    {
-                //        //last_duration = last_vp->frame_->duration;
-                //        last_duration = last_vp->duration_;
-                //    }
-                //    else
-                //    {
-                //        last_duration = duration;
-                //    }
-                //}
-
-                delay = computeTargetDelay(last_duration);
-                if (delay == 0)
-                {
+                    std::this_thread::sleep_for(std::chrono::microseconds(1));
                     frame_updated_ = true;
-                }
-
-                //time = getTime();
-                time = av_gettime_relative() / 1000000.0;
-
-                double frame_timer = video_frame_queue_->getFrameTimer();
-
-
-                if (time < frame_timer + delay)
-                {
-                    double calculate = frame_timer + delay - time;
-                    remaining_time = FFMIN(calculate, remaining_time);
-                    //DN_CORE_ERROR("1 FFMIN {} {}", calculate, remaining_time);
-                    //DN_CORE_ERROR("1 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
-                    //DN_CORE_ERROR("1 FFMIN {} {}", frame_timer + delay - time, remaining_time);
-                    av_usleep(remaining_time * 1000000.0);
-                    //av_usleep(remaining_time * 1000000.0);
-                    //video_frame_queue_->setFrameTimer(frame_timer + remaining_time);
-                    remaining_time = 0.01;
-                    continue_count++;
                     continue;
                 }
                 else
                 {
+                    double last_duration, duration, delay;
+                    double time;
+                    std::shared_ptr<DonutAVFrame> vp, last_vp;
 
-                    //DN_CORE_ERROR("Continue Count {}", continue_count);
-                    continue_count = 0;
+                    last_vp = video_frame_queue_->frameQueuePeekLast();
+                    vp = video_frame_queue_->frameQueuePeek();
 
-                    //time = getTime();
-                    time = av_gettime_relative() / 1000000.0;
-                    video_frame_queue_->setFrameTimer(time);
-                }
-
-                //video_frame_queue_->setFrameTimer(frame_timer + delay);
-
-                //if (delay > 0 && time - video_frame_queue_->getFrameTimer() > AV_SYNC_THRESHOLD_MAX)
-                //{
-                //    video_frame_queue_->setFrameTimer(time);
-                //}
-
-                //clock_->setClockAt(vp->pts_, vp->serial_, vp->pos_);
-                clock_->setClockAt(vp->pts_, vp->serial_, time);
-
-                //DN_CORE_ERROR("2 remaining : {:.6f} delay : {} time : {}", remaining_time, delay, frame_timer);
-                //DN_CORE_ERROR("2 FFMIN {} {}", frame_timer + delay - time, remaining_time);
-                //remaining_time = delay;
-                //av_usleep(remaining_time * 1000000.0);
-                //av_usleep(delay * 1000000.0);
-
-                if (video_frame_queue_->frameQueueNbRemaining() > 1)
-                {
-                    double next_duration = 0;
-                    auto next_vp = video_frame_queue_->frameQueuePeekLast();
-                    next_duration = computeDuration(next_vp, vp);
-                    //if (next_vp->serial_ == vp->serial_)
+                    //if (vp->serial_ != manager_->getSerial())
                     //{
-                    //    //double duration = vp->frame_->pts - last_vp->frame_->pts;
-                    //    double duration = next_vp->pts_ - vp->pts_;
-                    //    if (isnan(duration) || duration <= 0 || duration > manager_->max_frame_duration_)
-                    //    {
-                    //        //last_duration = last_vp->frame_->duration;
-                    //        next_duration = next_vp->duration_;
-                    //    }
-                    //    else
-                    //    {
-                    //        next_duration = duration;
-                    //    }
+                    //    video_frame_queue_->frameQueueNext();
+                    //    goto retry;
                     //}
-                    //time = av_gettime_relative() / 1000000.0;
-                    auto f_timer = video_frame_queue_->getFrameTimer();
-                    auto f_end = f_timer + next_duration;
-                    //auto new_time = getTime();
-                    auto new_time = av_gettime_relative() / 1000000.0;
-                    //if (time > video_frame_queue_->getFrameTimer() + next_duration)
-                    if (new_time > f_end)
+
+                    if (last_vp->getSerial() != vp->getSerial())
                     {
-                        video_frame_queue_->frameQueueNext();
+                        video_frame_queue_->setFrameTimer(av_gettime_relative() / 1000000.0);
+                    }
+
+                    last_duration = computeDuration(vp, last_vp);
+
+                    delay = computeTargetDelay(last_duration);
+                    if (delay == 0)
+                    {
                         frame_updated_ = true;
+                    }
+
+                    time = av_gettime_relative() / 1000000.0;
+
+                    double frame_timer = video_frame_queue_->getFrameTimer();
+
+
+                    if (time < frame_timer + delay)
+                    {
+                        double calculate = frame_timer + delay - time;
+                        remaining_time = FFMIN(calculate, remaining_time);
+
+                        av_usleep(remaining_time * 1000000.0);
+
+                        remaining_time = 0.01;
+                        continue_count++;
                         continue;
                     }
-                }
-
-                auto frame = video_frame_queue_->frameQueuePeekReadable();
-
-                clock_->setClockAt(vp->pts_, vp->serial_, time);
-
-                frame = video_frame_queue_->frameQueuePeekLast();
-                if (frame)
-                {
+                    else
                     {
-                        av_frame_ref(decoded_frame_, frame->frame_);
-                        frame_updated_ = false;
-                        lock.unlock();
+
+                        //DN_CORE_ERROR("Continue Count {}", continue_count);
+                        continue_count = 0;
+
+                        //time = getTime();
+                        time = av_gettime_relative() / 1000000.0;
+                        video_frame_queue_->setFrameTimer(time);
                     }
 
-                    av_frame_unref(frame->frame_);
-                    video_frame_queue_->frameQueueNext();
+                    clock_->setClockAt(vp->pts_, vp->serial_, time);
+
+                    if (video_frame_queue_->frameQueueNbRemaining() > 1)
+                    {
+                        double next_duration = 0;
+                        auto next_vp = video_frame_queue_->frameQueuePeekLast();
+                        next_duration = computeDuration(next_vp, vp);
+                        auto f_timer = video_frame_queue_->getFrameTimer();
+                        auto f_end = f_timer + next_duration;
+                        //auto new_time = getTime();
+                        auto new_time = av_gettime_relative() / 1000000.0;
+                        //if (time > video_frame_queue_->getFrameTimer() + next_duration)
+                        if (new_time > f_end)
+                        {
+                            video_frame_queue_->frameQueueNext();
+                            frame_updated_ = true;
+                            continue;
+                        }
+                    }
+
+                    auto frame = video_frame_queue_->frameQueuePeekReadable();
+
+                    clock_->setClockAt(vp->pts_, vp->serial_, time);
+
+                    frame = video_frame_queue_->frameQueuePeekLast();
+                    if (frame)
+                    {
+                        {
+                            av_frame_ref(decoded_frame_, frame->frame_);
+                            frame_updated_ = false;
+                            lock.unlock();
+                        }
+
+                        av_frame_unref(frame->frame_);
+                        video_frame_queue_->frameQueueNext();
+                    }
                 }
             }
+            else
+            {
+                lock.unlock();
+            }
 
-            std::this_thread::sleep_for(std::chrono::microseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
     void DonutScene::timerEvent(QTimerEvent* ev)
     {
-        //if (is_need_sync_)
-        //{
-        //    std::this_thread::sleep_for(std::chrono::microseconds(delay_time_));
-        //}
         if (!frame_updated_)
         {
             QQuickItem::update();

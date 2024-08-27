@@ -115,15 +115,25 @@ namespace Donut
 		this->v_packet_queue_ = video_queue;
 	}
 
+	void DonutAVDemuxHandler::setPaused(bool pause)
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+		demuxer_.setPaused(pause);
+		is_paused_ = pause;
+	}
+
 	void Donut::DonutAVDemuxHandler::threadLoop()
 	{
 		AVPacket* demux_pkt = av_packet_alloc();
 		while (!is_exit_)
 		{
-			if (is_pause_)
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-				continue;
+				std::lock_guard<std::mutex> lock(mtx_);
+				if (is_paused_)
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+					continue;
+				}
 			}
 
 			if (seek_req_)

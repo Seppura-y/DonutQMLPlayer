@@ -85,6 +85,8 @@ namespace Donut
 
 		Q_INVOKABLE void setPlaybackRate(float value);
 
+		Q_INVOKABLE void setPlayOrPause(bool pause);
+
 		Q_INVOKABLE float getPlaybackRate();
 	public slots:
 		void onVideoViewInitialized(QObject* view);
@@ -119,6 +121,9 @@ namespace Donut
 		void sigVideoVolume(double dPercent);
 		void sigPauseStat(bool bPaused);
 		void sigStop();
+
+	protected:
+		void timerEvent(QTimerEvent* ev) override;
 
 	private:
 		double getFrameDiffTime(AVFrame* frame);
@@ -173,6 +178,8 @@ namespace Donut
 		double frame_timer_ = 0;
 		double max_frame_duration_ = 10.0;
 		//double max_frame_duration_ = 3600.0;
+
+		bool is_paused_ = true;
 
 		friend class IDonutVideoView;
 		friend class DonutScene;

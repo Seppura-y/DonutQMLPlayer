@@ -213,11 +213,22 @@ namespace Donut
         return delay_time;
     }
 
+    void DonutAVDecodeHandler::setPaused(bool pause)
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        is_paused_ = pause;
+    }
+
     void Donut::DonutAVDecodeHandler::threadLoop()
     {
         AVFrame* decoded_frame = av_frame_alloc();
         while (!is_exit_)
         {
+            if (is_paused_)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
             auto par = decoder_.copyCodecParam();
             bool is_audio = par->para->sample_rate > 0 ? true : false;
 

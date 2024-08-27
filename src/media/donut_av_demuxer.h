@@ -35,6 +35,8 @@ namespace Donut
 		int64_t getStartTime();
 
 		int seekFile(int64_t min, int64_t target, int64_t max, int flags);
+
+		void setPaused(bool paused);
 	private:
 		int vs_count_ = 0;
 		int as_count_ = 0;
@@ -48,6 +50,8 @@ namespace Donut
 		int64_t total_duration_ = 0;
 		int64_t video_duration_ = 0;
 		int64_t audio_duration_ = 0;
+
+		bool is_paused_ = false;
 	};
 }
 

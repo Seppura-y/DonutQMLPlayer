@@ -39,6 +39,8 @@ namespace Donut
 		void setSleepTime(bool need_sync, double time);
 
 		void setVideoFramerate(int num, int den);
+
+		void setPaused(bool pause);
 	protected:
 		void threadLoop() override;
 

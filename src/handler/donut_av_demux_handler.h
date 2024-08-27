@@ -49,6 +49,8 @@ namespace Donut
 
 		void setAudioQueue(std::shared_ptr<DonutAVPacketQueue>& audio_queue);
 		void setVideoQueue(std::shared_ptr<DonutAVPacketQueue>& video_queue);
+
+		void setPaused(bool pause);
 	protected:
 		virtual void threadLoop() override;
 	private:

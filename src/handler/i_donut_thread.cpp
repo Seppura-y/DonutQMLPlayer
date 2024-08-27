@@ -37,7 +37,7 @@ namespace Donut
     void IDonutThread::pause()
     {
         std::unique_lock<std::mutex> lock(mtx_);
-        this->is_pause_ = !this->is_pause_;
+        this->is_paused_ = !this->is_paused_;
     }
 
 }

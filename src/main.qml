@@ -314,6 +314,11 @@ Window
             {
                 qmlAVManager.onSeekingTimePos(value)
             }
+
+            onPlayPauseButtonClicked: (checked)=>
+            {
+                qmlAVManager.setPlayOrPause(!checked)
+            }
         } // ControlBar
     } // GridLayout
 

@@ -25,6 +25,8 @@ namespace Donut
 
 		QObject::connect(this, &DonutQMLAVManager::sigMediaEOF, this, &DonutQMLAVManager::onMediaEOF);
 		//initManager();
+
+		startTimer(500);
 	}
 
 
@@ -33,6 +35,12 @@ namespace Donut
 		this->stop();
 		// 终止各个线程，防止在点击右上角关闭按钮后导致程序崩溃
 		resetManager();
+	}
+
+	void DonutQMLAVManager::timerEvent(QTimerEvent* ev)
+	{
+		std::unique_lock<std::mutex> lock(mtx_);
+		emit sigUpdateTimePosSec(audio_clock_->pts_);
 	}
 
 	DonutQMLAVManager* DonutQMLAVManager::getInstance()
@@ -69,8 +77,7 @@ namespace Donut
 				a_packet_queue_->packetQueueFlush();
 			}
 
-			std::unique_lock<std::mutex> lock(mtx_);
-			emit sigUpdateTimePosSec(audio_clock_->pts_);
+
 			//DN_CORE_ERROR("sigUpdateTimePosSec({})", audio_clock_->pts_);
 			//int a_remaining = a_frame_queue_->frameQueueNbRemaining();
 			//if (a_remaining)
@@ -282,6 +289,16 @@ namespace Donut
 		}
 	}
 
+	Q_INVOKABLE void DonutQMLAVManager::setPlayOrPause(bool pause)
+	{
+		is_paused_ = pause;
+
+		video_view_->setPaused(is_paused_);
+		demux_handler_->setPaused(is_paused_);
+		a_decode_handler_->setPaused(is_paused_);
+		v_decode_handler_->setPaused(is_paused_);
+	}
+
 	Q_INVOKABLE float DonutQMLAVManager::getPlaybackRate()
 	{
 		return playback_speed_;
@@ -300,6 +317,7 @@ namespace Donut
 		demux_handler_->setEofCallback([this]()
 		{
 			emit sigMediaEOF();
+			is_paused_ = true;
 		});
 
 		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
@@ -350,6 +368,8 @@ namespace Donut
 			this->start();
 			audio_player_->start();
 			video_view_->start();
+
+			is_paused_ = false;
 			return 0;
 		}
 		else

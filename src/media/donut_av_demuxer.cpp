@@ -283,6 +283,22 @@ int DonutAVDemuxer::seekFile(int64_t min, int64_t target, int64_t max, int flags
     return ret;
 }
 
+void DonutAVDemuxer::setPaused(bool paused)
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    if (!fmt_ctx_) return;
+    if (paused)
+    {
+        is_paused_ = true;
+        av_read_pause(fmt_ctx_);
+    }
+    else
+    {
+        is_paused_ = false;
+        av_read_play(fmt_ctx_);
+    }
+}
+
 int64_t DonutAVDemuxer::getStreamStartTime(int stream_index)
 {
     std::lock_guard<std::mutex> lock(mtx_);

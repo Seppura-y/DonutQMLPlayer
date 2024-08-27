@@ -22,7 +22,7 @@ Control
         //color: "lightgreen"
     }
 
-    signal playPauseButtonClicked()
+    signal playPauseButtonClicked(bool paused)
     signal previousButtonClicked()
     signal nextButtonClicked()
     signal stopButtonClicked()
@@ -254,7 +254,27 @@ Control
                     txt = isChecked ? String.fromCodePoint(0x23f8) :
                                     String.fromCodePoint(0x25b6)
                     controlBar.isPlaying = isChecked
+                    playPauseButtonClicked(isChecked)
                 }
+
+                //onButtonChecked 和 onButtonClicked 相互作用：
+                //当按钮被点击时，checked 状态会自动更新，触发 onButtonChecked。
+                //在 onButtonClicked 中又手动改变 checked 状态，这会导致额外的 onButtonChecked 触发。
+                //onButtonClicked:
+                //{
+                //    if(controlBar.isPlaying)
+                //    {
+                //        playPauseButtonClicked(false)
+                //        controlBar.isPlaying = false
+                //        //playPauseButton.checked = false
+                //    }
+                //    else
+                //    {
+                //        playPauseButtonClicked(true)
+                //        controlBar.isPlaying = true
+                //        //playPauseButton.checked = true
+                //    }
+                //}
             }
 
             FontButton
@@ -485,9 +505,10 @@ Control
 
         function onIsPlayingChanged()
         {
-            playPauseButton.txt = String.fromCodePoint(0x23f8)
+            playPauseButton.txt = isPlaying ? String.fromCodePoint(0x23f8) :
+                                    String.fromCodePoint(0x25b6)
 
-            playPauseButton.checked = true
+            playPauseButton.checked = isPlaying
         }
 
         function onCurrentTimeChanged()
