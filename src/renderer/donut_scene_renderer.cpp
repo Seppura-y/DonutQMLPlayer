@@ -582,6 +582,61 @@ void DonutSceneRenderer::drawYuvData(glm::vec3 position, glm::vec2 size, std::sh
     batch_data_.yuv_indices_count_ += 6;
 }
 
+void DonutSceneRenderer::drawRotatedYuvData(float angle, glm::vec3 position, glm::vec2 size, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture)
+{
+    const size_t rect_vertex_count = 4;
+    //const glm::vec2 texture_coords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
+
+    const glm::vec2 texture_coords[] = { { 0.0f, 1.0f },{ 1.0f, 1.0f },{ 1.0f, 0.0f },{ 0.0f, 0.0f } };
+
+    if (batch_data_.yuv_indices_count_ >= batch_data_.max_indices_)
+    {
+        flushAndReset();
+    }
+
+    // Update texture slots only if they are empty
+    if (!batch_data_.texture_slots_[batch_data_.y_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.y_texture_index_] = y_texture;
+    }
+
+    if (!batch_data_.texture_slots_[batch_data_.u_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.u_texture_index_] = u_texture;
+    }
+
+    if (!batch_data_.texture_slots_[batch_data_.v_texture_index_])
+    {
+        batch_data_.texture_slots_[batch_data_.v_texture_index_] = v_texture;
+    }
+
+    auto ratio = y_texture->getRatio();
+
+    auto rotate_matrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3{ 0.0f, 1.0f, 0.0f });
+
+    // Scale matrix based on texture ratio
+    auto scale_matrix = glm::scale(glm::mat4(1.0f), (y_texture->getRatio() > 1 ? glm::vec3{ size.x * y_texture->getRatio(), size.y, 1.0f }
+    : glm::vec3{ size.x, size.y / y_texture->getRatio(), 1.0f }));
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotate_matrix * scale_matrix;
+
+    glm::vec3 indices = glm::vec3(
+        static_cast<float>(batch_data_.y_texture_index_),
+        static_cast<float>(batch_data_.u_texture_index_),
+        static_cast<float>(batch_data_.v_texture_index_)
+    );
+
+    for (size_t i = 0; i < rect_vertex_count; i++)
+    {
+        batch_data_.yuv_vertex_buffer_ptr_->position_ = transform * batch_data_.rect_vertex_positions_[i];
+        batch_data_.yuv_vertex_buffer_ptr_->tex_coordinate_ = texture_coords[i];
+        batch_data_.yuv_vertex_buffer_ptr_->texture_indices_ = indices;
+        batch_data_.yuv_vertex_buffer_ptr_++;
+    }
+
+    batch_data_.yuv_indices_count_ += 6;
+}
+
 void DonutSceneRenderer::updateYuvTextures(int width, int height, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, void* y_data, uint32_t y_size, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, void* u_data, uint32_t u_size, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture, void* v_data, uint32_t v_size)
 {
     //window_->beginExternalCommands();

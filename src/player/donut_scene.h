@@ -107,6 +107,8 @@ namespace Donut
 
 		AVFrame* decoded_frame_ = nullptr;
 		bool frame_updated_ = true;
+
+		float angle_ = 0;
 	};
 }
 

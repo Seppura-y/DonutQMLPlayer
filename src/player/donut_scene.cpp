@@ -19,6 +19,10 @@ extern"C"
 
 #include <chrono>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/constants.hpp>
+
 double getTime()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> tp
@@ -184,6 +188,7 @@ namespace Donut
 
         if (y_texture_ && u_texture_ && v_texture_)
         {
+            //s_renderer_->drawRotatedYuvData(angle_, glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
             s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
         }
 
@@ -382,6 +387,7 @@ namespace Donut
         {
             QQuickItem::update();
         }
+        angle_ += 0.01;
     }
 
     void DonutScene::mousePressEvent(QMouseEvent* ev)
