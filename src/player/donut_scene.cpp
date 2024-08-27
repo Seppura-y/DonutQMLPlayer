@@ -110,6 +110,50 @@ namespace Donut
         qDebug() << "DonutSceneRenderer::setViewportSize width : " << size.width() << " height: " << size.height();
     }
 
+    void DonutScene::reset()
+    {
+        std::unique_lock<std::mutex> lock(mtx_);
+        //is_exit_ = true;
+        //if (video_frame_queue_)
+        //{
+        //    while (video_frame_queue_->frameQueueNbRemaining())
+        //    {
+        //        video_frame_queue_->frameQueueNext();
+        //    }
+
+        //    video_frame_queue_.reset();
+        //}
+
+
+        //this->start();
+        is_resetting_ = true;
+        if (y_texture_)
+        {
+            y_texture_.reset();
+            y_texture_ = nullptr;
+        }
+
+        if (u_texture_)
+        {
+            u_texture_.reset();
+            u_texture_ = nullptr;
+        }
+
+        if (v_texture_)
+        {
+            v_texture_.reset();
+            v_texture_ = nullptr;
+        }
+
+        video_frame_queue_.reset();
+        video_frame_queue_ = nullptr;
+
+        //lock.unlock();
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        //lock.lock();
+        //is_resetting_ = false;
+    }
+
     void DonutScene::setQMLAvManager(DonutQMLAVManager* manager)
     {
         av_manager_ = manager;
@@ -144,6 +188,8 @@ namespace Donut
                 //test_texture_ = std::make_shared<Donut::OpenGLTexture2D>("assets/textures/RPG Base/RPGpack_sheet_2X.png");
                 }, Qt::DirectConnection);
         }
+
+        //this->start();
     }
 
     void DonutScene::onUpdate()
@@ -212,15 +258,43 @@ namespace Donut
         while (!is_exit_)
         {
             std::unique_lock<std::mutex> lock(mtx_);
+            //if (is_resetting_)
+            //{
+            //    lock.unlock();
+            //    is_resetting_ = false;
+            //    std::this_thread::sleep_for(std::chrono::microseconds(1000));
+            //    continue;
+            //}
+
+
+            //if (is_resetting_)
+            //{
+            //    lock.unlock();
+            //    video_frame_queue_->frameQueueReset();
+            //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            //    continue;
+            //}
             if (!is_paused_)
             {
                 av_frame_unref(decoded_frame_);
 
             retry:
-                if (video_frame_queue_->frameQueueNbRemaining() == 0)
+                if (video_frame_queue_ == nullptr || video_frame_queue_->frameQueueNbRemaining() == 0)
                 {
-                    std::this_thread::sleep_for(std::chrono::microseconds(1));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     frame_updated_ = true;
+
+                    //if (is_resetting_)
+                    //{
+                    //    is_resetting_ = false;
+                    //    lock.unlock();
+                    //    video_frame_queue_->frameQueueReset();
+                    //}
+
+                    //if (video_frame_queue_->frameQueueNbRemaining() == 0)
+                    //{
+                    //    video_frame_queue_->frameQueueReset();
+                    //}
                     continue;
                 }
                 else

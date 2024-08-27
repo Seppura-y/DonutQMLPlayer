@@ -25,7 +25,7 @@ namespace Donut
 		std::thread worker_;
 
 		bool is_exit_ = true;
-		bool is_paused_ = false;
+		bool is_paused_ = true;
 
 		int thread_index_ = 0;
 	};

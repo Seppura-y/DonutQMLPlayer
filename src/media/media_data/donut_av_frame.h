@@ -78,6 +78,8 @@ public:
 
 	void frameQueueDestroy();
 
+	void frameQueueReset();
+
 	int getSerial() { return pkt_queue_->getSerial(); }
 
 	void setFrameTimer(double time) { frame_timer_ = time; }

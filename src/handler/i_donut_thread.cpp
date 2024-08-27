@@ -15,6 +15,7 @@ namespace Donut
 
         worker_ = std::thread(&IDonutThread::threadLoop, this);
 
+        is_paused_ = false;
         std::stringstream stream;
         stream << "thread " << std::this_thread::get_id() << " : start";
     }

@@ -40,6 +40,8 @@ namespace Donut
 
 		void setViewportSize(const QSize& size);
 
+		virtual void reset() override;
+
 
 		// player
 		Q_INVOKABLE void setQMLAvManager(DonutQMLAVManager* manager);

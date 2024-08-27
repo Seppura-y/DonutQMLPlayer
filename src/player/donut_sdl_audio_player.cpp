@@ -285,6 +285,7 @@ namespace Donut
         cur_pts_ = 0; //当前播放位置
         last_ms_ = 0;  //上次的时间戳
         pause_begin_ = 0;//暂停开始时间戳
+        is_exit_ = true;
     }
 
     void DonutSDLAudioPlayer::callback(unsigned char* stream, int len)

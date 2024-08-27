@@ -29,6 +29,8 @@ namespace Donut
 		void setManager(DonutQMLAVManager* manager);
 		void setPaused(bool pause);
 
+
+		virtual void reset() = 0;
 	protected:
 		double getFrameDiffTime(AVFrame* frame);
 		double getDelayTime(double diff);
@@ -50,6 +52,8 @@ namespace Donut
 
 		AVRational master_timebase_{ 1, 1 };
 		AVRational timebase_{ 1, 1 };
+
+		bool is_resetting_ = false;
 	};
 }
 #endif

@@ -317,4 +317,9 @@ namespace Donut
 			frame.reset();
 		}
 	}
+	void DonutAVFrameQueue::frameQueueReset()
+	{
+		std::unique_lock<std::mutex> lock(mtx_);
+		rindex_shown_ = 0;
+	}
 }
