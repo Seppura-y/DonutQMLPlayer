@@ -92,30 +92,11 @@ namespace Donut
 
 	void DonutQMLAVManager::updateHandler(void* data)
 	{
-		int num = 0;
-		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		
-		//if (data)
-		//{
-		//	AVPacket* pkt = static_cast<AVPacket*>(data);
-
-		//	if (pkt->stream_index == video_index_)
-		//	{
-		//		auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
-		//		v_packet_queue_->packetQueuePut(dn_pkt);
-		//	}
-		//	else if (pkt->stream_index == audio_index_)
-		//	{
-		//		auto dn_pkt = std::make_shared<DonutAVPacket>(pkt);
-		//		a_packet_queue_->packetQueuePut(dn_pkt);
-		//	}
-
-		//	av_packet_unref(pkt);
-		//}
 	}
 
 	int DonutQMLAVManager::resetManager()
 	{
+		DN_CORE_INFO("DonutQMLAVManager::resetManager()");
 		if (demux_handler_)
 		{
 			demux_handler_->stop();
@@ -138,11 +119,11 @@ namespace Donut
 				a_packet_queue_.reset();
 			}
 
-			//if (a_frame_queue_)
-			//{
-			//	a_frame_queue_->frameQueueDestroy();
-			//	a_frame_queue_.reset();
-			//}
+			if (a_frame_queue_)
+			{
+				a_frame_queue_->frameQueueDestroy();
+				a_frame_queue_.reset();
+			}
 		}
 
 		{
@@ -159,11 +140,12 @@ namespace Donut
 				v_packet_queue_.reset();
 			}
 
-			//if (v_frame_queue_)
-			//{
-			//	v_frame_queue_->frameQueueDestroy();
-			//	v_frame_queue_.reset();
-			//}
+			if (v_frame_queue_)
+			{
+				v_frame_queue_->frameQueueDestroy();
+				v_frame_queue_.reset();
+				DN_CORE_INFO("DonutQMLAVManager::resetManager() v_frame_queue_->frameQueueDestroy();");
+			}
 		}
 
 		{
@@ -172,6 +154,7 @@ namespace Donut
 				audio_player_->close();
 				audio_player_->stop();
 				audio_player_ = nullptr;
+				DN_CORE_INFO("DonutQMLAVManager::resetManager() audio_player_ reset");
 			}
 		}
 
@@ -181,10 +164,12 @@ namespace Donut
 				video_view_->reset();
 				//video_view_->stop();
 				//video_view_ = nullptr;
+				DN_CORE_INFO("DonutQMLAVManager::resetManager() video_view_ reset");
 			}
 		}
 
 		//initManager();
+		DN_CORE_INFO("DonutQMLAVManager::resetManager() Ended");
 		return 0;
 	}
 
@@ -318,6 +303,7 @@ namespace Donut
 	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		this->stop();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		if (path.toStdString() != current_url_)
 		{

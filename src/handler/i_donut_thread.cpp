@@ -1,5 +1,7 @@
 #include "i_donut_thread.h"
 
+#include "log.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -26,13 +28,14 @@ namespace Donut
         stream << "thread " << std::this_thread::get_id() << " : request stop";
 
         is_exit_ = true;
+        //DN_CORE_ERROR(stream.str());
         if (worker_.joinable())
         {
             worker_.join();
         }
         stream.clear();
         stream << "thread " << std::this_thread::get_id() << " : stop";
-
+        //DN_CORE_ERROR(stream.str());
     }
 
     void IDonutThread::pause()

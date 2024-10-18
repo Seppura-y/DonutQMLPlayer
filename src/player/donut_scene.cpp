@@ -147,6 +147,8 @@ namespace Donut
 
         video_frame_queue_.reset();
         video_frame_queue_ = nullptr;
+
+        releaseResources();
     }
 
     void DonutScene::setQMLAvManager(DonutQMLAVManager* manager)

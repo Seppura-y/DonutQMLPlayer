@@ -1,6 +1,7 @@
 #include "donut_av_demux_handler.h"
 
 #include "donut_av_global.h"
+#include "log.h"
 
 extern"C"
 {
@@ -202,6 +203,19 @@ namespace Donut
 			if (demux_pkt->stream_index == video_index_)
 			{
 				auto dn_pkt = std::make_shared<DonutAVPacket>(demux_pkt);
+
+				//if (!demux_pkt->data[0])
+				//{
+				//	DN_CORE_ERROR("data[0] empty");
+				//}
+				//if (!demux_pkt->data[1])
+				//{
+				//	DN_CORE_ERROR("data[1] empty");
+				//}
+				//if (!demux_pkt->data[2])
+				//{
+				//	DN_CORE_ERROR("data[2] empty");
+				//}
 				v_packet_queue_->packetQueuePut(dn_pkt);
 			}
 			else if (demux_pkt->stream_index == audio_index_)
