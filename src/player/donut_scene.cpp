@@ -151,6 +151,12 @@ namespace Donut
         releaseResources();
     }
 
+    void DonutScene::setPause(bool is_pause)
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        is_paused_ = is_pause;
+    }
+
     void DonutScene::setQMLAvManager(DonutQMLAVManager* manager)
     {
         av_manager_ = manager;
@@ -365,10 +371,10 @@ namespace Donut
                         {
                             av_frame_ref(decoded_frame_, frame->frame_);
                             frame_updated_ = false;
-                            lock.unlock();
                         }
 
                         av_frame_unref(frame->frame_);
+                            lock.unlock();
                         video_frame_queue_->frameQueueNext();
                     }
                 }

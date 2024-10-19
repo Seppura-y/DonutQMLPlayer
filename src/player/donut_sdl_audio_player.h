@@ -74,6 +74,8 @@ private:
     int audio_buf_index_ = 0;
 
     double af_end_time_ = 0;
+
+    SDL_AudioDeviceID audio_dev_;
 };
 
 

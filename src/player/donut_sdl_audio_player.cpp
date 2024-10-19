@@ -108,7 +108,8 @@ namespace Donut
         //this->input_spec_ = spec;
 
         //退出上一次音频
-        SDL_QuitSubSystem(SDL_INIT_AUDIO);
+        //SDL_PauseAudio(1);
+        SDL_CloseAudio();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
@@ -164,9 +165,9 @@ namespace Donut
         wanted_spec.callback = audioCallback;
         //wanted_spec.callback = audioCB;
 
-        SDL_AudioDeviceID audio_dev;
+        //SDL_AudioDeviceID audio_dev;
 
-        while (!(audio_dev = SDL_OpenAudioDevice(
+        while (!(audio_dev_ = SDL_OpenAudioDevice(
             NULL,
             0,
             &wanted_spec,
@@ -270,7 +271,7 @@ namespace Donut
         sound_touch_->setPitch(pitch_);
 
         // 启动回调，开始播放
-        SDL_PauseAudioDevice(audio_dev, 0);
+        SDL_PauseAudioDevice(audio_dev_, 0);
 
         nb_per_second_ = this->resample_spec_.bytes_per_sec;
         is_exit_ = false;
@@ -279,7 +280,6 @@ namespace Donut
 
     void DonutSDLAudioPlayer::close()
     {
-        SDL_QuitSubSystem(SDL_INIT_AUDIO);
         std::unique_lock<std::mutex> lock(mtx_);
         audio_datas_.clear();
         cur_pts_ = 0; //当前播放位置

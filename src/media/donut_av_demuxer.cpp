@@ -18,7 +18,8 @@ static void printError(int err)
 {
     char buffer[1024] = { 0 };
     av_strerror(err, buffer, sizeof(buffer));
-    std::cout << buffer << std::endl;
+    //std::cout << buffer << std::endl;
+    DN_CORE_ERROR(buffer);
 }
 
 #define PRINT_ERR_P(err) if(err != 0) {printError(err);return nullptr;}

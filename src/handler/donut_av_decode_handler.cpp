@@ -317,7 +317,6 @@ namespace Donut
                         frame_queue_->frameQueuePush(frame);
 
 
-
                         //auto pts = decoded_frame->pts;
                         //pts *= av_q2d(timebase_);
                         //auto cur = av_gettime_relative();

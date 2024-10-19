@@ -168,6 +168,7 @@ namespace Donut
 			}
 		}
 
+		//setPlayOrPause(true);
 		//initManager();
 		DN_CORE_INFO("DonutQMLAVManager::resetManager() Ended");
 		return 0;
@@ -221,6 +222,7 @@ namespace Donut
 			a_decode_handler_->setFrameQueue(a_frame_queue_);
 		}
 
+		//setPlayOrPause(false);
 		return 0;
 	}
 
@@ -303,7 +305,6 @@ namespace Donut
 	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		this->stop();
-		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		if (path.toStdString() != current_url_)
 		{
@@ -393,7 +394,7 @@ namespace Donut
 
 		if (is_loop_)
 		{
-
+			DN_CORE_ERROR("eof");
 		}
 	}
 
