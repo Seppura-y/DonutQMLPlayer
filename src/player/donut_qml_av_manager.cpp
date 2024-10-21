@@ -161,8 +161,8 @@ namespace Donut
 		{
 			if (video_view_)
 			{
-				video_view_->reset();
-				//video_view_->stop();
+				//video_view_->reset();
+				video_view_->stop();
 				//video_view_ = nullptr;
 				DN_CORE_INFO("DonutQMLAVManager::resetManager() video_view_ reset");
 			}
