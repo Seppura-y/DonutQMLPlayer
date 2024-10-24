@@ -316,8 +316,9 @@ namespace Donut
 		// 2.5.F 检测码流是否已经播放完
 		demux_handler_->setEofCallback([this]()
 		{
-			emit sigMediaEOF();
 			is_paused_ = true;
+			demux_handler_->setPaused(is_paused_);
+			emit sigMediaEOF();
 		});
 
 		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
@@ -392,9 +393,28 @@ namespace Donut
 
 		// 2.5.F 检测码流是否已经播放完
 
-		if (is_loop_)
+		if (!is_loop_)
 		{
 			DN_CORE_ERROR("eof");
+			if (a_decode_handler_)
+			{
+				a_decode_handler_->setPaused(is_paused_);
+			}
+
+			if (v_decode_handler_)
+			{
+				v_decode_handler_->setPaused(is_paused_);
+			}
+
+			if (video_view_)
+			{
+				video_view_->setPaused(is_paused_);
+			}
+
+			if (audio_player_)
+			{
+				audio_player_->pause(is_paused_);
+			}
 		}
 	}
 
