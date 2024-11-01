@@ -31,6 +31,11 @@ namespace Donut
 
 
 		virtual void reset() = 0;
+
+
+		void setRotationX(float value);
+		void setRotationY(float value);
+		void setRotationZ(float value);
 	protected:
 		double getFrameDiffTime(AVFrame* frame);
 		double getDelayTime(double diff);
@@ -54,6 +59,11 @@ namespace Donut
 		AVRational timebase_{ 1, 1 };
 
 		bool is_resetting_ = false;
+
+
+		float angle_x_ = 0;
+		float angle_y_ = 0;
+		float angle_z_ = 0;
 	};
 }
 #endif

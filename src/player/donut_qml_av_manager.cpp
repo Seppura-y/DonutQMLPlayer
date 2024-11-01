@@ -302,6 +302,30 @@ namespace Donut
 		return playback_speed_;
 	}
 
+	Q_INVOKABLE void DonutQMLAVManager::setPlayMode(int value)
+	{
+
+		return;
+	}
+
+	Q_INVOKABLE void DonutQMLAVManager::setRotationX(float value)
+	{
+		video_view_->setRotationX(value);
+		return Q_INVOKABLE void();
+	}
+
+	Q_INVOKABLE void DonutQMLAVManager::setRotationY(float value)
+	{
+		video_view_->setRotationY(value);
+		return Q_INVOKABLE void();
+	}
+
+	Q_INVOKABLE void DonutQMLAVManager::setRotationZ(float value)
+	{
+		video_view_->setRotationZ(value);
+		return Q_INVOKABLE void();
+	}
+
 	int DonutQMLAVManager::onOpenMediaFile(QString path)
 	{
 		this->stop();

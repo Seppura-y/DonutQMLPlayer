@@ -220,4 +220,22 @@ namespace Donut
     {
         is_paused_ = pause;
     }
+
+    Q_INVOKABLE void IDonutVideoView::setRotationX(float value)
+    {
+        angle_x_ = value;
+        return Q_INVOKABLE void();
+    }
+
+    Q_INVOKABLE void IDonutVideoView::setRotationY(float value)
+    {
+        angle_y_ = value;
+        return Q_INVOKABLE void();
+    }
+
+    Q_INVOKABLE void IDonutVideoView::setRotationZ(float value)
+    {
+        angle_z_ = value;
+        return Q_INVOKABLE void();
+    }
 }

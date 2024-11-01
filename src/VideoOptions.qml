@@ -12,6 +12,10 @@ ScrollView
 	property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
 	clip: true
 
+	signal rotationXChanged(int value)
+    signal rotationYChanged(int value)
+    signal rotationZChanged(int value)
+
 	ColumnLayout
 	{
 		Label
@@ -37,7 +41,7 @@ ScrollView
 
 		Label
 		{
-			text: qsTr("Eualizer")
+			text: qsTr("Rotation")
 			font.bold: true
 		}
 
@@ -47,53 +51,65 @@ ScrollView
 			rowSpacing: 0
 			columnSpacing: 0
 
-			Label { text: qsTr("Brightness") }
+			Label { text: qsTr("RotationX") }
 			Slider
 			{
-				id: brightnessSlider
+				id: rotationXSlider
 
-				from: -10
-				to: 10
+				from: 0
+				to: 360
 
 				value: 0
 				stepSize: 1
 				snapMode: Slider.SnapAlways
-				onValueChanged: print("brightness changed : " + value)
+				onValueChanged:
+				{
+					print("RotationX changed : " + value)
+					rotationXChanged(value)
+				}
 				Layout.fillWidth: true
 			}
-			Label { text: brightnessSlider.value }
+			Label { text: rotationXSlider.value }
 
-			Label { text: qsTr("Contrast") }
+			Label { text: qsTr("RotationY") }
 			Slider
 			{
-				id: contrastSlider
+				id: rotationYSlider
 
-				from: -10
-				to: 10
+				from: 0
+				to: 360
 
 				value: 0
 				stepSize: 1
 				snapMode: Slider.SnapAlways
-				onValueChanged: print("contrast changed : " + value)
+				onValueChanged:
+				{
+					print("RotationY changed : " + value)
+					rotationYChanged(value)
+				}
 				Layout.fillWidth: true
 			}
-			Label { text: contrastSlider.value }
+			Label { text: rotationYSlider.value }
 
-			Label { text: qsTr("Gamma") }
+			Label { text: qsTr("RotationZ") }
 			Slider
 			{
-				id: gammaSlider
+				id: rotationZSlider
 
-				from: -10
-				to: 10
+				from: 0
+				to: 360
 
 				value: 0
 				stepSize: 1
 				snapMode: Slider.SnapAlways
-				onValueChanged: print("gamma changed : " + value)
+				onValueChanged:
+				{
+					print("RotationZ changed : " + value)
+					rotationZChanged(value)
+				}
 				Layout.fillWidth: true
 			}
-			Label { text: gammaSlider.value }
+			Label { text: rotationZSlider.value }
 		} // GridLayout
 
 		Label

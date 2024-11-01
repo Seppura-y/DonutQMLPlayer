@@ -240,8 +240,11 @@ namespace Donut
 
         if (y_texture_ && u_texture_ && v_texture_)
         {
+            glm::vec4 position = glm::vec4{ 0.0f, 0.0f, 0.4f, 1.0f };
+            glm::mat4 transform = glm::mat4(1.0f);
+            position = position * transform;
             //s_renderer_->drawRotatedYuvData(angle_, glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
-            s_renderer_->drawYuvData(glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
+            s_renderer_->drawRotatedYuvData(glm::vec3(angle_x_, angle_y_, angle_z_), glm::vec3(position), glm::vec2{1.0f, 1.0f}, y_texture_, u_texture_, v_texture_);
         }
 
         s_renderer_->endScene();

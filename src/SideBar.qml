@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
+//import QtQuick.Controls.Material
 import QtQuick.Layouts
 
 Control {
@@ -9,6 +9,10 @@ Control {
     signal openFileRequested()
     signal openUrlRequested()
     signal playingIndexChanged()
+
+    signal rotationX(int value)
+    signal rotationY(int value)
+    signal rotationZ(int value)
 
 //    property MpvObject mpv: null
 
@@ -35,7 +39,7 @@ Control {
     [
         250,  // Playlist
         320,  // Settings
-        300,  // Video options
+        360,  // Video options
     ]
 
     // Color settings
@@ -73,6 +77,21 @@ Control {
         {
             id: videoOptions
             //mpvObject: mpv
+            onRotationXChanged:(val)=>
+            {
+                console.log("SideBar onRotationXChanged")
+                rotationX(val)
+            }
+
+            onRotationYChanged:(val)=>
+            {
+                rotationY(val)
+            }
+
+            onRotationZChanged:(val)=>
+            {
+                rotationZ(val)
+            }
         }
     }
 }

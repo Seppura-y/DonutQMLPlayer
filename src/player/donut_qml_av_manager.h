@@ -88,6 +88,11 @@ namespace Donut
 		Q_INVOKABLE void setPlayOrPause(bool pause);
 
 		Q_INVOKABLE float getPlaybackRate();
+		Q_INVOKABLE void setPlayMode(int value);
+
+		Q_INVOKABLE void setRotationX(float value);
+		Q_INVOKABLE void setRotationY(float value);
+		Q_INVOKABLE void setRotationZ(float value);
 	public slots:
 		void onVideoViewInitialized(QObject* view);
 
@@ -180,6 +185,8 @@ namespace Donut
 		//double max_frame_duration_ = 3600.0;
 
 		bool is_paused_ = true;
+
+		int play_mode_ = 0;
 
 		friend class IDonutVideoView;
 		friend class DonutScene;

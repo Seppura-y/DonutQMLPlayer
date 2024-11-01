@@ -244,6 +244,20 @@ Window
             {
                 controlBar.isPlaying = true
             }
+
+            onRotationX:(val)=>
+            {
+                qmlAVManager.setRotationX(val)
+            }
+            onRotationY:(val)=>
+            {
+                qmlAVManager.setRotationY(val)
+            }
+
+            onRotationZ:(val)=>
+            {
+                qmlAVManager.setRotationZ(val)
+            }
         }
 
         // Controlbar
@@ -318,6 +332,11 @@ Window
             onPlayPauseButtonClicked: (checked)=>
             {
                 qmlAVManager.setPlayOrPause(!checked)
+            }
+
+            onPlayModeButtonClicked:
+            {
+                qmlAVManager.setPlayMode()
             }
         } // ControlBar
     } // GridLayout
