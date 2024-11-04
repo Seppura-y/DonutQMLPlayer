@@ -1,4 +1,4 @@
-import QtQuick
+﻿import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
@@ -17,7 +17,7 @@ Popup
     property bool isMute: false
     property int upperValue: 100
     property int lowerValue: 0
-    property int volumeValue: 100
+    property int volumeValue: 20
     
     
     signal volumeValueUpdate(int value)
@@ -34,7 +34,16 @@ Popup
     function setValue(value)
     {
         print("setValue")
-        slider.value = slider.to * (value / upperValue)
+        //slider.value = slider.to * (value / upperValue)
+        volumeValue = value
+        slider.value = slider.to * (1.0 - volumeValue / upperValue)
+
+        //slider.value = value
+    }
+
+    function getValue()
+    {
+        return slider.visualPosition * upperValue
     }
     
     function setMute()
@@ -297,9 +306,8 @@ Popup
         {
             contentRect.height = track.height
             timer.start()
-            value = from
-            value = value + 1
-            value = value - 1
+            //slider.value = slider.to * (1.0 - volumeValue / upperValue)
+            volumePopup.setValue(20)
         }
     } // Slider
     

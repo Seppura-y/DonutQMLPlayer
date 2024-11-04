@@ -32,6 +32,8 @@ public:
 	Q_INVOKABLE void clear();
 	Q_INVOKABLE void playItem(int index);
 	Q_INVOKABLE void playNextItem();
+	Q_INVOKABLE int getPlayingIndex();
+	Q_INVOKABLE QList<QUrl> getPlayList();
 signals:
 	void playingIndexChanged();
 	void playingSingleDrop(int index);

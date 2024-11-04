@@ -2,6 +2,7 @@
 
 #include <QTime>
 #include "log.h"
+#include "playlist_model.h"
 
 extern"C"
 {
@@ -308,6 +309,44 @@ namespace Donut
 		return;
 	}
 
+	Q_INVOKABLE void DonutQMLAVManager::changePlayMode()
+	{
+		playmode_ = static_cast<Playmode>((static_cast<int>(playmode_) + 1) % 4);
+
+		switch (playmode_)
+		{
+		case Playmode::PLAYMODE_FILE_ONCE:
+		{
+			playmode_ = Playmode::PLAYMODE_FILE_ONCE;
+			//btn_playmode_->setText(QChar(0xE256));
+			//btn_playmode_->setToolTip(QString::fromLocal8Bit("file once"));
+			break;
+		}
+		case Playmode::PLAYMODE_FILE_LOOP:
+		{
+			playmode_ = Playmode::PLAYMODE_FILE_LOOP;
+			//btn_playmode_->setText(QChar(0xF366));
+			//btn_playmode_->setToolTip(QString::fromLocal8Bit("file loop"));
+			break;
+		}
+		case Playmode::PLAYMODE_LIST_ONCE:
+		{
+			playmode_ = Playmode::PLAYMODE_LIST_ONCE;
+			//btn_playmode_->setText(QChar(0xE0B5));
+			//btn_playmode_->setToolTip(QString::fromLocal8Bit("list once"));
+			break;
+		}
+		case Playmode::PLAYMODE_LIST_LOOP:
+		{
+			playmode_ = Playmode::PLAYMODE_LIST_LOOP;
+			//btn_playmode_->setText(QChar(0xF364));
+			//btn_playmode_->setToolTip(QString::fromLocal8Bit("list loop"));
+			break;
+		}
+		}
+		//emit sigPlaymodeChanged(playmode_);
+	}
+
 	Q_INVOKABLE void DonutQMLAVManager::setRotationX(float value)
 	{
 		video_view_->setRotationX(value);
@@ -340,9 +379,74 @@ namespace Donut
 		// 2.5.F 检测码流是否已经播放完
 		demux_handler_->setEofCallback([this]()
 		{
-			is_paused_ = true;
-			demux_handler_->setPaused(is_paused_);
-			emit sigMediaEOF();
+			QList<QUrl> playlist = PlaylistModel::getInstance()->getPlayList();
+			int playing_index = PlaylistModel::getInstance()->getPlayingIndex();
+			switch (playmode_)
+			{
+				case Playmode::PLAYMODE_FILE_ONCE:
+				{
+					is_paused_ = true;
+					demux_handler_->setPaused(is_paused_);
+					emit sigMediaEOF();
+					return;
+				}
+				case Playmode::PLAYMODE_FILE_LOOP:
+				{
+					onSeekingTimePos(0);
+					break;
+				}
+				case Playmode::PLAYMODE_LIST_ONCE:
+				{
+					QList<QUrl>::iterator it = playlist.begin() + playing_index;
+					if (++it == playlist.end())
+					{
+						emit sigMediaEOF();
+						break;
+					}
+					else
+					{
+
+					}
+				}
+				case Playmode::PLAYMODE_LIST_LOOP:
+				{
+					QList<QUrl>::iterator it = playlist.begin() + playing_index;
+					if (++it == playlist.end())
+					{
+						it = playlist.begin();
+					}
+					else
+					{
+
+					}
+
+					if ((*it).isEmpty())
+					{
+						return;
+					}
+
+					auto name = (*it).toString();
+					onOpenMediaFile(name);
+					break;
+
+					//QString cur_name = lb_item_name_->text();
+					//auto it = playlist_.find(cur_name);
+					//if (++it == playlist_.end())
+					//{
+					//	it = playlist_.begin();
+					//}
+					//if ((*it).isEmpty())
+					//{
+					//	return;
+					//}
+					//auto name = it.key();
+					//auto url = it.value();
+					//openning_filename_ = name;
+					//render_widget_->openMediaFile(url);
+					////emit sigPlayNextFile();
+					//break;
+				}
+			}
 		});
 
 		if (demux_handler_->openAVSource(path.toStdString().c_str()) == 0)
@@ -380,6 +484,7 @@ namespace Donut
 				
 				auto warpper = demux_handler_->copyAudioParameters();
 				audio_player_->open(*warpper);
+				audio_player_->setVolume(sound_volume_);
 			}
 
 			this->addNode(audio_player_);
@@ -485,6 +590,7 @@ namespace Donut
 
 	void DonutQMLAVManager::setSoundVolume(int value)
 	{
+		sound_volume_ = value;
 		if (audio_player_)
 			audio_player_->setVolume(value);
 	}

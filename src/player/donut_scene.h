@@ -46,10 +46,6 @@ namespace Donut
 		// player
 		Q_INVOKABLE void setQMLAvManager(DonutQMLAVManager* manager);
 
-		//Q_INVOKABLE void setRotationX(float value);
-		//Q_INVOKABLE void setRotationY(float value);
-		//Q_INVOKABLE void setRotationZ(float value);
-
 	signals:
 		void tChanged();
 		void sigItemInitialized();

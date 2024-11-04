@@ -8,6 +8,14 @@ Control
 {
     id: controlBar
 
+    enum Playmode
+    {
+        PlaymodeFileOnce,
+        PlaymodeFileLoop,
+        PlaymodeListOnce,
+        PlaymodeListLoop
+    }
+
     FontLoader
     {
         id: fontAwesome
@@ -28,7 +36,7 @@ Control
     signal stopButtonClicked()
     signal speedUpButtonClicked(var rate)
     signal speedDownButtonClicked(var rate)
-    signal playModeButtonClicked()
+    signal playModeButtonClicked(int mode)
     signal volumeButtonClicked(int value)
     signal volumeButtonMute()
     signal volumeButtonEntered(bool entered, point pos)
@@ -43,7 +51,8 @@ Control
     property double playbackSpeed: 1.0
     property int duration: 120
     property int currentTime: 0
-    property int volume: 100
+    property int volume: 20
+    property int curPlaymode: ControlBar.Playmode.PlaymodeFileOnce
 
     function toHHMMSS(seconds)
     {
@@ -64,6 +73,26 @@ Control
         {
             currentTime = seconds
         }
+    }
+    
+    function setPlaymodeListOnce()
+    {
+        playModeButton.txt = String.fromCodePoint(0xE0B5)
+    }
+
+    function setPlaymodeListLoop()
+    {
+        playModeButton.txt = String.fromCodePoint(0xF364)
+    }
+
+    function setPlaymodeFileOnce()
+    {
+        playModeButton.txt = String.fromCodePoint(0xE256)
+    }
+
+    function setPlaymodeFileLoop()
+    {
+        playModeButton.txt = String.fromCodePoint(0xF366)
     }
 
     ColumnLayout
@@ -393,11 +422,29 @@ Control
                 Layout.preferredHeight: 26
 
                 focusPolicy: Qt.NoFocus
-                txt: String.fromCodePoint(0xF364)
+                txt: String.fromCodePoint(0xE256)
 
                 onButtonClicked:
                 {
-                    playModeButtonClicked()
+                    curPlaymode = (curPlaymode + 1) % 4
+                    switch(curPlaymode)
+                    {
+                        case ControlBar.Playmode.PlaymodeFileOnce:
+                            controlBar.setPlaymodeFileOnce()
+                            break;
+                        case ControlBar.Playmode.PlaymodeFileLoop:
+                            controlBar.setPlaymodeFileLoop()
+                            break;
+                        case ControlBar.Playmode.PlaymodeListOnce:
+                            controlBar.setPlaymodeListOnce()
+                            break;
+                        case ControlBar.Playmode.PlaymodeListLoop:
+                            controlBar.setPlaymodeListLoop()
+                            break;
+                    }
+
+                    //playModeButtonClicked(int(curPlaymode))
+                    playModeButtonClicked(curPlaymode)
                     print("playModeButton onClicked")
                 }
             }

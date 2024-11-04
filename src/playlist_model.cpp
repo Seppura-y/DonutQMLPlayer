@@ -100,6 +100,7 @@ void PlaylistModel::playItem(int index)
 		int ret = Donut::DonutQMLAVManager::getInstance()->onOpenMediaFile(file_urls_[index].toLocalFile());
 		if (ret == 0)
 		{
+			playing_index_ = index;
 			playingIndexChanged();
 		}
 	}
@@ -109,4 +110,14 @@ void PlaylistModel::playItem(int index)
 void PlaylistModel::playNextItem()
 {
 	playItem(playing_index_ + 1);
+}
+
+int PlaylistModel::getPlayingIndex()
+{
+	return playing_index_;
+}
+
+QList<QUrl> PlaylistModel::getPlayList()
+{
+	return file_urls_;
 }

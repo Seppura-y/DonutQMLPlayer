@@ -11,6 +11,7 @@ import Donut.DonutQMLPlayer 1.0
 Window
 {
     id: window
+
     visible: true
     minimumWidth: 800
     minimumHeight: 450
@@ -19,6 +20,8 @@ Window
     title: "DonutQMLPlayer"
 
     property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+    property int soundVolume: 100
+
     flags: Qt.Window | (isMaterialUI ? Qt.FramelessWindowHint : 0)
 
     color: SkinColor.windowBackground
@@ -336,7 +339,7 @@ Window
 
             onPlayModeButtonClicked:
             {
-                qmlAVManager.setPlayMode()
+                qmlAVManager.setPlayMode(controlBar.curPlaymode)
             }
         } // ControlBar
     } // GridLayout
@@ -344,8 +347,9 @@ Window
 
     Component.onCompleted:
     {
+        soundVolume = volumePopup.getValue()
         //qmlAVManager.onVideoViewInitialized(glScene)
-
         glScene.setQMLAvManager(qmlAVManager)
+        qmlAVManager.setSoundVolume(soundVolume)
     }
 }

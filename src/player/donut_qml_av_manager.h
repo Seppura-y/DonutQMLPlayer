@@ -15,6 +15,7 @@
 
 namespace Donut
 {
+
 	class DonutQMLAVManager : public QQuickItem, public IDonutAVBaseHandler
 	{
 		Q_OBJECT
@@ -89,6 +90,7 @@ namespace Donut
 
 		Q_INVOKABLE float getPlaybackRate();
 		Q_INVOKABLE void setPlayMode(int value);
+		Q_INVOKABLE void changePlayMode();
 
 		Q_INVOKABLE void setRotationX(float value);
 		Q_INVOKABLE void setRotationY(float value);
@@ -134,6 +136,14 @@ namespace Donut
 		double getFrameDiffTime(AVFrame* frame);
 		double getDelayTime(double diff);
 
+	public:
+		enum class Playmode
+		{
+			PLAYMODE_FILE_ONCE = 0,
+			PLAYMODE_FILE_LOOP = 1,
+			PLAYMODE_LIST_ONCE = 2,
+			PLAYMODE_LIST_LOOP = 3
+		};
 
 	protected:
 		int width_ = -1;
@@ -186,7 +196,8 @@ namespace Donut
 
 		bool is_paused_ = true;
 
-		int play_mode_ = 0;
+		Playmode playmode_ = Playmode::PLAYMODE_FILE_ONCE;
+		int sound_volume_ = 100;
 
 		friend class IDonutVideoView;
 		friend class DonutScene;
