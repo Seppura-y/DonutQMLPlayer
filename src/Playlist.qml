@@ -55,32 +55,80 @@ Item
 				}
 			} // ListView
 		} // ScrollView
-
-		Button
+		FontButton
 		{
 			id: addButton
-			text: qsTr("Add")
-			onClicked:
+			Layout.preferredWidth: 60
+			Layout.preferredHeight: 40
+		
+			focusPolicy: Qt.NoFocus
+			txt: String.fromCodePoint(0xf65e)
+		
+			onButtonClicked:
 			{
 				addMenu.x = addButton.x
 				addMenu.y = addButton.y - addMenu.height
 				addMenu.open()
+				print("addButton onClicked")
 			}
 		}
 
-		Button
+		FontButton
 		{
 			id: delButton
-			text: qsTr("Del")
-			onClicked: PlaylistModel.removeItem(listView.currentIndex)
+			Layout.preferredWidth: 60
+			Layout.preferredHeight: 40
+		
+			focusPolicy: Qt.NoFocus
+			txt: String.fromCodePoint(0xf65f)
+		
+			onButtonClicked:
+			{
+				PlaylistModel.removeItem(listView.currentIndex)
+				print("delButton onClicked")
+			}
 		}
 
-		Button
+		FontButton
 		{
 			id: clearButton
-			text: qsTr("Clear")
-			onClicked: PlaylistModel.clear()
+			Layout.preferredWidth: 60
+			Layout.preferredHeight: 40
+		
+			focusPolicy: Qt.NoFocus
+			txt: String.fromCodePoint(0xe2ae)
+		
+			onButtonClicked:
+			{
+				PlaylistModel.clear()
+				print("clearButton onClicked")
+			}
 		}
+		//Button
+		//{
+		//	id: addButton
+		//	text: qsTr("Add")
+		//	onClicked:
+		//	{
+		//		addMenu.x = addButton.x
+		//		addMenu.y = addButton.y - addMenu.height
+		//		addMenu.open()
+		//	}
+		//}
+		//
+		//Button
+		//{
+		//	id: delButton
+		//	text: qsTr("Del")
+		//	onClicked: PlaylistModel.removeItem(listView.currentIndex)
+		//}
+		//
+		//Button
+		//{
+		//	id: clearButton
+		//	text: qsTr("Clear")
+		//	onClicked: PlaylistModel.clear()
+		//}
 	} // GridLayout
 
 	Menu

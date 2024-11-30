@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+﻿cmake_minimum_required(VERSION 3.22)
 project(DonutQMLPlayer)
 
 
@@ -14,7 +14,6 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/include/soundtouch/SoundTouch
 )
 
-### QT库设置
 find_package(Qt6 COMPONENTS
     Core
     Qml
@@ -179,7 +178,6 @@ target_link_libraries(${PROJECT_NAME}
     swscale
 )
 
-# 项目输出路径
 set(RUNTIME "${CMAKE_CURRENT_LIST_DIR}/bin")
 set_target_properties(${PROJECT_NAME}
     PROPERTIES

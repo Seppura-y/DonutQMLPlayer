@@ -18,26 +18,26 @@ ScrollView
 
 	ColumnLayout
 	{
-		Label
-		{
-			text: qsTr("Video")
-			font.bold: true
-		}
-
-		RowLayout
-		{
-			Button
-			{
-				text: qsTr("Enable")
-				onClicked: print("video Enabled")
-			}
-
-			Button
-			{
-				text: qsTr("Disable")
-				onClicked: print("video Disabled")
-			}
-		}
+		//Label
+		//{
+		//	text: qsTr("Video")
+		//	font.bold: true
+		//}
+		//
+		//RowLayout
+		//{
+		//	Button
+		//	{
+		//		text: qsTr("Enable")
+		//		onClicked: print("video Enabled")
+		//	}
+		//
+		//	Button
+		//	{
+		//		text: qsTr("Disable")
+		//		onClicked: print("video Disabled")
+		//	}
+		//}
 
 		Label
 		{
@@ -112,24 +112,24 @@ ScrollView
 			Label { text: rotationZSlider.value }
 		} // GridLayout
 
-		Label
-		{
-			text: qsTr("Video Speed")
-			font.bold: true
-		}
+		//Label
+		//{
+		//	text: qsTr("Video Speed")
+		//	font.bold: true
+		//}
 
-		GridLayout
-		{
-			columns: 3
-			rowSpacing: isMaterialUI ? -5 : 5
-
-			Button { text: "x0.50"; onClicked: print("playback speed: x" + 0.50) }
-			Button { text: "x0.75"; onClicked: print("playback speed: x" + 0.75) }
-			Button { text: "x1.00"; onClicked: print("playback speed: x" + 1.00) }
-			Button { text: "x1.25"; onClicked: print("playback speed: x" + 1.25) }
-			Button { text: "x1.50"; onClicked: print("playback speed: x" + 1.50) }
-			Button { text: "x1.75"; onClicked: print("playback speed: x" + 1.75) }
-			Button { text: "x2.00"; onClicked: print("playback speed: x" + 2.00) }
-		}
+		//GridLayout
+		//{
+		//	columns: 3
+		//	rowSpacing: isMaterialUI ? -5 : 5
+		//
+		//	Button { text: "x0.50"; onClicked: print("playback speed: x" + 0.50) }
+		//	Button { text: "x0.75"; onClicked: print("playback speed: x" + 0.75) }
+		//	Button { text: "x1.00"; onClicked: print("playback speed: x" + 1.00) }
+		//	Button { text: "x1.25"; onClicked: print("playback speed: x" + 1.25) }
+		//	Button { text: "x1.50"; onClicked: print("playback speed: x" + 1.50) }
+		//	Button { text: "x1.75"; onClicked: print("playback speed: x" + 1.75) }
+		//	Button { text: "x2.00"; onClicked: print("playback speed: x" + 2.00) }
+		//}
 	}
 }
