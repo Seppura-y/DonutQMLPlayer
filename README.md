@@ -3,9 +3,7 @@
 
 1.GUI部分使用QML开发，
 
-2.音视频播放器SDK参考ffplay的处理逻辑，使用C++11进行封装与重构，实现了ffplay的大部分功能，并通过SoundTouch库实现音频的倍速不变调的处理
-
-  由于是使用C++进行面向对象的封装，理论上可以移植到安卓平台(音频部分已经使用OpenSLES替换本项目的SDL，视频渲染部分使用OpenGLES替换)
+2.音视频播放器SDK参考ffplay的处理逻辑，使用C++11进行封装与重构，实现了ffplay的大部分功能，并通过SoundTouch库实现音频的倍速不变调的处理由于是使用C++进行面向对象的封装，理论上可以移植到安卓平台(音频部分已经使用OpenSLES替换本项目的SDL，视频渲染部分使用OpenGLES替换)
   
 3.使用自封装的OpenGL引擎(参考油管大佬cherno的Hazel引擎，对其进行简化并使用QOpenGLFunctions替换)，能实现简单的平移旋转缩放操作
 
