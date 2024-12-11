@@ -525,6 +525,11 @@ namespace Donut
 		if (!is_loop_)
 		{
 			DN_CORE_ERROR("eof");
+			if (demux_handler_)
+			{
+				demux_handler_->setPaused(is_paused_);
+			}
+
 			if (a_decode_handler_)
 			{
 				a_decode_handler_->setPaused(is_paused_);

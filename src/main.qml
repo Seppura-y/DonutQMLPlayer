@@ -339,7 +339,8 @@ Window
 
             onPlayModeButtonClicked:
             {
-                qmlAVManager.setPlayMode(controlBar.curPlaymode)
+                //qmlAVManager.setPlayMode(controlBar.curPlaymode)
+                qmlAVManager.changePlayMode()
             }
         } // ControlBar
     } // GridLayout

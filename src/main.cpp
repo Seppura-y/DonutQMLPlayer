@@ -99,13 +99,13 @@ int main(int argc, char **argv)
     qputenv("QSG_RHI_BACKEND", QByteArray("opengl"));
     QGuiApplication app(argc, argv);
 
-    checkVersion(4, 5);
+    //checkVersion(4, 5);
 
-    QSurfaceFormat fmt;
-    fmt.setRenderableType(QSurfaceFormat::OpenGL);
-    fmt.setVersion(4, 5);
-    fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
-    QSurfaceFormat::setDefaultFormat(fmt);
+    //QSurfaceFormat fmt;
+    //fmt.setRenderableType(QSurfaceFormat::OpenGL);
+    //fmt.setVersion(4, 5);
+    //fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+    //QSurfaceFormat::setDefaultFormat(fmt);
 
 
     QQmlEngine engine;
