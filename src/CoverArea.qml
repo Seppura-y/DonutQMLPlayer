@@ -17,7 +17,7 @@ MouseArea
 	property real lastMouseY: 0
 	property int activeEdges: 0
 	property bool moveable: false
-	property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+	//property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
 
 	property bool isControlBarHovered: true
 	property bool isTitleBarHovered: true

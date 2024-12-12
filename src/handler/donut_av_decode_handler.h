@@ -18,7 +18,7 @@ namespace Donut
 		~DonutAVDecodeHandler();
 		int openDecoder(AVCodecParameters* param);
 		int openDecoder(std::shared_ptr<DonutAVParamWarpper> param);
-		int openDecoder(std::shared_ptr<DonutAVStream> param);
+		//int openDecoder(std::shared_ptr<DonutAVStream> param);
 
 		void updateHandler(void* data) override;
 
@@ -51,11 +51,11 @@ namespace Donut
 		bool is_need_play_ = false;
 
 		DonutAVDecoder decoder_;
-		DonutAVPacketDataList pkt_list_;
+		//DonutAVPacketDataList pkt_list_;
 
 		AVFrame* decoded_frame_ = nullptr;
 
-		std::unique_ptr<DonutAVDataCache<AVFrame*>> cache_;
+		//std::unique_ptr<DonutAVDataCache<AVFrame*>> cache_;
 		std::shared_ptr<DonutAVFrameQueue> frame_queue_;
 		std::shared_ptr<DonutAVPacketQueue> packet_queue_;
 

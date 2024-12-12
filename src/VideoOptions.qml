@@ -9,7 +9,8 @@ ScrollView
 {
 	id:  videoOptionsDialog
 
-	property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+	//property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+	property bool isMaterialUI: true
 	clip: true
 
 	signal rotationXChanged(int value)

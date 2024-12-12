@@ -2,9 +2,10 @@
 #define DONUT_AV_VIDEO_DECODER_H
 
 #include "core.h"
-#include "donut_av_video_codec.h"
+
 #include "donut_av_frame.h"
 #include "donut_av_packet.h"
+#include "donut_av_codec_base.h"
 struct AVPacket;
 struct AVFrame;
 

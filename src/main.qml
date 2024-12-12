@@ -19,7 +19,8 @@ Window
     height: 720
     title: "DonutQMLPlayer"
 
-    property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+    //property bool isMaterialUI: Utils.environmentVariable("QT_QUICK_CONTROLS_STYLE") == "Material"
+    property bool isMaterialUI: true
     property int soundVolume: 100
 
     flags: Qt.Window | (isMaterialUI ? Qt.FramelessWindowHint : 0)
