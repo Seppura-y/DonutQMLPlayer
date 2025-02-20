@@ -69,21 +69,30 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
             video_timebase_ = stream->time_base;
             if (stream->duration == AV_NOPTS_VALUE)
             {
-                AVPacket* packet = av_packet_alloc();
-                while (av_read_frame(fmt_ctx, packet) >= 0)
+                if (!strcmp(fmt_ctx->iformat->name, "rtp")
+                    || !strcmp(fmt_ctx->iformat->name, "rtsp")
+                    || !strcmp(fmt_ctx->iformat->name, "sdp"))
                 {
-                    if (packet->stream_index == i)
-                    {
-                        int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
-                        if (pts != AV_NOPTS_VALUE)
-                        {
-                            video_duration_ = video_duration_ > pts ? video_duration_ : pts;
-                        }
-                    }
-                    av_packet_unref(packet);
+
                 }
-                avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
-                fmt_ctx->streams[i]->duration = video_duration_;
+                else
+                {
+                    AVPacket* packet = av_packet_alloc();
+                    while (av_read_frame(fmt_ctx, packet) >= 0)
+                    {
+                        if (packet->stream_index == i)
+                        {
+                            int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
+                            if (pts != AV_NOPTS_VALUE)
+                            {
+                                video_duration_ = video_duration_ > pts ? video_duration_ : pts;
+                            }
+                        }
+                        av_packet_unref(packet);
+                    }
+                    avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
+                    fmt_ctx->streams[i]->duration = video_duration_;
+                }
             }
             video_duration_ = fmt_ctx->streams[i]->duration;
             video_streams_[vs_count_] = stream;
@@ -94,22 +103,32 @@ AVFormatContext* DonutAVDemuxer::openContext(const char* url)
             stream = fmt_ctx->streams[i];
             if (stream->duration == AV_NOPTS_VALUE)
             {
-                AVPacket* packet = av_packet_alloc();
-                while (av_read_frame(fmt_ctx, packet) >= 0)
+                if (!strcmp(fmt_ctx->iformat->name, "rtp")
+                    || !strcmp(fmt_ctx->iformat->name, "rtsp")
+                    || !strcmp(fmt_ctx->iformat->name, "sdp"))
                 {
-                    if (packet->stream_index == i)
-                    {
-                        int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
-                        if (pts != AV_NOPTS_VALUE)
-                        {
-                            audio_duration_ = audio_duration_ > pts ? audio_duration_ : pts;
-                        }
-                    }
-                    av_packet_unref(packet);
+
                 }
-                avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
-                fmt_ctx->streams[i]->duration = audio_duration_;
-                //fmt_ctx->streams[i]->time_base = { 1, stream->codecpar->sample_rate };
+                else
+                {
+                    AVPacket* packet = av_packet_alloc();
+                    while (av_read_frame(fmt_ctx, packet) >= 0)
+                    {
+                        if (packet->stream_index == i)
+                        {
+                            int64_t pts = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
+                            if (pts != AV_NOPTS_VALUE)
+                            {
+                                audio_duration_ = audio_duration_ > pts ? audio_duration_ : pts;
+                            }
+                        }
+                        av_packet_unref(packet);
+                    }
+                    avformat_seek_file(fmt_ctx, i, 0, 0, 0, 0);
+                    fmt_ctx->streams[i]->duration = audio_duration_;
+                    //fmt_ctx->streams[i]->time_base = { 1, stream->codecpar->sample_rate };
+                }
+
             }
             audio_timebase_ = fmt_ctx->streams[i]->time_base;
             audio_duration_ = fmt_ctx->streams[i]->duration;

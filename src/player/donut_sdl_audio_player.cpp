@@ -1,12 +1,12 @@
-#include "donut_sdl_audio_player.h"
+﻿#include "donut_sdl_audio_player.h"
 
 
 #include "log.h"
 
 extern"C"
 {
-    #include <libavcodec/avcodec.h>
-    #include <libavutil/time.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/time.h>
 }
 
 namespace Donut
@@ -173,7 +173,7 @@ namespace Donut
             &wanted_spec,
             &actual_spec,
             SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE))
-        )
+            )
         {
             av_log(NULL, AV_LOG_WARNING, "SDL_OpenAudio (%d channels, %d Hz): %s\n",
                 wanted_spec.channels, wanted_spec.freq, SDL_GetError());
@@ -458,7 +458,7 @@ namespace Donut
     void DonutSDLAudioPlayer::setPlaybackSpeed(float speed)
     {
         playback_speed_ = speed;
-        if(sound_touch_)
+        if (sound_touch_)
             sound_touch_->setTempo(playback_speed_);
     }
 }
