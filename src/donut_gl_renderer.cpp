@@ -141,15 +141,15 @@
 //
 //void DonutGLItemRenderer::calculateAspectRatio()
 //{
-//    // ¼ÆËãÊÓ¿Ú¿í¸ß±ÈºÍÊÓÆµ¿í¸ß±È
+//    // è®¡ç®—è§†å£å®½é«˜æ¯”å’Œè§†é¢‘å®½é«˜æ¯”
 //    float viewportAspectRatio = static_cast<float>(m_viewportSize.width()) / static_cast<float>(m_viewportSize.height());
 //    float videoAspectRatio = static_cast<float>(1024) / static_cast<float>(600);
 //
-//    // ¼ÆËãËõ·Å±ÈÀı
+//    // è®¡ç®—ç¼©æ”¾æ¯”ä¾‹
 //    float scale = 1.0f;
 //    glm::vec2 translation = glm::vec2(0.0f);
 //    if (viewportAspectRatio > videoAspectRatio) {
-//        // ÊÓ¿Ú½Ï¿í£¬ÊÓÆµÉÏÏÂÁôºÚ±ß
+//        // è§†å£è¾ƒå®½ï¼Œè§†é¢‘ä¸Šä¸‹ç•™é»‘è¾¹
 //        scale = static_cast<float>(m_viewportSize.height()) / static_cast<float>(600);
 //        translation.x = (m_viewportSize.width() - 1024 * scale) / 2.0f;
 //
@@ -157,7 +157,7 @@
 //        //translation.y = (m_viewportSize.height() - 600 * scale) / 2.0f;
 //    }
 //    else {
-//        // ÊÓ¿Ú½Ï¸ß£¬ÊÓÆµ×óÓÒÁôºÚ±ß
+//        // è§†å£è¾ƒé«˜ï¼Œè§†é¢‘å·¦å³ç•™é»‘è¾¹
 //        scale = static_cast<float>(m_viewportSize.width()) / static_cast<float>(1024);
 //        translation.y = (m_viewportSize.height() - 600 * scale) / 2.0f;
 //
@@ -165,10 +165,10 @@
 //        //translation.x = (m_viewportSize.width() - 1024 * scale) / 2.0f;
 //    }
 //
-//    // ´´½¨±ä»»¾ØÕó
-//    glm::mat4 transformMatrix = glm::mat4(1.0f); // ³õÊ¼»¯Îªµ¥Î»¾ØÕó
-//    transformMatrix = glm::translate(transformMatrix, glm::vec3(translation, 0.0f)); // Æ½ÒÆ
+//    // åˆ›å»ºå˜æ¢çŸ©é˜µ
+//    glm::mat4 transformMatrix = glm::mat4(1.0f); // åˆå§‹åŒ–ä¸ºå•ä½çŸ©é˜µ
+//    transformMatrix = glm::translate(transformMatrix, glm::vec3(translation, 0.0f)); // å¹³ç§»
 //    transformMatrix = glm::rotate(transformMatrix, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-//    transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f)); // Ëõ·Å
+//    transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f)); // ç¼©æ”¾
 //    batch_data_.rect_shader_->uploadUniformMat4fv("u_translation", transformMatrix);
 //}

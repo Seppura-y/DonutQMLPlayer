@@ -125,7 +125,7 @@ namespace Donut
 
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, TextureFormat format)
 	{
-		if (format == TextureFormat::TEXTURE_FORMAT_YUV420)
+		if (format == TextureFormat::TEXTURE_FORMAT_YUV420P)
 		{
 			width_ = width;
 			height_ = height;
@@ -148,6 +148,25 @@ namespace Donut
 			//OPENGL_EXTRA_FUNCTIONS(glTextureStorage2D(object_id_, 1, internal_format_, width_, height_));
 			OPENGL_EXTRA_FUNCTIONS(glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, 0));
 		}
+		else if (format == TextureFormat::TEXTURE_FORMAT_YUV420P10LE)
+		{
+			width_ = width;
+			height_ = height;
+			channels_ = 1; // 仍为单通道（Y、U、V 分别处理）
+
+			internal_format_ = GL_R16; // 16 位单通道整数格式
+			data_format_ = GL_RED;     // 数据格式仍为单通道
+
+			OPENGL_EXTRA_FUNCTIONS(glCreateTextures(GL_TEXTURE_2D, 1, &object_id_));
+			OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
+
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_S, GL_REPEAT));
+			OPENGL_EXTRA_FUNCTIONS(glTextureParameteri(object_id_, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+			OPENGL_EXTRA_FUNCTIONS(glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, width, height, 0, GL_RED, GL_UNSIGNED_SHORT, 0));
+		}
 		//else
 		//{
 		//	OpenGLTexture2D(width, height);
@@ -156,7 +175,7 @@ namespace Donut
 
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t size, TextureFormat format)
 	{
-		if (format == TextureFormat::TEXTURE_FORMAT_YUV420)
+		if (format == TextureFormat::TEXTURE_FORMAT_YUV420P)
 		{
 			width_ = width;
 			height_ = height;
@@ -201,6 +220,35 @@ namespace Donut
 		DN_CORE_ASSERT(size == width_ * height_ * bytes_per_pixel, "data must be entire texture!");
 		OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
 		OPENGL_EXTRA_FUNCTIONS(glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_BYTE, data));
+		//OPENGL_EXTRA_FUNCTIONS(glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, GL_UNSIGNED_SHORT, data));
+		is_loaded_ = true;
+	}
+
+	void OpenGLTexture2D::setData(void* data, uint32_t width, uint32_t height, TextureFormat format)
+	{
+		uint32_t bytes_per_pixel = 0;
+		GLenum data_type = GL_UNSIGNED_BYTE;
+
+		switch (data_format_)
+		{
+		case GL_RGBA:
+			bytes_per_pixel = 4;
+			break;
+		case GL_RGB:
+			bytes_per_pixel = 3;
+			break;
+		case GL_RED:
+			bytes_per_pixel = (format == TextureFormat::TEXTURE_FORMAT_YUV420P10LE) ? 2 : 1;
+			data_type = (format == TextureFormat::TEXTURE_FORMAT_YUV420P10LE) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+			break;
+		default:
+			DN_CORE_ASSERT(false, "Unsupported data format!");
+			return;
+		}
+
+		DN_CORE_ASSERT(width == width_ && height == height_, "Width and height must match texture dimensions!");
+		OPENGL_EXTRA_FUNCTIONS(glBindTexture(GL_TEXTURE_2D, object_id_));
+		OPENGL_EXTRA_FUNCTIONS(glTextureSubImage2D(object_id_, 0, 0, 0, width_, height_, data_format_, data_type, data));
 		is_loaded_ = true;
 	}
 

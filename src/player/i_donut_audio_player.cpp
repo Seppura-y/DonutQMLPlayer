@@ -35,7 +35,7 @@ void IDonutAudioPlayer::push(AVFrame* frame)
         return;
     }
 
-    //暂时支持双通道
+    //鏆傛椂鏀寔鍙岄�氶亾
     switch (frame->format)
     {
         //case AV_SAMPLE_FMT_S16P:        ///< signed 16 bits, planar
@@ -69,7 +69,7 @@ bool IDonutAudioPlayer::open(DonutAVParamWarpper& para)
         timebase_ = (double)para.time_base->den / (double)para.time_base->num;
         tb_ = *para.time_base;
 
-        //一定要使用format context的timebase，否则对不上解码帧的时间
+        //涓�瀹氳浣跨敤format context鐨則imebase锛屽惁鍒欏涓嶄笂瑙ｇ爜甯х殑鏃堕棿
         //tb_ = para.samplerate_;
     }
 

@@ -34,7 +34,7 @@ namespace Donut
 	DonutQMLAVManager::~DonutQMLAVManager()
 	{
 		this->stop();
-		// 终止各个线程，防止在点击右上角关闭按钮后导致程序崩溃
+		// 缁堟鍚勪釜绾跨▼锛岄槻姝㈠湪鐐瑰嚮鍙充笂瑙掑叧闂寜閽悗瀵艰嚧绋嬪簭宕╂簝
 		resetManager();
 	}
 
@@ -189,7 +189,7 @@ namespace Donut
 		a_frame_queue_ = std::make_shared<DonutAVFrameQueue>(a_packet_queue_, 9, 1);
 		a_clock_ = std::make_shared<DonutAVClock>();
 
-		// video decoder 要放在audio decoder上面，否则avcodec_send_packet时会警告 invalid arguement
+		// video decoder 瑕佹斁鍦╝udio decoder涓婇潰锛屽惁鍒檃vcodec_send_packet鏃朵細璀﹀憡 invalid arguement
 		//demux_handler_->addNode(v_decode_handler_);
 		//demux_handler_->addNode(a_decode_handler_);
 
@@ -376,7 +376,7 @@ namespace Donut
 
 		initManager();
 
-		// 2.5.F 检测码流是否已经播放完
+		// 2.5.F 妫�娴嬬爜娴佹槸鍚﹀凡缁忔挱鏀惧畬
 		demux_handler_->setEofCallback([this]()
 		{
 			QList<QUrl> playlist = PlaylistModel::getInstance()->getPlayList();
@@ -520,7 +520,7 @@ namespace Donut
 	{
 		//qDebug() << "DonutQMLAVManager::onMediaEOF()";
 
-		// 2.5.F 检测码流是否已经播放完
+		// 2.5.F 妫�娴嬬爜娴佹槸鍚﹀凡缁忔挱鏀惧畬
 
 		if (!is_loop_)
 		{

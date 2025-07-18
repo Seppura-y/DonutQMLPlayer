@@ -46,6 +46,7 @@ namespace Donut
 		float getRatio() const { return (float)width_ / (float)height_; }
 
 		virtual void setData(void* data, uint32_t size);
+		virtual void setData(void* data, uint32_t width, uint32_t height, TextureFormat format);
 
 		virtual uint32_t getObjectId() const;
 

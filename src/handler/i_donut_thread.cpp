@@ -15,7 +15,7 @@ namespace Donut
         this->thread_index_ = i++;
         is_exit_ = false;
 
-        worker_ = std::thread(&IDonutThread::threadLoop, this);
+        worker_ = std::jthread(&IDonutThread::threadLoop, this);
 
         is_paused_ = false;
         std::stringstream stream;

@@ -158,55 +158,55 @@ namespace Donut
         double default_delay_time = 0.04;
         if (diff > 0.003)
         {
-            // master³¬Ç°£¬µ÷ÕûË¯ÃßÊ±¼äÎª2/3
+            // masterè¶…å‰ï¼Œè°ƒæ•´ç¡çœ æ—¶é—´ä¸º2/3
             delay_time = delay_time * 2 / 3;
             if (delay_time < default_delay_time / 2)
             {
-                // Ë¯ÃßÊ±¼ä×îÉÙÊÇÄ¬ÈÏÖµ(40ms)µÄ 2/3
+                // ç¡çœ æ—¶é—´æœ€å°‘æ˜¯é»˜è®¤å€¼(40ms)çš„ 2/3
                 delay_time = default_delay_time * 2 / 3;
             }
             else if (delay_time > default_delay_time * 2)
             {
-                // Ë¯ÃßÊ±¼ä×îÉÙÊÇÄ¬ÈÏÖµ(40ms)µÄ 2±¶
+                // ç¡çœ æ—¶é—´æœ€å°‘æ˜¯é»˜è®¤å€¼(40ms)çš„ 2å€
                 delay_time = default_delay_time * 2;
             }
         }
         else if (diff < -0.003)
         {
-            // masterÂäºó£¬µ÷ÕûÎªdelay timeµÄ1.5±¶
+            // masterè½åï¼Œè°ƒæ•´ä¸ºdelay timeçš„1.5å€
             delay_time = delay_time * 3 / 2;
             if (delay_time < default_delay_time / 2)
             {
-                // Ë¯ÃßÊ±¼ä×îÉÙÊÇÄ¬ÈÏÖµ(40ms)µÄ 2/3
+                // ç¡çœ æ—¶é—´æœ€å°‘æ˜¯é»˜è®¤å€¼(40ms)çš„ 2/3
                 delay_time = default_delay_time * 2 / 3;
             }
             else if (delay_time > default_delay_time * 2)
             {
-                // Ë¯ÃßÊ±¼ä×îÉÙÊÇÄ¬ÈÏÖµ(40ms)µÄ 2±¶
+                // ç¡çœ æ—¶é—´æœ€å°‘æ˜¯é»˜è®¤å€¼(40ms)çš„ 2å€
                 delay_time = default_delay_time * 2;
             }
         }
 
-        // master³¬Ç°500ms
+        // masterè¶…å‰500ms
         if (diff >= 0.5)
         {
-            // Ö±½ÓÌø¹ı±¾Ö¡
+            // ç›´æ¥è·³è¿‡æœ¬å¸§
             delay_time = 0;
         }
         else if (diff <= -0.5)
         {
-            // masterÂäºó³¬¹ı500ms£¬2±¶Ä¬ÈÏÖµ(2 * 40ms)
+            // masterè½åè¶…è¿‡500msï¼Œ2å€é»˜è®¤å€¼(2 * 40ms)
             delay_time = default_delay_time * 2;
         }
 
-        // master³¬Ç°10Ãë£¬²»½øĞĞÍ¬²½£¬Ö±½ÓÇå¿Õslave¶ÓÁĞ
+        // masterè¶…å‰10ç§’ï¼Œä¸è¿›è¡ŒåŒæ­¥ï¼Œç›´æ¥æ¸…ç©ºslaveé˜Ÿåˆ—
         if (diff >= 10)
         {
             //packet_queue_->packetQueueFlush();
             delay_time = default_delay_time;
         }
 
-        // masterÂäºó10Ãë£¬²»½øĞĞÍ¬²½£¬Ö±½ÓÇå¿Õmaster¶ÓÁĞ
+        // masterè½å10ç§’ï¼Œä¸è¿›è¡ŒåŒæ­¥ï¼Œç›´æ¥æ¸…ç©ºmasteré˜Ÿåˆ—
         if (diff <= -10)
         {
             //packet_queue_->packetQueueFlush();

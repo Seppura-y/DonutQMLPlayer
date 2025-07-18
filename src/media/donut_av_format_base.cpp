@@ -165,7 +165,7 @@ std::shared_ptr<DonutAVParamWarpper> DonutAVFormatBase::copyVideoParameters()
 	avcodec_parameters_copy(param->para, fmt_ctx_->streams[video_index_]->codecpar);
 	*param->time_base = fmt_ctx_->streams[video_index_]->time_base;
 
-	// ²Î¿¼ffplayµÄvideo_thread
+	// å‚è€ƒffplayçš„video_thread
 	param->framerate_ = av_guess_frame_rate(fmt_ctx_, fmt_ctx_->streams[video_index_], nullptr);
 	return param;
 }

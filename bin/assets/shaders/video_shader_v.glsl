@@ -57,4 +57,3 @@ void main(void)
     
     fragColor = vec4(rgb, 1.0);
 }
-

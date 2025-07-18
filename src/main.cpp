@@ -9,7 +9,7 @@
 #include "log.h"
 #include "donut_qml_av_manager.h"
 
-//½âÎö×Ö·û´®ÖÐµÄopengl°æ±¾ºÅ
+//è§£æžå­—ç¬¦ä¸²ä¸­çš„openglç‰ˆæœ¬å·
 bool parseOpenGLVersion(const QByteArray& versionString, int& major, int& minor)
 {
     bool majorOk = false;
@@ -64,7 +64,7 @@ bool checkVersion(int minMajor, int minMinor)
 {
     int major = 0;
     int minor = 0;
-    //Ò»°ãÐèÒªÏÈ¹¹ÔìÒ»¸öQGuiApplicationÓÐÐ©º¯Êý²ÅÄÜµ÷ÓÃ
+    //ä¸€èˆ¬éœ€è¦å…ˆæž„é€ ä¸€ä¸ªQGuiApplicationæœ‰äº›å‡½æ•°æ‰èƒ½è°ƒç”¨
     QScreen* screen = qApp->primaryScreen();
     if (screen)
     {

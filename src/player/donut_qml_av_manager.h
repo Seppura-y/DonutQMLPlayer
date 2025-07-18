@@ -120,8 +120,8 @@ namespace Donut
 		void sigVideoPlaySeconds(int nSeconds);
 		void sigVideoTotalSeconds(int nSeconds);
 
-		void sigPlayMsg(QString strMsg);// 错误信息
-		void sigFrameDimensionsChanged(int nFrameWidth, int nFrameHeight); // 视频宽高发生变化
+		void sigPlayMsg(QString strMsg);// 閿欒淇℃伅
+		void sigFrameDimensionsChanged(int nFrameWidth, int nFrameHeight); // 瑙嗛瀹介珮鍙戠敓鍙樺寲
 		void sigStartPlay(QString strFileName);
 		//void sigStopFinished();
 

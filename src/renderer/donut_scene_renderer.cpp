@@ -1,4 +1,4 @@
-#include "donut_scene_renderer.h"
+ï»¿#include "donut_scene_renderer.h"
 
 #include "opengl_shader.h"
 
@@ -86,7 +86,8 @@ void DonutSceneRenderer::initAll()
             || rif->graphicsApi() == QSGRendererInterface::OpenGLRhi);
 
 
-        batch_data_.yuv_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_v.glsl");
+        //batch_data_.yuv_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_v.glsl");
+        batch_data_.yuv_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/video_shader_factor.glsl");
         batch_data_.rect_shader_ = std::make_shared<Donut::OpenGLShader>("assets/shaders/texture.glsl");
 
         //Sprite Init//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +120,7 @@ void DonutSceneRenderer::initAll()
             rectangle_indices_offset += 4;
         }
 
-        // ÕâÀïÓÃQtµÄOpenGL½Ó¿Ú£¬ÎŞ·¨ÔÚ´´½¨EBOÊ±Í¬Ê±´«µİÊı¾İ£¬ÒªÁíÍâµ÷ÓÃsetData£¬Ô­ÒòÎ´Öª
+        // è¿™é‡Œç”¨Qtçš„OpenGLæ¥å£ï¼Œæ— æ³•åœ¨åˆ›å»ºEBOæ—¶åŒæ—¶ä¼ é€’æ•°æ®ï¼Œè¦å¦å¤–è°ƒç”¨setDataï¼ŒåŸå› æœªçŸ¥
         batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
         batch_data_.rect_ebo_->setData(rectangle_indices, batch_data_.max_indices_);
         batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
@@ -157,7 +158,7 @@ void DonutSceneRenderer::initAll()
             yuv_indices_offset += 4;
         }
 
-        // ÕâÀïÓÃQtµÄOpenGL½Ó¿Ú£¬ÎŞ·¨ÔÚ´´½¨EBOÊ±Í¬Ê±´«µİÊı¾İ£¬ÒªÁíÍâµ÷ÓÃsetData£¬Ô­ÒòÎ´Öª
+        // è¿™é‡Œç”¨Qtçš„OpenGLæ¥å£ï¼Œæ— æ³•åœ¨åˆ›å»ºEBOæ—¶åŒæ—¶ä¼ é€’æ•°æ®ï¼Œè¦å¦å¤–è°ƒç”¨setDataï¼ŒåŸå› æœªçŸ¥
         batch_data_.yuv_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(yuv_indices, batch_data_.max_indices_));
         batch_data_.yuv_ebo_->setData(yuv_indices, batch_data_.max_indices_);
         batch_data_.yuv_vao_->setIndexBuffer(batch_data_.yuv_ebo_);
@@ -238,7 +239,7 @@ void DonutSceneRenderer::initForYuvRender()
             offset += 4;
         }
 
-        // ÕâÀïÓÃQtµÄOpenGL½Ó¿Ú£¬ÎŞ·¨ÔÚ´´½¨EBOÊ±Í¬Ê±´«µİÊı¾İ£¬ÒªÁíÍâµ÷ÓÃsetData£¬Ô­ÒòÎ´Öª
+        // è¿™é‡Œç”¨Qtçš„OpenGLæ¥å£ï¼Œæ— æ³•åœ¨åˆ›å»ºEBOæ—¶åŒæ—¶ä¼ é€’æ•°æ®ï¼Œè¦å¦å¤–è°ƒç”¨setDataï¼ŒåŸå› æœªçŸ¥
         batch_data_.yuv_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(yuv_indices, batch_data_.max_indices_));
         batch_data_.yuv_ebo_->setData(yuv_indices, batch_data_.max_indices_);
         batch_data_.yuv_vao_->setIndexBuffer(batch_data_.yuv_ebo_);
@@ -320,7 +321,7 @@ void DonutSceneRenderer::initForSpriteRender()
             offset += 4;
         }
 
-        // ÕâÀïÓÃQtµÄOpenGL½Ó¿Ú£¬ÎŞ·¨ÔÚ´´½¨EBOÊ±Í¬Ê±´«µİÊı¾İ£¬ÒªÁíÍâµ÷ÓÃsetData£¬Ô­ÒòÎ´Öª
+        // è¿™é‡Œç”¨Qtçš„OpenGLæ¥å£ï¼Œæ— æ³•åœ¨åˆ›å»ºEBOæ—¶åŒæ—¶ä¼ é€’æ•°æ®ï¼Œè¦å¦å¤–è°ƒç”¨setDataï¼ŒåŸå› æœªçŸ¥
         batch_data_.rect_ebo_ = std::make_shared<Donut::OpenGLIndexBuffer>(Donut::OpenGLIndexBuffer(rectangle_indices, batch_data_.max_indices_));
         batch_data_.rect_ebo_->setData(rectangle_indices, batch_data_.max_indices_);
         batch_data_.rect_vao_->setIndexBuffer(batch_data_.rect_ebo_);
@@ -489,7 +490,7 @@ void DonutSceneRenderer::drawTexturedRectangle(glm::vec3 position, glm::vec2 siz
 
     for (uint32_t i = 4; i < batch_data_.texture_index_; i++)
     {
-        // »ñÈ¡rawÖ¸Õë£¬È»ºó½âÒıÓÃ£¬ÒÔµ÷ÓÃoperator==(const Texture& other)
+        // è·å–rawæŒ‡é’ˆï¼Œç„¶åè§£å¼•ç”¨ï¼Œä»¥è°ƒç”¨operator==(const Texture& other)
         if (*batch_data_.texture_slots_[i].get() == *texture.get())
         //if (*batch_data_.texture_slots_[i].get() == *cat_texture.get())
         {
@@ -701,17 +702,17 @@ void DonutSceneRenderer::updateYuvTextures(int width, int height, std::shared_pt
 
     if (!y_texture)
     {
-        y_texture = std::make_shared<Donut::OpenGLTexture2D>(width, height, TextureFormat::TEXTURE_FORMAT_YUV420);
+        y_texture = std::make_shared<Donut::OpenGLTexture2D>(width, height, TextureFormat::TEXTURE_FORMAT_YUV420P);
     }
 
     if (!u_texture)
     {
-        u_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+        u_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
     }
 
     if (!v_texture)
     {
-        v_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
+        v_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
     }
 
     y_texture->bind(1);
@@ -724,6 +725,62 @@ void DonutSceneRenderer::updateYuvTextures(int width, int height, std::shared_pt
     v_texture->setData(v_data, v_size);
 
     //window_->endExternalCommands();
+}
+
+void DonutSceneRenderer::updateYuvTextures(int width, int height, int color_space, TextureFormat format, std::shared_ptr<Donut::OpenGLTexture2D>& y_texture, void* y_data, uint32_t y_size, std::shared_ptr<Donut::OpenGLTexture2D>& u_texture, void* u_data, uint32_t u_size, std::shared_ptr<Donut::OpenGLTexture2D>& v_texture, void* v_data, uint32_t v_size)
+{
+    TextureFormat texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P;
+    int pixel_format = 0;
+    switch (format)
+    {
+        case TextureFormat::TEXTURE_FORMAT_YUV420P:
+        {
+            pixel_format = 0;
+            break;
+        }
+        case TextureFormat::TEXTURE_FORMAT_YUVJ420P:
+        {
+            pixel_format = 1;
+            break;
+        }
+        case TextureFormat::TEXTURE_FORMAT_YUV420P10LE:
+        {
+            pixel_format = 2;
+            break;
+        }
+    }
+
+
+    GLint pixel_format_loc = OPENGL_EXTRA_FUNCTIONS(glGetUniformLocation(batch_data_.yuv_shader_->getId(), "pixel_format"));
+    OPENGL_EXTRA_FUNCTIONS(glUniform1i(pixel_format_loc, pixel_format));
+
+    GLint color_space_loc = OPENGL_EXTRA_FUNCTIONS(glGetUniformLocation(batch_data_.yuv_shader_->getId(), "color_space"));
+    OPENGL_EXTRA_FUNCTIONS(glUniform1i(color_space_loc, color_space));
+
+    if (!y_texture)
+    {
+        y_texture = std::make_shared<Donut::OpenGLTexture2D>(width, height, format);
+    }
+
+    if (!u_texture)
+    {
+        u_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, format);
+    }
+
+    if (!v_texture)
+    {
+        v_texture = std::make_shared<Donut::OpenGLTexture2D>(width / 2, height / 2, format);
+    }
+
+
+    y_texture->bind(1);
+    y_texture->setData(y_data, width, height, format);
+
+    u_texture->bind(2);
+    u_texture->setData(u_data, width / 2, height / 2, format);
+
+    v_texture->bind(3);
+    v_texture->setData(v_data, width / 2, height / 2, format);
 }
 
 void DonutSceneRenderer::updateSpriteTexture(const std::string& path, std::shared_ptr<Donut::OpenGLTexture2D>& texture)
@@ -790,7 +847,7 @@ void DonutSceneRenderer::flush()
     }
 
 
-    // ÒÔÏÂ²âÊÔflat rect »æÖÆ
+    // ä»¥ä¸‹æµ‹è¯•flat rect ç»˜åˆ¶
     //batch_data_.rect_vao_->bind();
     //batch_data_.rect_vbo_->bind();
     ////batch_data_.rect_shader_->bind();
@@ -873,15 +930,15 @@ void DonutSceneRenderer::endScene()
 
 void DonutSceneRenderer::calculateAspectRatio()
 {
-    // ¼ÆËãÊÓ¿Ú¿í¸ß±ÈºÍÊÓÆµ¿í¸ß±È
+    // è®¡ç®—è§†å£å®½é«˜æ¯”å’Œè§†é¢‘å®½é«˜æ¯”
     float viewportAspectRatio = static_cast<float>(viewport_size_.width()) / static_cast<float>(viewport_size_.height());
     float videoAspectRatio = static_cast<float>(1024) / static_cast<float>(600);
 
-    // ¼ÆËãËõ·Å±ÈÀı
+    // è®¡ç®—ç¼©æ”¾æ¯”ä¾‹
     float scale = 1.0f;
     glm::vec2 translation = glm::vec2(0.0f);
     if (viewportAspectRatio > videoAspectRatio) {
-        // ÊÓ¿Ú½Ï¿í£¬ÊÓÆµÉÏÏÂÁôºÚ±ß
+        // è§†å£è¾ƒå®½ï¼Œè§†é¢‘ä¸Šä¸‹ç•™é»‘è¾¹
         scale = static_cast<float>(viewport_size_.height()) / static_cast<float>(600);
         translation.x = (viewport_size_.width() - 1024 * scale) / 2.0f;
 
@@ -889,7 +946,7 @@ void DonutSceneRenderer::calculateAspectRatio()
         //translation.y = (viewport_size_.height() - 600 * scale) / 2.0f;
     }
     else {
-        // ÊÓ¿Ú½Ï¸ß£¬ÊÓÆµ×óÓÒÁôºÚ±ß
+        // è§†å£è¾ƒé«˜ï¼Œè§†é¢‘å·¦å³ç•™é»‘è¾¹
         scale = static_cast<float>(viewport_size_.width()) / static_cast<float>(1024);
         translation.y = (viewport_size_.height() - 600 * scale) / 2.0f;
 
@@ -897,10 +954,10 @@ void DonutSceneRenderer::calculateAspectRatio()
         //translation.x = (viewport_size_.width() - 1024 * scale) / 2.0f;
     }
 
-    // ´´½¨±ä»»¾ØÕó
-    glm::mat4 transformMatrix = glm::mat4(1.0f); // ³õÊ¼»¯Îªµ¥Î»¾ØÕó
-    transformMatrix = glm::translate(transformMatrix, glm::vec3(translation, 0.0f)); // Æ½ÒÆ
+    // åˆ›å»ºå˜æ¢çŸ©é˜µ
+    glm::mat4 transformMatrix = glm::mat4(1.0f); // åˆå§‹åŒ–ä¸ºå•ä½çŸ©é˜µ
+    transformMatrix = glm::translate(transformMatrix, glm::vec3(translation, 0.0f)); // å¹³ç§»
     //transformMatrix = glm::rotate(transformMatrix, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f)); // Ëõ·Å
+    transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f)); // ç¼©æ”¾
     batch_data_.rect_shader_->uploadUniformMat4fv("u_translation", transformMatrix);
 }

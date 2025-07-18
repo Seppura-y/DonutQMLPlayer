@@ -218,7 +218,7 @@ namespace Donut
 			cond_.wait(lock);
 			//if (cond_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout)
 			//{
-			//	// 处理超时情况
+			//	// 澶勭悊瓒呮椂鎯呭喌
 			//	return nullptr;
 			//}
 		}
@@ -239,7 +239,7 @@ namespace Donut
 			cond_.wait(lock);
 			//if (cond_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout)
 			//{
-			//	// 处理超时情况
+			//	// 澶勭悊瓒呮椂鎯呭喌
 			//	//lock.unlock();
 			//	return std::make_shared<DonutAVFrame>();
 			//}

@@ -38,17 +38,17 @@ public:
 
     int audioDecodeFrame();
 private:
-    long long cur_pts_ = 0;     //µ±Ç°²¥·ÅÎ»ÖÃ
-    long long last_ms_ = 0;     //ÉÏ´ÎµÄÊ±¼ä´Á
-    long long pause_begin_ = 0; //ÔİÍ£¿ªÊ¼Ê±¼ä´Á
+    long long cur_pts_ = 0;     //å½“å‰æ’­æ”¾ä½ç½®
+    long long last_ms_ = 0;     //ä¸Šæ¬¡çš„æ—¶é—´æˆ³
+    long long pause_begin_ = 0; //æš‚åœå¼€å§‹æ—¶é—´æˆ³
 
     soundtouch::SoundTouch* sound_touch_ = nullptr;
 
-    // ¾­soundtouch´¦ÀíºóµÄÒôÆµÊı¾İ sample rate * channels * sizeof(short)
+    // ç»soundtouchå¤„ç†åçš„éŸ³é¢‘æ•°æ® sample rate * channels * sizeof(short)
     soundtouch::SAMPLETYPE* st_source_buffer_ = nullptr;
     soundtouch::SAMPLETYPE* st_resample_buffer_ = nullptr;
 
-    // ffmpeg½Ó¿ÚÖØ²ÉÑùºóµÄÒôÆµÊı¾İ sample rate * channels * sizeof(short)
+    // ffmpegæ¥å£é‡é‡‡æ ·åçš„éŸ³é¢‘æ•°æ® sample rate * channels * sizeof(short)
     uint8_t* resampled_buffer_ = nullptr;
     uint8_t* processed_buffer_ = nullptr;
 
@@ -67,7 +67,7 @@ private:
     int nb_per_second_ = 0;
     int nb_storage_ = 0;
 
-    // SDL_OpenAudioDevice·µ»ØµÄSDL_AudioSpecÖĞ¼ÇÂ¼
+    // SDL_OpenAudioDeviceè¿”å›çš„SDL_AudioSpecä¸­è®°å½•
     int audio_hw_buf_size_ = 0;
 
     int audio_write_buf_size_ = 0;

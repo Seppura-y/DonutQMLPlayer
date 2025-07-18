@@ -286,9 +286,9 @@ Control
                     playPauseButtonClicked(isChecked)
                 }
 
-                //onButtonChecked ºÍ onButtonClicked Ïà»¥×÷ÓÃ£º
-                //µ±°´Å¥±»µã»÷Ê±£¬checked ×´Ì¬»á×Ô¶¯¸üĞÂ£¬´¥·¢ onButtonChecked¡£
-                //ÔÚ onButtonClicked ÖĞÓÖÊÖ¶¯¸Ä±ä checked ×´Ì¬£¬Õâ»áµ¼ÖÂ¶îÍâµÄ onButtonChecked ´¥·¢¡£
+                //onButtonChecked å’Œ onButtonClicked ç›¸äº’ä½œç”¨ï¼š
+                //å½“æŒ‰é’®è¢«ç‚¹å‡»æ—¶ï¼Œchecked çŠ¶æ€ä¼šè‡ªåŠ¨æ›´æ–°ï¼Œè§¦å‘ onButtonCheckedã€‚
+                //åœ¨ onButtonClicked ä¸­åˆæ‰‹åŠ¨æ”¹å˜ checked çŠ¶æ€ï¼Œè¿™ä¼šå¯¼è‡´é¢å¤–çš„ onButtonChecked è§¦å‘ã€‚
                 //onButtonClicked:
                 //{
                 //    if(controlBar.isPlaying)

@@ -15,6 +15,7 @@ extern"C"
 {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
 }
 
 #include <chrono>
@@ -195,60 +196,209 @@ namespace Donut
         //this->start();
     }
 
-    void DonutScene::onUpdate()
+    //void DonutScene::onUpdate()
+    //{
+    //    std::lock_guard<std::mutex> lock(mtx_);
+    //    if (!is_paused_)
+    //    {
+    //        if (!frame_updated_ && decoded_frame_ && decoded_frame_->data[0])
+    //        {
+    //            TextureFormat texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P;
+    //            int pixel_format = 0;
+    //            int color_space = 0;
+    //            color_space = decoded_frame_->colorspace == AVCOL_SPC_BT709 ? 1 : 1;
+
+    //            if (decoded_frame_->format == AV_PIX_FMT_YUV420P)
+    //            {
+    //                if (!y_texture_)
+    //                {
+    //                    y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+
+    //                if (!u_texture_)
+    //                {
+    //                    u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+
+    //                if (!v_texture_)
+    //                {
+    //                    v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+
+    //                //y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
+    //                //u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
+    //                //v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
+
+    //            }
+    //            else if (decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
+    //            {
+    //                pixel_format = 1;
+    //                if (!y_texture_)
+    //                {
+    //                    y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+
+    //                if (!u_texture_)
+    //                {
+    //                    u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+
+    //                if (!v_texture_)
+    //                {
+    //                    v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P);
+    //                }
+    //            }
+    //            else if (decoded_frame_->format == AV_PIX_FMT_YUV420P10LE)
+    //            {
+    //                pixel_format = 2;
+    //                texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P10LE;
+    //                if (!y_texture_)
+    //                {
+    //                    y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420P10LE);
+    //                }
+
+    //                if (!u_texture_)
+    //                {
+    //                    u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P10LE);
+    //                }
+
+    //                if (!v_texture_)
+    //                {
+    //                    v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420P10LE);
+    //                }
+
+    //                //y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
+    //                //u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
+    //                //v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
+    //            }
+    //            s_renderer_->updateYuvTextures(
+    //                decoded_frame_->width, decoded_frame_->height,
+    //                color_space,
+    //                texture_format,
+    //                y_texture_, decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height,
+    //                u_texture_, decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2,
+    //                v_texture_, decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2
+    //            );
+    //            
+
+
+    //            frame_updated_ = true;
+    //        }
+
+    //        av_frame_unref(decoded_frame_);
+    //    }
+
+    //    s_renderer_->beginScene(scene_camera_);
+
+    //    if (test_texture_)
+    //    {
+    //        s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+    //    }
+
+    //    if (y_texture_ && u_texture_ && v_texture_)
+    //    {
+    //        glm::vec4 position = glm::vec4{ 0.0f, 0.0f, 0.4f, 1.0f };
+    //        glm::mat4 transform = glm::mat4(1.0f);
+    //        position = position * transform;
+    //        //s_renderer_->drawRotatedYuvData(angle_, glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
+    //        s_renderer_->drawRotatedYuvData(glm::vec3(angle_x_, angle_y_, angle_z_), glm::vec3(position), glm::vec2{1.0f, 1.0f}, y_texture_, u_texture_, v_texture_);
+    //    }
+
+    //    s_renderer_->endScene();
+    //}
+
+
+
+void DonutScene::onUpdate()
+{
+    std::lock_guard<std::mutex> lock(mtx_);
+    if (!is_paused_)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
-        if (!is_paused_)
+        if (!frame_updated_ && decoded_frame_ && decoded_frame_->data[0])
         {
-            if (!frame_updated_ && decoded_frame_ && decoded_frame_->data[0])
+            TextureFormat texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P;
+            int pixel_format = 0;
+            int color_space = 0;
+
+            // 设置像素格式和颜色空间
+            if (decoded_frame_->format == AV_PIX_FMT_YUV420P)
             {
-                if (decoded_frame_->format == AV_PIX_FMT_YUV420P ||
-                    decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
-                {
-                    if (!y_texture_)
-                    {
-                        y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-
-                    if (!u_texture_)
-                    {
-                        u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-
-                    if (!v_texture_)
-                    {
-                        v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, TextureFormat::TEXTURE_FORMAT_YUV420);
-                    }
-
-                    y_texture_->setData(decoded_frame_->data[0], decoded_frame_->linesize[0] * decoded_frame_->height);
-                    u_texture_->setData(decoded_frame_->data[1], decoded_frame_->linesize[1] * decoded_frame_->height / 2);
-                    v_texture_->setData(decoded_frame_->data[2], decoded_frame_->linesize[2] * decoded_frame_->height / 2);
-                }
-
-                frame_updated_ = true;
+                texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P;
+                pixel_format = 0;
+                color_space = decoded_frame_->colorspace == AVCOL_SPC_BT709 ? 1 : 0; // BT.601 常见于标清
+            }
+            else if (decoded_frame_->format == AV_PIX_FMT_YUVJ420P)
+            {
+                texture_format = TextureFormat::TEXTURE_FORMAT_YUVJ420P;
+                pixel_format = 1;
+                color_space = decoded_frame_->colorspace == AVCOL_SPC_BT709 ? 1 : 0;
+            }
+            else if (decoded_frame_->format == AV_PIX_FMT_YUV420P10LE)
+            {
+                texture_format = TextureFormat::TEXTURE_FORMAT_YUV420P10LE;
+                pixel_format = 2;
+                color_space = decoded_frame_->colorspace == AVCOL_SPC_BT709 ? 1 : 0; // BT.709
             }
 
-            av_frame_unref(decoded_frame_);
+            // 处理 linesize 填充
+            AVPixelFormat av_format = (texture_format == TextureFormat::TEXTURE_FORMAT_YUV420P10LE ? AV_PIX_FMT_YUV420P10LE :
+                texture_format == TextureFormat::TEXTURE_FORMAT_YUVJ420P ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P);
+
+            SwsContext* sws_ctx = sws_getContext(decoded_frame_->width, decoded_frame_->height, av_format,
+                decoded_frame_->width, decoded_frame_->height, av_format,
+                SWS_BILINEAR, nullptr, nullptr, nullptr);
+            AVFrame* aligned_frame = av_frame_alloc();
+            aligned_frame->width = decoded_frame_->width;
+            aligned_frame->height = decoded_frame_->height;
+            aligned_frame->format = av_format;
+            av_frame_get_buffer(aligned_frame, 0);
+
+            sws_scale(sws_ctx, decoded_frame_->data, decoded_frame_->linesize, 0, decoded_frame_->height,
+                aligned_frame->data, aligned_frame->linesize);
+
+            // 创建纹理
+            if (!y_texture_)
+                y_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width, decoded_frame_->height, texture_format);
+            if (!u_texture_)
+                u_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, texture_format);
+            if (!v_texture_)
+                v_texture_ = std::make_shared<Donut::OpenGLTexture2D>(decoded_frame_->width / 2, decoded_frame_->height / 2, texture_format);
+
+            // 更新纹理（使用对齐数据）
+            s_renderer_->updateYuvTextures(
+                decoded_frame_->width, decoded_frame_->height, color_space, texture_format,
+                y_texture_, aligned_frame->data[0], aligned_frame->linesize[0] * decoded_frame_->height,
+                u_texture_, aligned_frame->data[1], aligned_frame->linesize[1] * decoded_frame_->height / 2,
+                v_texture_, aligned_frame->data[2], aligned_frame->linesize[2] * decoded_frame_->height / 2
+            );
+
+            // 清理
+            av_frame_free(&aligned_frame);
+            sws_freeContext(sws_ctx);
+
+            frame_updated_ = true;
         }
 
-        s_renderer_->beginScene(scene_camera_);
-
-        if (test_texture_)
-        {
-            s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
-        }
-
-        if (y_texture_ && u_texture_ && v_texture_)
-        {
-            glm::vec4 position = glm::vec4{ 0.0f, 0.0f, 0.4f, 1.0f };
-            glm::mat4 transform = glm::mat4(1.0f);
-            position = position * transform;
-            //s_renderer_->drawRotatedYuvData(angle_, glm::vec3{ 0.0f, 0.0f, 0.4f }, glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
-            s_renderer_->drawRotatedYuvData(glm::vec3(angle_x_, angle_y_, angle_z_), glm::vec3(position), glm::vec2{1.0f, 1.0f}, y_texture_, u_texture_, v_texture_);
-        }
-
-        s_renderer_->endScene();
+        av_frame_unref(decoded_frame_);
     }
+
+    s_renderer_->beginScene(scene_camera_);
+
+    if (test_texture_)
+    {
+        s_renderer_->drawTexturedRectangle(glm::vec3{ 0.0f, 0.0f, 0.3f }, glm::vec2{ 1.0f, 1.0f }, test_texture_, glm::vec4{ 1.f, 1.f, 1.f, 1.f });
+    }
+
+    if (y_texture_ && u_texture_ && v_texture_)
+    {
+        glm::vec4 position = glm::vec4{ 0.0f, 0.0f, 0.4f, 1.0f };
+        glm::mat4 transform = glm::mat4(1.0f);
+        position = position * transform;
+        s_renderer_->drawRotatedYuvData(glm::vec3(angle_x_, angle_y_, angle_z_), glm::vec3(position), glm::vec2{ 1.0f, 1.0f }, y_texture_, u_texture_, v_texture_);
+    }
+
+    s_renderer_->endScene();
+}
 
 
     void DonutScene::updateHandler(void* data)

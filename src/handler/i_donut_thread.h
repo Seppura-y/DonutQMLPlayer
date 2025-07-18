@@ -22,7 +22,7 @@ namespace Donut
 
 	protected:
 		std::mutex mtx_;
-		std::thread worker_;
+		std::jthread worker_;
 
 		bool is_exit_ = true;
 		bool is_paused_ = true;
